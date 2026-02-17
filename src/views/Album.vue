@@ -323,7 +323,7 @@
 
 <script setup lang="ts">
 import CButton from "@/components/CButton.vue";
-import {computed, ComputedRef, onMounted, ref, watch} from "vue";
+import {computed, onMounted, ref, watch} from "vue";
 import CDialog from "@/components/CDialog.vue";
 import AppInput from "@/components/ui/AppInput.vue";
 import AppSelect from "@/components/ui/AppSelect.vue";
