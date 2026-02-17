@@ -1,0 +1,154 @@
+<template>
+  <div
+      class="flex flex-col bg-gray-800 w-full"
+  >
+    <div
+        class="w-full container m-auto h-20 py-2.5 px-2 2xl:px-4  text-white grid grid-cols-[1fr_auto_1fr] grid-flow-col-dense items-center shadow-md transition-colors"
+    >
+      <div class="flex items-center gap-2">
+        <i class="fas fa-industry text-3xl"></i>
+        <h2>PHOTOBOOK</h2>
+      </div>
+
+      <div
+          v-if="isDesktop"
+          class="flex items-center w-full gap-2 flex-row">
+        <router-link
+            v-for="(route, index) in mainRoutes"
+            :key="index"
+            :to="route?.path"
+            active-class="bg-gray-600"
+            class="py-2 px-3 gap-2 text-sm flex uppercase items-center max-lg:p-1 text-center rounded-sm hover:bg-gray-600 dark:hover:bg-gray-700 transition duration-200"
+            :class="index === mainRoutes.length - 1 ? 'hidden' : 'of-hidden'"
+        >
+          <i class="w-4 h-4" v-if="route.meta.icon" :class="route.meta.icon"></i>
+          {{ route.name }}
+        </router-link>
+
+      </div>
+      <div
+          class="flex items-center justify-end"
+      >
+        <CButton
+            v-if="isDesktop"
+            type="button"
+            text="Chiqish"
+            variant="danger"
+            is-has-fa-icon
+            faClass="fa-solid fa-arrow-right-from-bracket"
+            @click="backToLogin"
+        />
+      </div>
+      <div class="flex justify-end">
+        <div
+            class="burger-menu"
+            v-if="!isDesktop"
+            @click="toggleBurgerMenu"
+            :class="{ active: isMenuOpen }"
+        >
+          <span></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { useRouter } from "vue-router";
+import CButton from "@/components/CButton.vue";
+import {computed, ComputedRef} from "vue";
+
+const router = useRouter();
+
+const emits = defineEmits(["toggleMenu"]);
+const props = defineProps({
+  routes: {
+    type: Array,
+    required: true,
+  },
+  isMenuOpen: {
+    type: Boolean,
+    default: false,
+  }
+})
+
+const mainRoutes: ComputedRef = computed(() => {
+
+  return props.routes
+
+})
+// const isMenuOpen = ref(false);
+
+const toggleBurgerMenu = () => {
+  emits("toggleMenu");
+}
+
+
+// const getMenuProps = computed<MenuItem[]>(() => {
+//   return props.routes as MenuItem[];
+// });
+
+const backToLogin = () => {
+  router.push("/login");
+}
+
+const openToProfile = () => {
+  router.push("/profile");
+}
+const isDesktop = computed(() => window.innerWidth > 768);
+
+</script>
+
+<style scoped>
+
+.burger-menu {
+  position: relative;
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
+  z-index: 100;
+
+  span {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: 3px;
+    background-color: #ffffff;
+    transition: background-color 0.3s ease-in-out;
+    top: 15px;
+
+    &::before,
+    &::after {
+      content: '';
+      position: absolute;
+      width: 100%;
+      height: 3px;
+      background-color: #ffffff;
+      transition: transform 0.3s ease-in-out;
+      left: 0;
+    }
+
+    &::before {
+      top: -10px;
+    }
+
+    &::after {
+      top: 10px;
+    }
+  }
+
+  &.active {
+    span {
+      background-color: transparent;
+
+      &::before {
+        transform: translateY(10px) rotate(45deg);
+      }
+
+      &::after {
+        transform: translateY(-10px) rotate(-45deg);
+      }
+    }
+  }
+}
+</style>
