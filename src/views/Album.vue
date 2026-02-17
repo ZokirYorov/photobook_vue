@@ -345,7 +345,6 @@ const formStatus = ref<string | ''>('');
 const formFilter = ref<string | ''>('');
 const formData = ref<string | ''>('');
 
-// const orderItems = computed(() => dataStore.state.albums )
 
 const filteredAlbums = computed(() => {
   let data = dataStore.state.albums
