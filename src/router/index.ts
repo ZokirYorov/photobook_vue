@@ -1,8 +1,8 @@
 import {createRouter, createWebHashHistory, RouteRecordRaw} from "vue-router";
-import {authService} from "@/service/authService";
+// import {authService} from "@/service/authService";
 
 
-const routes: Array<RouteRecordRaw> = [
+const routes = [
     {
         path: "/",
         name: "Main",

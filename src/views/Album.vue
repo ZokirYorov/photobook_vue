@@ -180,7 +180,7 @@
       </div>
     </CDialog>
     <div class="bg-white w-full flex overflow-x-auto flex-col p-4 min-h-0 rounded-xl shadow">
-      <h2 class="text-2xl font-semibold">Buyurtmalar ro'yxati</h2>
+      <h2 class="text-2xl font-semibold">Buyurtmalar jadvali</h2>
       <div class="flex w-full items-end gap-2 py-2">
         <AppSelect
             v-model="formStatus"
@@ -358,14 +358,17 @@ const filteredAlbums = computed(() => {
         item.employeeName?.toLowerCase().includes(search) ||
         item.pageNumber?.toFixed().includes(search) ||
         item.termData?.toString().includes(search) ||
-        item.createdData?.toString().includes(search) ||
+        item.createdData?.toLowerCase().includes(search) ||
         item.receiverName?.toLowerCase().includes(search)
     )
   }
 
-  return [...data].sort((a, b) =>
-      new Date(b.createdData).getTime() - new Date(a.createdData).getTime()
-  )
+  // return [...data].sort((a: any, b: any) => new Date(b.createdData).getMilliseconds() - new Date(a.createdData).getMilliseconds());
+  return [...data].sort((a, b) => {
+    const dateA =  new Date(a.createdData).getMilliseconds();
+    const dateB =  new Date(b.createdData).getMilliseconds();
+    return dateB - dateA  // oxirgi qo'shilgan birinchi
+  })
 })
 
 const allUsers = ref([
