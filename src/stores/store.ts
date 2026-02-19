@@ -4,7 +4,7 @@ import {
     CategoryForm,
     ExpensesForm, IForm,
     IFormData,
-    IItems, UserForm,
+    IItems, IPicture, Order, UserForm,
 } from '@/typeModules/useModules';
 import {ref, UnwrapRef} from "vue";
 import { collection, addDoc, query, Query, updateDoc, orderBy, where, getDocs, deleteDoc, doc } from 'firebase/firestore'
@@ -15,33 +15,56 @@ export const useStore = defineStore('item', () => {
 
         users: [] as UserForm[],
         items: [] as IItems[],
+        vignette: [] as Order[],
         albums: [] as AllOrders[],
+        pictures: [] as IPicture[],
         categories: [] as CategoryForm[],
         expenses: [] as ExpensesForm[],
         customers: [] as IFormData[],
     });
 
-    const loadAlbums = async (status?: string) => {
+    const loadCollection = async <T>(
+        collectionName: string,
+        filters?: {
+            status?: string | null
+            from?: string | null
+            to?: string | null
+        }
+    ): Promise<T[]> => {
         try {
-            const baseRef = collection(db, "albums")
+            const baseRef = collection(db, collectionName)
 
-            let q: Query = baseRef
+            const conditions: any[] = []
 
-            if (status) {
-                q = query(baseRef, where("status", "==", status))
+            if (filters?.status) {
+                conditions.push(where("status", "==", filters.status))
             }
+
+            if (filters?.from) {
+                conditions.push(where("createdData", "==", filters.from))
+            }
+
+            if (filters?.to) {
+                conditions.push(where("termData", "==", filters.to))
+            }
+
+            const q = conditions.length
+                ? query(baseRef, ...conditions)
+                : baseRef
 
             const snap = await getDocs(q)
 
-            state.value.albums = snap.docs.map(doc => ({
+            return snap.docs.map(doc => ({
                 id: doc.id,
                 ...doc.data()
-            })) as AllOrders[]
+            })) as T[]
 
         } catch (error) {
             console.log(error)
+            return []
         }
     }
+
 
     const loadComments = async () => {
         const snap = await getDocs(collection(db, 'customers'))
@@ -165,6 +188,68 @@ export const useStore = defineStore('item', () => {
         state.value.albums = state.value.albums.filter(album => album.id !== id)
     }
 
+    const loadGetOrders = async () => {
+        const snap = await getDocs(collection(db, 'vignette'))
+        state.value.vignette = snap.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+        })) as Order[]
+    }
+
+    const addOrder = async (item: Order) => {
+        const { id, ...itemData } = item;
+        await addDoc(collection(db, 'vignette'), {
+            ...itemData,
+            createdAt: Date.now()
+        })
+        await loadGetOrders()
+    }
+
+    const updateOrder = async (id: string, item: Order) => {
+        const { id: _, ...itemData } = item;
+        await updateDoc(doc(db, 'vignette', id), {
+            ...itemData,
+            updatedAt: Date.now()
+        })
+        await loadGetOrders()
+    }
+
+    const deleteOrder = async (id: string) => {
+        await deleteDoc(doc(db, 'vignette', id))
+        state.value.vignette = state.value.vignette.filter(v => v.id !== id)
+    }
+
+    const loadGetPictures = async () => {
+        const snap = await getDocs(collection(db, 'pictures'))
+        state.value.pictures = snap.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+        })) as IPicture[]
+    }
+
+    const addPictures = async (item: IPicture) => {
+        const { id, ...itemData } = item;
+        await addDoc(collection(db, 'pictures'), {
+            ...itemData,
+            createdAt: Date.now()
+        })
+        await loadGetPictures()
+    }
+
+    const updatePictures = async (id: string, item: IPicture) => {
+        const { id: _, ...itemData } = item;
+        await updateDoc(doc(db, 'pictures', id), {
+            ...itemData,
+            updatedAt: Date.now()
+        })
+        await loadGetPictures()
+    }
+
+    const deletePictures = async (id: string) => {
+        await deleteDoc(doc(db, 'pictures', id))
+        state.value.pictures = state.value.pictures.filter(p => p.id !== id)
+    }
+
     const loadMaterials = async () => {
         const q = query(
             collection(db, 'materials'),
@@ -213,10 +298,12 @@ export const useStore = defineStore('item', () => {
 
     return {
         state,
-        loadAlbums,
+        loadCollection,
         loadComments, addComment, updateComment, deleteComment, getAllOrders,
         addUser, updateUser, deleteUser, loadGetUsers,
         loadMaterials, addMaterial, updateMaterial, deleteMaterial,
         loadGetAlbum, addAlbum, updateAlbum, deleteAlbum,
+        loadGetOrders, addOrder, updateOrder, deleteOrder,
+        loadGetPictures, addPictures, updatePictures, deletePictures,
     }
 })

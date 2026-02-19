@@ -8,10 +8,6 @@ export interface UserLogin {
     email: string;
     password: string;
 }
-export interface Paging {
-    page: number;
-    size: number;
-}
 
 export interface IItems {
     id: string | null;
@@ -34,6 +30,7 @@ export interface AllOrders {
     id: string;
     categoryName: string | null; // buyurtma turi nomi
     orderName: string; // buyurtma nomi { tuy, maktab ...,}
+    itemType: string;
     pageNumber: number | null; // betlar soni
     amountNumber: number | null; //buyurtma soni
     customerName: string; // mijoz nomi
@@ -48,6 +45,42 @@ export interface AllOrders {
     updatedAt: string | null; // yangilangan kun
 }
 
+export interface Order {
+    id: string;
+    categoryName: string | null;
+    orderName: string;
+    pageNumber: number | null;
+    amountNumber: number | null;
+    customerName: string;
+    receiverName: string;
+    employeeName: string;
+    processNumber: number | null;
+    termData: string | null;
+    status: string;
+    //doneData: number | null;
+    createdData: string;
+    createdAt: string | null;
+    updatedAt: string | null;
+}
+
+export interface IPicture {
+    id: string;
+    categoryName: string | null;
+    orderName: string;
+    itemType: string;
+    pageNumber: number | null;
+    amountNumber: number | null;
+    customerName: string;
+    receiverName: string;
+    employeeName: string;
+    processNumber: number | null;
+    termData: string | null;
+    status: string;
+    //doneData: number | null;
+    createdData: string;
+    createdAt: string | null;
+    updatedAt: string | null;
+}
 export interface UserForm {
     id: string;
     fullName: string;
@@ -56,16 +89,6 @@ export interface UserForm {
     createdAt: string | null;
     updatedAt: string | null;
 }
-
-export interface Order {
-    id: number | null;
-    name: string;
-    fullName: string;
-    client: string;
-    data: string | null;
-    status: string;
-}
-
 
 export interface ExpensesForm {
     id: number | string | null;

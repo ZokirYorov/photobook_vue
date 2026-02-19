@@ -1,11 +1,11 @@
 <template>
-  <div class="flex flex-col container m-auto gap-4 p-6 min-h-screen w-full">
-    <div class="flex flex-col sm:flex-row gap-4 items-center bg-white rounded-xl p-4 justify-between w-full">
+  <div class="flex flex-col container m-auto gap-2 p-4 min-h-screen w-full">
+    <div class="flex flex-col sm:flex-row gap-4 items-center bg-white rounded-xl py-3 px-4 justify-between w-full">
       <div class="flex items-center gap-4">
-        <i class="fa-solid fa-book-open text-4xl text-blue-600"></i>
+        <img class="w-12" src="../assets/album.png" alt="">
         <div>
-          <h2 class="text-xl font-semibold uppercase text-md">Buyurtmalar</h2>
-          <p class="text-gray-600 text-md font-semibold">2 <span>ta buyurtma</span></p>
+          <h2 class="text-md font-semibold uppercase">Buyurtmalar</h2>
+          <p class="text-gray-600 text-sm font-semibold">{{pageProcessed}} dona</p>
         </div>
       </div>
       <CButton
@@ -16,10 +16,10 @@
       />
     </div>
     <div
-        class="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 bg-gray-100 rounded-xl p-4 justify-between"
+        class="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 bg-gray-200 rounded-xl p-2 justify-between"
     >
       <div
-          class="flex flex-col gap-4 bg-white rounded-xl p-4 justify-between"
+          class="flex flex-col gap-4 bg-white rounded-xl py-2 px-4 justify-between"
           v-for="(cat, index) in categoryType"
           :key="index"
       >
@@ -32,23 +32,37 @@
         <div
             class="flex gap-4 items-center justify-between"
         >
-          <div class="flex flex-col">
-            <div class="gap-2 flex items-center font-semibold">
-              <span class="text-gray-400">Buyurtma</span>
-              <span class="text-xl text-blue-600">
+          <div class="flex flex-col w-full border-r-2 border-gray-200">
+            <div class="gap-1 flex flex-col items-start font-semibold">
+              <span class="text-gray-600 text-sm flex">Jami</span>
+              <div class="flex text-md gap-2 items-center">
+                <span class="text-blue-600">
                 {{getCategoryCount(cat.value)}}
-              </span>
-              <span class="text-gray-400 text-lg">dona</span>
+                </span>
+                <span class="text-gray-400">dona</span>
+              </div>
             </div>
-
           </div>
-          <div class="flex flex-col">
-            <div class="gap-2 flex items-center font-semibold">
-              <span class="text-gray-400">Bajarilgan</span>
-              <span class="text-xl text-blue-600">
+          <div class="flex flex-col w-full border-r-2 border-gray-200">
+            <div class="gap-1 flex flex-col items-center font-semibold">
+              <span class="text-gray-600 text-sm">Bajarilgan</span>
+              <div class="flex text-md gap-2 items-center">
+                <span class="text-blue-600">
                 {{getCount(cat.value)}}
-              </span>
-              <span class="text-gray-400 text-lg">dona</span>
+                </span>
+                <span class="text-gray-400">dona</span>
+              </div>
+            </div>
+          </div>
+          <div class="flex flex-col w-full">
+            <div class="gap-2 flex flex-col items-center font-semibold">
+              <span class="text-gray-600 text-sm">Qoldi</span>
+              <div class="flex text-md gap-2 items-center">
+                <span class="text-blue-600">
+                {{getRemaining(cat.value)}}
+                </span>
+                <span class="text-gray-400">dona</span>
+              </div>
             </div>
           </div>
         </div>
@@ -113,24 +127,38 @@
                 v-model="itemForm.processNumber"
             />
           </div>
-          <AppInput
-              type="text"
-              placeholder="Masalan: Maktab"
-              label="Nomi"
-              v-model="itemForm.orderName"
-          />
-          <AppInput
-              type="text"
-              v-model="itemForm.customerName"
-              placeholder="Ism kiriting"
-              label="Mijoz ismi"
-          />
-          <AppInput
-              v-model="itemForm.receiverName"
-              placeholder="Ism kiriting"
-              type="text"
-              label="Qabul qiluvchi"
-          />
+          <div class="flex items-center justify-between w-full gap-2">
+            <AppInput
+                type="text"
+                placeholder="Masalan: Maktab"
+                label="Nomi"
+                class="w-full"
+                v-model="itemForm.orderName"
+            />
+            <AppInput
+                type="text"
+                placeholder="Masalan: Qora koja"
+                label="Turi"
+                class="w-full"
+                v-model="itemForm.itemType"
+            />
+          </div>
+          <div class="flex w-full gap-2 items-center justify-between">
+            <AppInput
+                type="text"
+                v-model="itemForm.customerName"
+                placeholder="Ism kiriting"
+                label="Mijoz ismi"
+                class="w-full"
+            />
+            <AppInput
+                v-model="itemForm.receiverName"
+                placeholder="Ism kiriting"
+                type="text"
+                class="w-full"
+                label="Qabul qiluvchi"
+            />
+          </div>
           <AppSelect
               v-model="itemForm.employeeName"
               :options="allUsers"
@@ -172,69 +200,73 @@
             />
             <CButton
                 type="submit"
-                text="Saqlash"
+                :text="isEditing ? 'Yangilash' : 'Saqlash'"
                 variant="success"
             />
           </div>
         </form>
       </div>
     </CDialog>
-    <div class="bg-white w-full flex overflow-x-auto flex-col p-4 min-h-0 rounded-xl shadow">
-      <h2 class="text-2xl font-semibold">Buyurtmalar jadvali</h2>
-      <div class="flex w-full items-end gap-2 py-2">
-        <AppSelect
-            v-model="formStatus"
-            :options="itemStatus"
-            disabledValue="Barcha holat"
-            label=""
-            has-reset
-            resetText="Hammasi"
-            style="width: 30%"
-        />
-        <AppInput
-            v-model="formFilter"
-            type="search"
-            label=""
-            class="w-full"
-            style="width: 30%"
-            placeholder="Qidirish..."
-        />
-        <AppInput
-            v-model="formData"
-            type="date"
-            label=""
-        />
-        <CButton
-            type="button"
-            text="Bekor qilish"
-            variant="ghost-accent"
-            @click="closeFilter"
-            class="mb-1"
-        />
+    <div class="bg-white w-full flex overflow-x-auto overflow-y-auto flex-col px-4 py-2 gap-3 min-h-0 rounded-xl shadow">
+      <div class="flex flex-col w-full border-b-2 border-gray-200">
+        <h2 class="text-2xl font-semibold">Buyurtmalar jadvali</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-5 w-[80%] items-end gap-4 py-2">
+          <AppSelect
+              v-model="formStatus"
+              :options="itemStatus"
+              disabledValue="Barcha holat"
+              label="Holat"
+              has-reset
+              resetText="Hammasi"
+          />
+          <AppInput
+              v-model="formFilter"
+              type="search"
+              label="Qidirish"
+              placeholder="Qidirish..."
+          />
+          <AppInput
+              v-model="formData"
+              type="date"
+              label="Qabul sanasi"
+          />
+          <AppInput
+              v-model="endData"
+              type="date"
+              label="Tugash sanasi"
+          />
+          <CButton
+              type="button"
+              text="Tozalash"
+              variant="ghost-accent"
+              @click="closeFilter"
+              class="mb-1"
+          />
+        </div>
       </div>
       <table
-          class="w-full rounded">
+          class="w-full rounded table-auto">
         <colgroup>
-          <col style="width: 5%">
+          <col style="width: 2%">
           <col style="width: 13%">
           <col style="width: 12%">
           <col style="width: 12%">
           <col style="width: 13%">
-          <col style="width: 12%">
+          <col style="width: 14%">
           <col style="width: 10%">
           <col style="width: 10%">
-          <col style="width: 10%">
-          <col style="width: 10%">
+          <col style="width: 8%">
+          <col style="width: 6%">
         </colgroup>
-        <thead class="bg-gray-200 rounded-2xl border-b border-gray-600">
+        <thead class="bg-gray-200 rounded-2xl border-b border-gray-600 tracking-wider">
         <tr>
           <th class="px-2 py-3 text-start">№</th>
           <th class="p-2 text-start">Buyurtma nomi</th>
           <th class="p-2 text-start">Mijoz</th>
           <th class="p-2 text-start">Qabul qilgan</th>
           <th class="p-2 text-start">Mas'ul</th>
-          <th class="p-2 px-4 text-start">Jarayon</th>
-          <th class="p-2 text-start">Sana</th>
+          <th class="py-2 px-4 text-start">Jarayon</th>
+          <th class="p-3 text-start">Sana</th>
           <th class="p-2 text-start">Muddat</th>
           <th class="p-2 text-start">Holat</th>
           <th class="p-2 text-start">Operations</th>
@@ -243,48 +275,49 @@
         <tbody v-if="filteredAlbums.length > 0">
         <tr
             class="border-b border-gray-600 hover:bg-gray-100"
-            v-for="(order, index) in filteredAlbums" :key="index"
+            v-for="(album, index) in filteredAlbums" :key="index"
         >
-          <td class="p-2 ">{{ index + 1 }}</td>
+          <td class="py-2 px-3">{{ index + 1 }}</td>
 <!--          <td class="p-2 ">-->
 <!--            <img :src="order.imgUrl" alt=""/>-->
 <!--          </td>-->
           <td class="p-2 break-all">
-            <p class="break-all font-semibold">{{ order.orderName }}</p>
-            <p class="text-gray-600 text-sm font-semibold break-all">{{order.categoryName}}</p>
+            <p class="font-semibold">{{ album.orderName }}</p>
+            <p class="text-gray-500 text-sm font-semibold">{{album.categoryName}}</p>
+            <p class="text-blue-600 text-sm font-semibold">{{album.itemType}}</p>
           </td>
-          <td class="p-2 break-all">{{ order.customerName }}</td>
-          <td class="p-2 break-all">{{ order.receiverName }}</td>
-          <td class="p-2 pr-2 break-all">{{ order.employeeName }}</td>
-          <td class="p-2 px-4">
-            <div>
+          <td class="p-2">{{ album.customerName }}</td>
+          <td class="p-2">{{ album.receiverName }}</td>
+          <td class="p-2">{{ album.employeeName }}</td>
+          <td class="py-2 px-4">
+            <div class="flex flex-col gap-2">
               <div class="w-full bg-gray-300 h-2 rounded-full overflow-hidden">
                 <span
-                    v-if="order.processNumber && order.amountNumber"
+                    v-if="album.processNumber && album.amountNumber"
                     class="block h-full bg-blue-600 transition-all duration-300"
                     :style="{
-                    width: ((order.processNumber) / order.amountNumber * 100) + '%'
+                    width: ((album.processNumber) / album.amountNumber * 100) + '%'
                   }"
                 ></span>
               </div>
-              <div class="text-sm gap-2 mt-1 flex px-2 items-center justify-between text-gray-600">
-                <span>{{ order.processNumber || 0 }} / {{ order.amountNumber }}</span>
-                <span>{{order.pageNumber || 0}}-Bet</span>
+              <div class="text-sm mt-1 flex items-center justify-between text-gray-600">
+                <span>{{ album.processNumber || 0 }} / {{ album.amountNumber }}</span>
+                <span>{{album.pageNumber || 0}}-Bet</span>
               </div>
             </div>
           </td>
-          <td class="p-2 ">{{ formatDate(order.createdData) }}</td>
-          <td class="p-2 ">{{ formatDate(order.termData) }}</td>
-          <td class="p-2 "
+          <td class="py-2 px-1">{{ formatDate(album.createdData) }}</td>
+          <td class="p-2">{{ formatDate(album.termData) }}</td>
+          <td class="p-2"
           >
             <span
-                :class="[statusColor[order.status],
+                :class="[statusColor[album.status],
                   'rounded-xl px-3 py-1 font-semibold text-sm',
                 ]">
-              {{ order.status }}
+              {{ album.status }}
             </span>
           </td>
-          <td class="p-2 ">
+          <td class="py-2 px-3">
             <div
                 class="flex items-center gap-2"
             >
@@ -292,13 +325,13 @@
                   type="button"
                   text="Edit"
                   variant="ghost-accent"
-                  @click="editForm(order)"
+                  @click="editForm(album)"
               />
               <CButton
                   type="button"
                   text="Delete"
                   variant="danger"
-                  @click="deleteItem(order.id)"
+                  @click="deleteItem(album.id)"
               />
             </div>
           </td>
@@ -341,9 +374,10 @@ const isEditing = ref(false);
 const isVisible = ref(false);
 const selectedItem = ref<string | null>(null);
 const showConfirmItem = ref(false);
-const formStatus = ref<string | ''>('');
+const formStatus = ref<string | null>(null);
+const formData = ref<string | null>(null);
+const endData = ref<string | null>(null);
 const formFilter = ref<string | ''>('');
-const formData = ref<string | ''>('');
 
 
 const filteredAlbums = computed(() => {
@@ -354,11 +388,11 @@ const filteredAlbums = computed(() => {
 
     data = data.filter(item =>
         item.orderName?.toLowerCase().includes(search) ||
+        item.categoryName?.toLowerCase().includes(search) ||
         item.customerName?.toLowerCase().includes(search) ||
         item.employeeName?.toLowerCase().includes(search) ||
+        item.amountNumber?.toFixed().includes(search) ||
         item.pageNumber?.toFixed().includes(search) ||
-        item.termData?.toString().includes(search) ||
-        item.createdData?.toLowerCase().includes(search) ||
         item.receiverName?.toLowerCase().includes(search)
     )
   }
@@ -383,6 +417,7 @@ const itemForm = ref<AllOrders>({
   id: '',
   categoryName: '',
   orderName: '',
+  itemType: '',
   processNumber: null,
   pageNumber: null,
   amountNumber: null,
@@ -405,24 +440,32 @@ const itemForm = ref<AllOrders>({
 //   }
 //   dataStore.loadGetAlbum()
 // }
+const filters = computed(() => ({
+  status: formStatus.value,
+  from: formData.value,
+  to: endData.value
+}))
 
-watch(() => formFilter.value,  () => {
-  dataStore.loadAlbums();
-})
+watch(
+    filters,
+    async (newFilters) => {
+      dataStore.state.albums = await dataStore.loadCollection<AllOrders>(
+          "albums",
+          newFilters
+      )
+    },
+    { deep: true }
+)
 
-
-watch(formStatus, async (newStatus) => {
-  await dataStore.loadAlbums(newStatus);
-})
-
-watch(() => formData.value, () => {
-  dataStore.loadAlbums();
+watch( () => formFilter.value, async (newStatus) => {
+  await dataStore.loadCollection(newStatus);
 })
 
 const closeFilter = () => {
   formStatus.value = '';
-  formStatus.value = '';
+  formFilter.value = '';
   formData.value = '';
+  endData.value = '';
   dataStore.loadGetAlbum();
 }
 
@@ -430,10 +473,17 @@ const categoryType = [
   { id: 1, value: 'A3 Albom', text: 'A3 Albom', item: '10, 20, 30, 40'},
   { id: 2, value: 'A3 Kitob (knijniy)', text: 'A3 Kitob (knijniy)', item: '10, 20, 30, 40'},
   { id: 3, value: "O'rtacha (Sredniy)", text: "O'rtacha (Sredniy)", item: '10, 20, 30, 40' },
-  { id: 4, value: 'Kichik Albom', text: 'Kichik Albom', item: '6, 8, 10, 12, 14, 16, 18, 20, 30, 40'},
-  { id: 5, value: 'Kichik Kitob (knijniy)', text: 'Kichik Kitob (knijniy)', item: '6, 8, 10, 12, 14, 16, 18, 20, 30, 40' },
+  { id: 4, value: 'Kichik Albom', text: 'Kichik Albom', item: '6, 8, 10, 12, 14, 16, 18, 20, 30'},
+  { id: 5, value: 'Kichik Kitob (knijniy)', text: 'Kichik Kitob (knijniy)', item: '6, 8, 10, 12, 14, 16, 18, 20, 30' },
   { id: 6, value: 'Ikki tomonlama', text: 'Ikki tomonlama', item: '6, 8, 10, 12, 14, 16' },
 ]
+
+const pageProcessed = computed(() => {
+  return filteredAlbums.value.reduce(
+      (sum, item) => sum + (item.amountNumber || 0),
+      0
+  )
+})
 
 const getCategoryCount = (value: string) => {
   return filteredAlbums.value
@@ -447,12 +497,21 @@ const getCount = (value: string) => {
       .reduce((total, item) => total + (item.processNumber || 0), 0)
 }
 
+const getRemaining = (value: string) => {
+  return filteredAlbums.value
+      .filter(item => item.categoryName === value)
+      .reduce((total, item) => {
+        const totalNum = item.amountNumber || 0
+        const processed = item.processNumber || 0
+        return total + (totalNum - processed)
+      }, 0)
+}
+
 const itemStatus = ref( [
   { value: 'Kutilmoqda', text: 'Kutilmoqda' },
   { value: 'Jarayonda', text: 'Jarayonda' },
   { value: 'Bajarilgan', text: 'Bajarilgan' },
 ])
-
 
 const visibleForm = () => {
   isVisible.value = true;
@@ -493,11 +552,12 @@ const submitForm = async ( ) => {
 
     if (isEditing.value) {
       await dataStore.updateAlbum(itemForm.value.id, itemForm.value);
+      Toast.success( "Yangilandi!");
     } else {
      await dataStore.addAlbum(itemForm.value);
+      Toast.success( "Qo'shildi!");
     }
     await dataStore.loadGetAlbum()
-    Toast.success( isEditing ? "Yangilandi!" : "Qo'shildi!");
     resetForm();
     isVisible.value = false;
     isEditing.value = false;
@@ -506,7 +566,6 @@ const submitForm = async ( ) => {
     console.log("Error", error);
   }
 }
-
 
 const editForm = async (item: AllOrders): Promise<void> => {
   isVisible.value = true;
@@ -538,6 +597,7 @@ const resetForm = () => {
     // imgUrl: null,
     categoryName: '',
     orderName: '',
+    itemType: '',
     processNumber: null,
     pageNumber: null,
     amountNumber: null,

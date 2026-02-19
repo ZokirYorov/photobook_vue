@@ -1,6 +1,6 @@
 <template>
   <div
-      class="flex flex-col bg-gray-800 w-full"
+      class="flex flex-col overflow-x-auto bg-gray-800 w-full"
   >
     <div
         class="w-full container m-auto h-20 py-2.5 px-2 2xl:px-4  text-white grid grid-cols-[1fr_auto_1fr] grid-flow-col-dense items-center shadow-md transition-colors"
@@ -38,6 +38,33 @@
             faClass="fa-solid fa-arrow-right-from-bracket"
             @click="backToLogin"
         />
+        <CDialog
+            :show="isExit"
+            @close="isExit = false"
+            body-class="justify-center bg-blue-800 text-center px-4 pb-8"
+        >
+          <div
+              class="flex flex-col gap-4 w-full items-center justify-center bg-white rounded-2xl"
+          >
+            <h2 class="text-lg font-semibold">Rostdan ham chiqmoqchimisiz ?</h2>
+            <div class="flex items-center justify-center gap-2 w-full">
+              <CButton
+                  type="button"
+                  text="Ha, Chiqish"
+                  class="px-6 py-5"
+                  variant="danger"
+                  @click="confirmBack"
+              />
+              <CButton
+                  type="button"
+                  text="Bekor qilish"
+                  class="px-6 py-5"
+                  variant="ghost-accent"
+                  @click="isExit = false"
+              />
+            </div>
+          </div>
+        </CDialog>
       </div>
       <div class="flex justify-end">
         <div
@@ -56,7 +83,8 @@
 <script setup lang="ts">
 import { useRouter } from "vue-router";
 import CButton from "@/components/CButton.vue";
-import {computed, ComputedRef} from "vue";
+import {computed, ComputedRef, ref} from "vue";
+import CDialog from "@/components/CDialog.vue";
 
 const router = useRouter();
 
@@ -71,6 +99,8 @@ const props = defineProps({
     default: false,
   }
 })
+
+const isExit = ref(false);
 
 const mainRoutes: ComputedRef = computed(() => {
 
@@ -89,7 +119,12 @@ const toggleBurgerMenu = () => {
 // });
 
 const backToLogin = () => {
+  isExit.value = true;
+}
+
+const confirmBack = () => {
   router.push("/login");
+  isExit.value = false;
 }
 
 const openToProfile = () => {

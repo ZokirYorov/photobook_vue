@@ -2,7 +2,7 @@ import {createRouter, createWebHashHistory, RouteRecordRaw} from "vue-router";
 // import {authService} from "@/service/authService";
 
 
-const routes = [
+const routes: Array<RouteRecordRaw> = [
     {
         path: "/",
         name: "Main",
@@ -22,13 +22,33 @@ const routes = [
             },
             {
                 path: "/album",
-                name: "Albomlar",
+                name: "Albom",
                 component: () =>import('../views/Album.vue'),
                 meta: {
                     requiresAuth: true,
                     id: 1,
-                    icon: 'fa-solid fa-shopping-cart'
+                    icon: 'fa-solid fa-book'
                 },
+            },
+            {
+                path: "/vignette",
+                name: "Vinetka",
+                component: () =>import('../views/Vinetka.vue'),
+                meta: {
+                    requiresAuth: true,
+                    id: 2,
+                    icon: 'fa-solid fa-book-open'
+                }
+            },
+            {
+                path: "/albums",
+                name: "Rasmli albom",
+                component: () =>import('../views/PictureAlbum.vue'),
+                meta: {
+                    requiresAuth: true,
+                    id: 3,
+                    icon: 'fa-solid fa-images'
+                }
             },
             {
                 path: '/employee',
@@ -36,7 +56,7 @@ const routes = [
                 component: () =>import('../views/Employees.vue'),
                 meta: {
                     requiresAuth: true,
-                    id: 2,
+                    id: 4,
                     icon: 'fa-solid fa-users'
                 },
             },
@@ -46,7 +66,7 @@ const routes = [
                 component: () => import('../views/Materials.vue'),
                 meta: {
                     requiresAuth: true,
-                    id: 3,
+                    id: 5,
                     icon: 'fa-solid fa-boxes'
                 }
             },
@@ -56,7 +76,7 @@ const routes = [
                 component: () =>import('../views/Customers.vue'),
                 meta: {
                     requiresAuth: true,
-                    id: 4,
+                    id: 6,
                     icon: 'fa-solid fa-address-book'
                 },
             },
@@ -66,7 +86,7 @@ const routes = [
                 component: () =>import('../views/UserProfile.vue'),
                 meta: {
                     requiresAuth: true,
-                    id: 5,
+                    id: 7,
                     icon: 'fas fa-user'
                 },
             }

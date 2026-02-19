@@ -1,6 +1,6 @@
 <template>
   <div
-      class="w-full invisible sm:w-1/2 md:w-1/3 h-full pt-20 min-h-screen bg-gray-700 transition-all ease-in-out duration-300 absolute z-40 top-0 left-0"
+      class="w-full invisible sm:w-1/2 md:w-1/3 h-full pt-20 min-h-screen bg-gray-700 transition-all ease-in-out duration-300 fixed inset-0 z-40 top-0 left-0"
       @click="toggleMenu"
       :class="isMenuVisible ? 'visible' : 'invisible'"
   >
@@ -29,6 +29,7 @@
 
 <script setup lang="ts">
 import {computed, ComputedRef} from "vue";
+import {watch} from "vue";
 
 const emits = defineEmits(['toggleMenu']);
 
@@ -52,4 +53,14 @@ const mainMenuItems: ComputedRef = computed(() => {
 
 const isDesktop = computed(() => window.innerWidth > 768);
 
+watch(
+    () => props.isMenuVisible,
+    (val) => {
+      if (val) {
+        document.body.style.overflow = 'hidden'
+      } else {
+        document.body.style.overflow = ''
+      }
+    }
+)
 </script>
