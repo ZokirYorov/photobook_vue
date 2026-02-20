@@ -91,7 +91,7 @@
       >
         <form
             @submit.prevent="submitForm"
-            class="flex flex-col gap-3 overflow-y-auto px-4"
+            class="flex flex-col gap-3 text-md overflow-y-auto px-4"
         >
           <h2 class=" text-2xl font-semibold">
             {{isEditing ? "Formani uzgartirish" : "Forma qo'shish"}}
@@ -102,7 +102,7 @@
               disabledValue="Tanlang"
               text-field="text"
               value-field="value"
-              label="Albom turi"
+              label="Vinetka turi"
           />
           <div class="flex w-full gap-2 px-1 items-center justify-between">
             <AppInput
@@ -127,18 +127,24 @@
               v-model="itemForm.processNumber"
           />
           </div>
-          <AppInput
-              type="text"
-              placeholder="Masalan: Maktab"
-              label="Nomi"
-              v-model="itemForm.orderName"
-          />
-          <AppInput
-              type="text"
-              v-model="itemForm.customerName"
-              placeholder="Ism kiriting"
-              label="Mijoz ismi"
-          />
+          <div
+              class="flex gap-2 items-center justify-between"
+          >
+            <AppInput
+                type="text"
+                placeholder="Masalan: Maktab"
+                label="Nomi"
+                class="w-full"
+                v-model="itemForm.orderName"
+            />
+            <AppInput
+                type="text"
+                class="w-full"
+                v-model="itemForm.customerName"
+                placeholder="Ism kiriting"
+                label="Mijoz ismi"
+            />
+          </div>
           <AppInput
               v-model="itemForm.receiverName"
               placeholder="Ism kiriting"
@@ -152,6 +158,14 @@
               text-field="name"
               value-field="name"
               label="Mas'ul xodim"
+          />
+          <AppSelect
+              v-model="itemForm.status"
+              :options="itemStatus"
+              disabledValue="Xolatni tanlang"
+              label="Status"
+              text-field="text"
+              value-field="value"
           />
           <div
               class="flex items-center w-full gap-2"
@@ -169,14 +183,6 @@
                 v-model="itemForm.termData"
             />
           </div>
-          <AppSelect
-              v-model="itemForm.status"
-              :options="itemStatus"
-              disabledValue="Xolatni tanlang"
-              label="Status"
-              text-field="text"
-              value-field="value"
-          />
           <div class="flex flex-col sm:flex-row items-stretch lg:flex-row gap-2 sm:items-center justify-end w-full">
             <CButton
                 type="button"

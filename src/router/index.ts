@@ -1,4 +1,4 @@
-import {createRouter, createWebHashHistory, RouteRecordRaw} from "vue-router";
+import {createRouter, createWebHistory, RouteRecordRaw} from "vue-router";
 // import {authService} from "@/service/authService";
 
 
@@ -106,7 +106,7 @@ const routes: Array<RouteRecordRaw> = [
 ]
 const router = createRouter({
     routes,
-    history: createWebHashHistory(),
+    history: createWebHistory(),
 })
 
 // router.beforeEach(async (to, _, next) => {

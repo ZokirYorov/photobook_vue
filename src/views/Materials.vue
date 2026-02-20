@@ -19,22 +19,22 @@
       >
         <AppInput label="Tovar nomi"
                   type="text"
-                  placeholder="Item name"
+                  placeholder="Tovar nomini kiriting"
                   v-model="form.itemName"
         />
         <AppInput label="Tovar turi"
                   type="text"
-                  placeholder="Item type name"
+                  placeholder="Tovar turini kiriting"
                   v-model="form.itemType"
         />
         <AppInput label="Miqdori"
                   type="number"
-                  placeholder="Quantity"
+                  placeholder="1,2,3 ..."
                   v-model="form.quantity"
         />
         <AppInput label="Birligi"
                   type="text"
-                  placeholder="Unit type name"
+                  placeholder="masalan: Dona, Pachka, Quti, Uram"
                   v-model="form.unitName"
         />
 

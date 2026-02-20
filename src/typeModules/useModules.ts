@@ -5,7 +5,7 @@ export interface Register {
 }
 
 export interface UserLogin {
-    email: string;
+    userName: string;
     password: string;
 }
 
@@ -118,7 +118,7 @@ export interface IForm {
 export interface IFormData {
     id: string | null;
     name: string;
-    pageNumber: number | null;
+    pageNumber: string | null;
     createdAt: number | null;
     updatedAt: number | null;
 }

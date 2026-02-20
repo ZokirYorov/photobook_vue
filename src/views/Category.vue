@@ -30,17 +30,17 @@
 <!--          </span>-->
           <AppInput
               id="text"
-              label="Text"
+              label="Name"
               type="text"
               required
-              placeholder="Enter text"
+              placeholder="Nomini kiriting"
               v-model="form.name"
           />
           <AppInput
               id="name"
-              label="Name"
-              placeholder="Enter name"
-              type="number"
+              label="Page numbers"
+              placeholder="Necha betliklar ?"
+              type="text"
               required
               v-model="form.pageNumber"
           />

@@ -20,7 +20,7 @@
       >
         <AppInput label="F.I.O"
                   type="text"
-                  placeholder="Enter Name"
+                  placeholder="Ism kiritng"
                   v-model="form.fullName"
         />
         <AppInput label="Kasbi"

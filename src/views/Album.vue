@@ -91,7 +91,7 @@
       >
         <form
             @submit.prevent="submitForm"
-            class="flex flex-col gap-3 overflow-y-auto px-4"
+            class="flex flex-col gap-3 overflow-y-auto text-md px-4"
         >
           <h2 class=" text-2xl font-semibold">
             {{isEditing ? "Formani uzgartirish" : "Forma qo'shish"}}
