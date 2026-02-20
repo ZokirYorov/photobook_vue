@@ -49,10 +49,10 @@
       </div>
     </CDialog>
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-      <StatCard title="Jami Buyurtmalar" :value="stats.totalOrders" color="blue" icon="fa-shopping-cart" />
-      <StatCard title="Jarayonda" :value="stats.pending" color="yellow" icon="fa-clock" />
-      <StatCard title="Bajarilgan" :value="stats.completed" color="green" icon="fa-check-circle" />
-      <StatCard title="Umumiy Summa" :value="stats.revenue + ' so‘m'" color="purple" icon="fa-money-bill-wave" />
+      <StatCard title="Jami Buyurtmalar" :value="stats.totalOrders" color="blue" icon="fa-shopping-cart text-blue-600" />
+      <StatCard title="Jarayonda" :value="stats.pending" color="yellow" icon="fa-clock text-yellow-600" />
+      <StatCard title="Bajarilgan" :value="stats.completed" color="green" icon="fa-check-circle text-green-600" />
+      <StatCard title="Umumiy Summa" :value="stats.revenue + ' so‘m'" color="purple" icon="fa-money-bill-wave text-purple-600" />
     </div>
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
       <div class="flex flex-col justify-between shadow-xl rounded-xl hover:bg-gray-100 h-full bg-white items-center"

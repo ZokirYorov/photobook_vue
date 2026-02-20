@@ -200,7 +200,7 @@
           <AppSelect
               v-model="formStatus"
               :options="itemStatus"
-              disabledValue="Barcha holat"
+              disabledValue="Tanlang"
               label="Holat"
               has-reset
               resetText="Hammasi"

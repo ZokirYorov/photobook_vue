@@ -28,10 +28,29 @@
                   placeholder="Kasbni kiriting"
                   v-model="form.profession"
         />
-        <AppInput label="Phone Number"
+        <AppInput label="Login"
+                  type="text"
+                  placeholder="Loginni kiriting"
+                  v-model="form.isLogin"
+        />
+        <AppInput label="Password"
+                  type="number"
+                  placeholder="123..."
+                  v-model="form.isPassword"
+        />
+        <AppInput label="Phone number"
                   type="number"
                   placeholder="+998 -"
                   v-model="form.phoneNumber"
+        />
+        <AppSelect
+            v-model="form.roles"
+            label="Role"
+            :options="userRoles"
+            disabledValue="Tanlang"
+            text-field="text"
+            value-field="value"
+            is-multiple
         />
 <!--        <AppInput-->
 <!--            label="Payment method"-->
@@ -103,9 +122,9 @@
           <div class="flex items-center gap-2 justify-between">
             <div class="flex items-center gap-4">
             <span
-                class="font-semibold text-xl w-10 h-10 p-4 flex items-center justify-center rounded-full text-white bg-blue-800"
+                class="font-semibold text-xl w-12 h-12 p-4 flex items-center justify-center rounded-full text-white bg-blue-800"
             >
-              {{user.fullName.charAt(0).toUpperCase()}}
+              {{getInitials(user.fullName)}}
             </span>
               <div
                   class="flex flex-col"
@@ -133,7 +152,35 @@
               />
             </div>
           </div>
-          <span><i class="fas fa-phone text-blue-600"></i> Tel: {{user.phoneNumber}}</span>
+          <div
+              class="flex items-end gap-2 justify-between"
+          >
+            <div class="flex flex-col items-start text-md font-semibold">
+              <div>Login: <span class="text-gray-600">{{user.isLogin}}</span></div>
+              <div>Parol: <span class="text-gray-600">{{user.isPassword}}</span></div>
+              <div
+                  class="flex gap-1"
+              >
+                Role:
+                <div class="flex items-center gap-2">
+                  <div class="text-gray-600 flex flex-col w-full gap-2"
+                       v-for="(role, index) in user.roles"
+                       :key="index"
+                  >
+                    {{role}}
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div
+                class="flex flex-col items-start text-md font-semibold"
+            >
+              <div class="flex">
+
+              </div>
+              <span><i class="fas fa-phone text-blue-600"></i> Tel: {{user.phoneNumber}}</span>
+            </div>
+          </div>
         </div>
       </div>
       <div
@@ -199,9 +246,10 @@ import AppInput from "@/components/ui/AppInput.vue";
 import CButton from "@/components/CButton.vue";
 import CDialog from "@/components/CDialog.vue";
 import { useStore } from "@/stores/store";
-import {UserForm} from "@/typeModules/useModules";
+import {Role, UserForm} from "@/typeModules/useModules";
 import Loading from "@/components/Loading.vue";
 import DeleteConfirm from "@/components/DeleteConfirm.vue";
+import AppSelect from "@/components/ui/AppSelect.vue";
 
 const store = useStore();
 
@@ -209,6 +257,7 @@ const visibleShow = ref(false);
 const isLoading = ref(false);
 const showModal = ref(false);
 const selectedUser = ref('');
+const role = ref<Role[]>([])
 // const selectedFile = ref<File | null>(null);
 const isEditing = ref(false);
 // const avatarPreview = ref<string>("");
@@ -220,6 +269,9 @@ const form = ref<UserForm>({
   id: '',
   fullName: '',
   profession: '',
+  isLogin: '',
+  isPassword: '',
+  roles: '',
   phoneNumber: null,
   createdAt: null,
   updatedAt: null,
@@ -231,11 +283,32 @@ const clickVisibleForm = () => {
     id: '',
     fullName: '',
     profession: '',
+    isLogin: '',
+    isPassword: '',
+    roles: '',
     phoneNumber: null,
     createdAt: null,
     updatedAt: null,
   }
 }
+
+const userRoles = ref([
+  { id: 0, value: 'USER', text: 'USER' },
+  { id: 1, value: 'ADMIN', text: 'ADMIN' },
+])
+
+const getInitials = (fullName?: string) => {
+  if (!fullName) return ''
+
+  return fullName
+      .trim()
+      .split(' ')
+      .filter(Boolean)
+      .map(word => word.charAt(0).toUpperCase())
+      .slice(0, 2)
+      .join('')
+}
+
 
 // const getItemName = (itemId: string) => {
 //   const item = allItems.value.find(item => item._id === itemId);
@@ -260,7 +333,7 @@ const clickVisibleForm = () => {
 
 const submitForm = async () => {
 
-  if (!form.value.fullName || !form.value.profession || !form.value.phoneNumber) {
+  if (!form.value.fullName || !form.value.profession || !form.value.phoneNumber || !form.value.isLogin || !form.value.isPassword || !form.value.roles) {
     return alert("Iltimos formani to'ldiring!");
   }
   isLoading.value = true;
@@ -279,6 +352,9 @@ const submitForm = async () => {
       id: '',
       fullName: '',
       profession: '',
+      isLogin: '',
+      isPassword: '',
+      roles: '',
       phoneNumber: null,
       createdAt: null,
       updatedAt: null,
@@ -329,6 +405,9 @@ const closeForm = () => {
     id: '',
     fullName: '',
     profession: '',
+    isLogin: '',
+    isPassword: '',
+    roles: '',
     phoneNumber: null,
     createdAt: null,
     updatedAt: null,

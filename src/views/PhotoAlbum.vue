@@ -215,7 +215,7 @@
           <AppSelect
               v-model="formStatus"
               :options="itemStatus"
-              disabledValue="Barcha holat"
+              disabledValue="Tanlang"
               label="Holat"
               has-reset
               resetText="Hammasi"
@@ -555,13 +555,13 @@ const submitForm = async ( ) => {
     filteredPictures.value.push(itemForm.value);
 
     if (isEditing.value) {
-      await dataStore.updatePictures(itemForm.value.id, itemForm.value);
+      await dataStore.updatePhotos(itemForm.value.id, itemForm.value);
       Toast.success( "Yangilandi!");
     } else {
-      await dataStore.addPictures(itemForm.value);
+      await dataStore.addPhotos(itemForm.value);
       Toast.success(  "Qo'shildi!");
     }
-    await dataStore.loadGetPictures()
+    await dataStore.loadGetPhotos()
     resetForm();
     isVisible.value = false;
     isEditing.value = false;
@@ -580,7 +580,7 @@ const editForm = async (item: IPicture): Promise<void> => {
 const deleteConfirmItem = async () => {
   if (!selectedItem.value) return;
   try {
-    await dataStore.deletePictures(selectedItem.value)
+    await dataStore.deletePhotos(selectedItem.value)
     Toast.info("Successfully deleted!");
     showConfirmItem.value = false;
     selectedItem.value = null;
@@ -633,7 +633,7 @@ const formatDate = (dateString?: string | null): string => {
 
 
 onMounted(async () => {
-  await dataStore.loadGetPictures()
+  await dataStore.loadGetPhotos()
   // await Promise.all([
   //     // await dataStore.loadCategories(),
   // ])

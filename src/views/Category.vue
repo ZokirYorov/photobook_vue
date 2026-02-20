@@ -2,7 +2,7 @@
   <div class="flex flex-col container m-auto  px-6 h-full w-full">
     <div class="w-full h-full flex flex-col">
       <div class="flex items-center justify-between py-6 w-full">
-        <h2 class="text-2xl font-semibold">Users Table</h2>
+        <h2 class="text-2xl font-semibold">Toifalar jadvali</h2>
         <CButton
             text="Add users"
             @click="clickVisibleForm"
@@ -34,22 +34,15 @@
               type="text"
               required
               placeholder="Enter text"
-              v-model="form.text"
+              v-model="form.name"
           />
           <AppInput
               id="name"
               label="Name"
               placeholder="Enter name"
-              type="text"
+              type="number"
               required
-              v-model="form.name"
-          />
-          <AppInput
-              id="data"
-              label="Data"
-              type="date"
-              required
-              v-model="form.date"
+              v-model="form.pageNumber"
           />
           <div class="flex items-center gap-4 justify-center w-full">
             <CButton
@@ -88,13 +81,13 @@
           body-class="justify-center bg-blue-800 text-center px-4 pb-8"
       >
         <DeleteConfirm
-            title="Bu klientni uchirmoqchimisiz?"
+            title="Ushbu kategoriyani uchirmoqchimisiz?"
             v-model:show="showConfirmDelete"
             @confirm="confirmDelete"
         />
       </CDialog>
-      <Loading v-if="isLoading"/>
-      <div v-else-if="customers.length" class="flex w-full py-4 rounded-lg overflow-x-auto bg-white">
+<!--      <Loading v-if="isLoading"/>-->
+      <div  class="flex w-full py-4 rounded-lg overflow-x-auto bg-white">
         <table
             class="w-full"
         >
@@ -108,22 +101,20 @@
           <thead>
           <tr class="uppercase text-sm w-full text-gray-600 border-b border-gray-100">
             <th class="p-3 text-start">№</th>
-            <th class="text-start">Text</th>
             <th class="text-start">Name</th>
-            <th class="text-start">Data</th>
+            <th class="text-start">Pages</th>
             <th class="text-start">Operations</th>
           </tr>
           </thead>
-          <tbody>
+          <tbody v-if="customers.length">
           <tr
               class="hover:bg-gray-100 w-full border-b border-gray-100"
               v-for="(user, index) in customers"
               :key="index"
           >
             <td class="px-3 py-2 text-start">{{index + 1}}</td>
-            <td class="items-start break-all px-1">{{user.text}}</td>
-            <td class="items-start break-all PX-1">{{user.name}}</td>
-            <td class="items-start">{{getDate(user.date)}}</td>
+            <td class="items-start break-all px-1">{{user.name}}</td>
+            <td class="items-start break-all PX-1">{{user.pageNumber}}</td>
             <td>
               <div class="flex items-center justify-start gap-3 text-xl w-full">
                 <i
@@ -140,10 +131,17 @@
             </td>
           </tr>
           </tbody>
+          <tbody v-else>
+          <tr>
+            <td
+                colspan="10"
+                class="text-center py-6 text-gray-600 text-lg font-semibold"
+            >
+              Toifa topilmadi !
+            </td>
+          </tr>
+          </tbody>
         </table>
-      </div>
-      <div v-else class="flex items-center justify-center">
-        Mijoz topilmadi!
       </div>
     </div>
   </div>
@@ -156,16 +154,16 @@ import CButton from "@/components/CButton.vue";
 import {computed, onMounted, ref} from "vue";
 import CDialog from "@/components/CDialog.vue";
 import AppInput from "@/components/ui/AppInput.vue";
-import axiosInstance from "@/axios";
-import { authService } from "@/service/authService";
+// import axiosInstance from "@/axios";
+// import { authService } from "@/service/authService";
 import { useToast } from "vue-toastification";
 import DeleteConfirm from "@/components/DeleteConfirm.vue";
 import { IFormData } from "@/typeModules/useModules";
-import Loading from "@/components/Loading.vue";
+// import Loading from "@/components/Loading.vue";
 
 const authStore = useStore();
 const Toast = useToast();
-const dataStore = authService();
+// const dataStore = authService();
 const visibleForm = ref(false);
 const isEditing = ref(false);
 const selectedFile = ref<File | null>(null);
@@ -180,9 +178,8 @@ const isLoading = ref(false);
 
 const form = ref<IFormData>({
   id: null,
-  text: '',
   name: '',
-  date: '',
+  pageNumber: null,
   createdAt: null,
   updatedAt: null
 })
@@ -193,11 +190,10 @@ const clickVisibleForm = () => {
   visibleForm.value = true;
   form.value = {
     id: null,
-    text: '',
     name: '',
-    date: '',
+    pageNumber: null,
     createdAt: null,
-    updatedAt: null,
+    updatedAt: null
   }
 }
 
@@ -213,25 +209,23 @@ const load = async () => {
 const submit = async () => {
 
   isLoading.value = true;
-  if (!form.value.name && !form.value.text && !form.value.date ) {
+  if (!form.value.name && !form.value.pageNumber ) {
     return alert("Iltimos formani to'ldiring!")
   }
 
   try {
 
-    if (isEditing.value && form.value.id) {
+    if (isEditing.value) {
 
-      const { id , ...commentData} = form.value;
-
-      await authStore.updateComment(id, commentData);
+      await authStore.updateComment(form.value.id, form.value);
+      Toast.success("Yangilandi!");
     } else {
-      const {id, ...commentData } = form.value;
 
-      await authStore.addComment(commentData);
+      await authStore.addComment(form.value);
+      Toast.success("Qo'shildi!");
     }
     closeVisibleForm();
     await load();
-    Toast.success(isEditing.value ? "Yangilandi!" : "Qo'shildi!");
     isLoading.value = false;
   }
   catch (error) {
@@ -265,12 +259,11 @@ const imageRemove = () => {
 const closeVisibleForm = () => {
   visibleForm.value = false;
   form.value = {
-    id: '',
-    text: '',
+    id: null,
     name: '',
-    date: '',
+    pageNumber: null,
     createdAt: null,
-    updatedAt: null,
+    updatedAt: null
   }
 }
 

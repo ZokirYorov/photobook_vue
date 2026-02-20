@@ -41,9 +41,9 @@ const routes: Array<RouteRecordRaw> = [
                 }
             },
             {
-                path: "/albums",
+                path: "/photo",
                 name: "Rasmli albom",
-                component: () =>import('../views/PictureAlbum.vue'),
+                component: () =>import('../views/PhotoAlbum.vue'),
                 meta: {
                     requiresAuth: true,
                     id: 3,
@@ -71,9 +71,9 @@ const routes: Array<RouteRecordRaw> = [
                 }
             },
             {
-                path: '/customer',
-                name: 'Mijozlar',
-                component: () =>import('../views/Customers.vue'),
+                path: '/category',
+                name: 'Kategoriyalar',
+                component: () =>import('../views/Category.vue'),
                 meta: {
                     requiresAuth: true,
                     id: 6,

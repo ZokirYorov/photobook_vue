@@ -2,7 +2,7 @@ import { defineStore} from "pinia";
 import {
     AllOrders,
     CategoryForm,
-    ExpensesForm, IForm,
+    ExpensesForm,
     IFormData,
     IItems, IPicture, Order, UserForm,
 } from '@/typeModules/useModules';
@@ -67,7 +67,7 @@ export const useStore = defineStore('item', () => {
 
 
     const loadComments = async () => {
-        const snap = await getDocs(collection(db, 'customers'))
+        const snap = await getDocs(collection(db, 'categories'))
 
         state.value.customers = snap.docs.map(d => ({
             id: d.id,
@@ -75,18 +75,20 @@ export const useStore = defineStore('item', () => {
         })) as IFormData[]
     }
 
-    const addComment = async (item: IForm) => {
-        await addDoc(collection(db, 'customers'), {
-            ...item,
+    const addComment = async (item: IFormData) => {
+        const {id, ...itemData} = item
+        await addDoc(collection(db, 'categories'), {
+            ...itemData,
             createdAt: Date.now()
         })
 
         await loadComments()
     }
 
-    const updateComment = async (id: string, item: IForm) => {
-        await updateDoc(doc(db, 'customers', id), {
-            ...item,
+    const updateComment = async (id: string | null, item: IFormData) => {
+        const { id: _, ...itemData } = item
+        await updateDoc(doc(db, 'categories', String(id)), {
+            ...itemData,
             updatedAt: Date.now()
         })
 
@@ -94,7 +96,7 @@ export const useStore = defineStore('item', () => {
     }
 
     const deleteComment = async (id: string) => {
-        await deleteDoc(doc(db, 'customers', id))
+        await deleteDoc(doc(db, 'categories', id))
         state.value.customers = state.value.customers.filter(c => c.id !== id)
     }
 
@@ -219,7 +221,7 @@ export const useStore = defineStore('item', () => {
         state.value.vignette = state.value.vignette.filter(v => v.id !== id)
     }
 
-    const loadGetPictures = async () => {
+    const loadGetPhotos = async () => {
         const snap = await getDocs(collection(db, 'pictures'))
         state.value.pictures = snap.docs.map(doc => ({
             id: doc.id,
@@ -227,25 +229,25 @@ export const useStore = defineStore('item', () => {
         })) as IPicture[]
     }
 
-    const addPictures = async (item: IPicture) => {
+    const addPhotos = async (item: IPicture) => {
         const { id, ...itemData } = item;
         await addDoc(collection(db, 'pictures'), {
             ...itemData,
             createdAt: Date.now()
         })
-        await loadGetPictures()
+        await loadGetPhotos()
     }
 
-    const updatePictures = async (id: string, item: IPicture) => {
+    const updatePhotos = async (id: string, item: IPicture) => {
         const { id: _, ...itemData } = item;
         await updateDoc(doc(db, 'pictures', id), {
             ...itemData,
             updatedAt: Date.now()
         })
-        await loadGetPictures()
+        await loadGetPhotos()
     }
 
-    const deletePictures = async (id: string) => {
+    const deletePhotos = async (id: string) => {
         await deleteDoc(doc(db, 'pictures', id))
         state.value.pictures = state.value.pictures.filter(p => p.id !== id)
     }
@@ -304,6 +306,6 @@ export const useStore = defineStore('item', () => {
         loadMaterials, addMaterial, updateMaterial, deleteMaterial,
         loadGetAlbum, addAlbum, updateAlbum, deleteAlbum,
         loadGetOrders, addOrder, updateOrder, deleteOrder,
-        loadGetPictures, addPictures, updatePictures, deletePictures,
+        loadGetPhotos, addPhotos, updatePhotos, deletePhotos,
     }
 })

@@ -85,9 +85,18 @@ export interface UserForm {
     id: string;
     fullName: string;
     profession: string;
+    isLogin: string;
+    isPassword: string;
+    roles: string;
     phoneNumber: number | null;
     createdAt: string | null;
     updatedAt: string | null;
+}
+
+export interface Role {
+    id: number
+    name: string
+    description: string
 }
 
 export interface ExpensesForm {
@@ -102,16 +111,14 @@ export interface ExpensesForm {
 }
 
 export interface IForm {
-    text: string;
     name: string;
-    date: string;
+    pageNumber: null;
 }
 
 export interface IFormData {
     id: string | null;
-    text: string;
     name: string;
-    date: string;
+    pageNumber: number | null;
     createdAt: number | null;
     updatedAt: number | null;
 }

@@ -13,7 +13,7 @@
         <p class="text-gray-500 text-sm">{{ title }}</p>
         <p class="text-2xl font-bold">{{ value }}</p>
       </div>
-      <i class="fas text-4xl opacity-20" :class="icon"></i>
+      <i class="fas text-4xl opacity-40" :class="icon"></i>
     </div>
   </div>
 </template>
