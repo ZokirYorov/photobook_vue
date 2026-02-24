@@ -81,17 +81,17 @@
         <div class="flex border-t border-gray-200 my-4"></div>
         <div class="grid grid-cols-2 gap-4">
           <div class="bg-white/10 rounded-lg p-3 backdrop-blur-sm">
-            <p class="text-sm opacity-80 mb-1">Kutilmoqda</p>
+            <p class="text-sm mb-1">Kutilmoqda</p>
             <p class="text-2xl font-bold">{{ item.pending }}</p>
           </div>
           <div class="bg-white/10 rounded-lg p-3 backdrop-blur-sm">
-            <p class="text-sm opacity-80 mb-1">Bajarilgan</p>
+            <p class="text-sm mb-1">Bajarilgan</p>
             <p class="text-2xl font-bold">{{ item.completed }}</p>
           </div>
         </div>
         <div class="mt-4">
           <div class="flex items-center justify-between text-sm mb-2">
-            <span class="opacity-80">Bajarilish foizi</span>
+            <span class="">Bajarilish foizi</span>
             <span class="font-bold">
             {{ item.total > 0 ? Math.round((Number(item.completed) / item.total) * 100) : 0 }}%
           </span>
