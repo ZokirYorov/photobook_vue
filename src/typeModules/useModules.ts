@@ -19,9 +19,11 @@ export interface IItems {
     updatedAt: string | null;
 }
 
-export interface CategoryForm {
-    id: number | string | null;
-    name: string | null;
+export interface AllCategory {
+    id: string;
+    name: string;
+    pageNumber: string | null;
+    itemSize: string | null;
     createdAt: string | null;
     updatedAt: string | null;
 }

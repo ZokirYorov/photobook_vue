@@ -1,7 +1,17 @@
 <template>
-  <div class="flex flex-col h-full w-full p-6 gap-6">
-    <div class="w-full flex items-center justify-between">
-      <span class="text-xl font-semibold">Xom ashyolar</span>
+  <div class="flex flex-col container m-auto h-full w-full p-6 gap-6">
+    <div class="w-full flex bg-white p-4 rounded-xl items-center justify-between">
+      <div class="flex items-center gap-2">
+        <CButton
+            type="button"
+            text="Ortga"
+            is-has-fa-icon
+            variant="ghost-accent"
+            faClass="fa-solid fa-arrow-left"
+            @click="router.back()"
+        />
+        <span class="text-xl font-semibold">Xom ashyolar</span>
+      </div>
       <CButton
           type="button"
           text="+Add"
@@ -165,7 +175,9 @@ import CButton from "@/components/CButton.vue";
 import CDialog from "@/components/CDialog.vue";
 import AppInput from "@/components/ui/AppInput.vue";
 import DeleteConfirm from "@/components/DeleteConfirm.vue";
+import { useRouter } from "vue-router";
 
+const router = useRouter();
 const store = useStore();
 
 const visibleTodo = ref(false);

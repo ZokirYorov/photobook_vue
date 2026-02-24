@@ -16,7 +16,6 @@ const routes: Array<RouteRecordRaw> = [
                 component: () =>import('../views/Dashboard.vue'),
                 meta: {
                     requiresAuth: true,
-                    id: 0,
                     icon: 'fa-solid fa-house'
                 },
             },
@@ -26,7 +25,6 @@ const routes: Array<RouteRecordRaw> = [
                 component: () =>import('../views/Album.vue'),
                 meta: {
                     requiresAuth: true,
-                    id: 1,
                     icon: 'fa-solid fa-book'
                 },
             },
@@ -36,7 +34,6 @@ const routes: Array<RouteRecordRaw> = [
                 component: () =>import('../views/Vinetka.vue'),
                 meta: {
                     requiresAuth: true,
-                    id: 2,
                     icon: 'fa-solid fa-book-open'
                 }
             },
@@ -46,7 +43,6 @@ const routes: Array<RouteRecordRaw> = [
                 component: () =>import('../views/PhotoAlbum.vue'),
                 meta: {
                     requiresAuth: true,
-                    id: 3,
                     icon: 'fa-solid fa-images'
                 }
             },
@@ -56,7 +52,6 @@ const routes: Array<RouteRecordRaw> = [
                 component: () =>import('../views/Employees.vue'),
                 meta: {
                     requiresAuth: true,
-                    id: 4,
                     icon: 'fa-solid fa-users'
                 },
             },
@@ -66,17 +61,15 @@ const routes: Array<RouteRecordRaw> = [
                 component: () => import('../views/Materials.vue'),
                 meta: {
                     requiresAuth: true,
-                    id: 5,
                     icon: 'fa-solid fa-boxes'
                 }
             },
             {
                 path: '/category',
                 name: 'Kategoriyalar',
-                component: () =>import('../views/Category.vue'),
+                component: () =>import('../views/Categories.vue'),
                 meta: {
                     requiresAuth: true,
-                    id: 6,
                     icon: 'fa-solid fa-address-book'
                 },
             },
@@ -86,7 +79,6 @@ const routes: Array<RouteRecordRaw> = [
                 component: () =>import('../views/UserProfile.vue'),
                 meta: {
                     requiresAuth: true,
-                    id: 7,
                     icon: 'fas fa-user'
                 },
             }

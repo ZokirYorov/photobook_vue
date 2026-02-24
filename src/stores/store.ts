@@ -1,7 +1,7 @@
 import { defineStore} from "pinia";
 import {
+    AllCategory,
     AllOrders,
-    CategoryForm,
     ExpensesForm,
     IFormData,
     IItems, IPicture, Order, UserForm,
@@ -18,7 +18,9 @@ export const useStore = defineStore('item', () => {
         vignette: [] as Order[],
         albums: [] as AllOrders[],
         pictures: [] as IPicture[],
-        categories: [] as CategoryForm[],
+        alCategory: [] as AllCategory[],
+        vignetteCategory: [] as AllCategory[],
+        photoCategory: [] as AllCategory[],
         expenses: [] as ExpensesForm[],
         customers: [] as IFormData[],
     });
@@ -285,27 +287,110 @@ export const useStore = defineStore('item', () => {
         state.value.items = state.value.items.filter(item => item.id !== id)
     }
 
-
-    const getAllOrders = async () => {
-        try {
-            // const response = await axiosInstance.get("/api/orders")
-            // state.value.orders = response.data;
-            // return response.data
-        }
-        catch (error) {
-            console.error(error);
-        }
+    const loadAlbumCategories = async () => {
+        const snap = await getDocs(collection(db, 'alCategory'))
+        state.value.alCategory = snap.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+        })) as AllCategory[]
     }
 
+    const addAlCategory = async (item: AllCategory) => {
+        const { id, ...itemData } = item
+        await addDoc(collection(db, 'alCategory'), {
+            ...itemData,
+            createdAt: Date.now()
+        })
+        await loadAlbumCategories()
+    }
+
+    const updateAlCategory = async (id: string, item: AllCategory) => {
+        const { id: _, ...itemData } = item;
+        await updateDoc(doc(db, 'alCategory', id), {
+            ...itemData,
+            updatedAt: Date.now()
+        })
+        await loadAlbumCategories()
+    }
+
+    const deleteAlCategory = async (id: string) => {
+        await deleteDoc(doc(db, 'alCategory', id))
+        state.value.alCategory = state.value.alCategory.filter(c => c.id !== id)
+    }
+
+    const loadVigCategory = async () => {
+        const snap = await getDocs(collection(db, 'vigCategory'))
+        state.value.vignetteCategory = snap.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+        })) as AllCategory[]
+    }
+
+    const addVigCategory = async (item: AllCategory) => {
+        const { id, ...itemData } = item;
+        await addDoc(collection(db, 'vigCategory'), {
+            ...itemData,
+            createdAt: Date.now()
+        })
+        await loadVigCategory()
+    }
+
+    const updateVigCategory = async (id: string, item: AllCategory) => {
+        const { id: _, ...itemData } = item;
+        await updateDoc(doc(db, 'vigCategory', id), {
+            ...itemData,
+            updatedAt: Date.now()
+        })
+        await loadVigCategory()
+    }
+
+    const deleteVigCategory = async (id: string) => {
+        await deleteDoc(doc(db, 'vigCategory', id))
+        state.value.vignetteCategory = state.value.vignetteCategory.filter(c => c.id !== id)
+    }
+
+    const loadPhotoCategory = async () => {
+        const snap = await getDocs(collection(db, 'photoCategory'))
+        state.value.photoCategory = snap.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+        })) as AllCategory[]
+    }
+
+    const addPhotoCategory = async (item: AllCategory) => {
+        const { id, ...itemData } = item;
+        await addDoc(collection(db, 'photoCategory'), {
+            ...itemData,
+            createdAt: Date.now()
+        })
+        await loadPhotoCategory()
+    }
+
+    const updatePhotoCategory = async (id: string, item: AllCategory) => {
+        const { id: _, ...itemData } = item;
+        await updateDoc(doc(db, 'photoCategory', id), {
+            ...itemData,
+            updatedAt: Date.now()
+        })
+        await loadPhotoCategory()
+    }
+
+    const deletePhotoCategory = async (id: string) => {
+        await deleteDoc(doc(db, 'photoCategory', id))
+        state.value.photoCategory = state.value.photoCategory.filter(c => c.id !== id)
+    }
 
     return {
         state,
         loadCollection,
-        loadComments, addComment, updateComment, deleteComment, getAllOrders,
+        loadComments, addComment, updateComment, deleteComment,
         addUser, updateUser, deleteUser, loadGetUsers,
         loadMaterials, addMaterial, updateMaterial, deleteMaterial,
         loadGetAlbum, addAlbum, updateAlbum, deleteAlbum,
         loadGetOrders, addOrder, updateOrder, deleteOrder,
         loadGetPhotos, addPhotos, updatePhotos, deletePhotos,
+        loadAlbumCategories, addAlCategory, updateAlCategory, deleteAlCategory,
+        loadVigCategory, addVigCategory, updateVigCategory, deleteVigCategory,
+        loadPhotoCategory, addPhotoCategory, updatePhotoCategory, deletePhotoCategory,
     }
 })

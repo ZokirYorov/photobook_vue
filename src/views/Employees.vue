@@ -1,6 +1,6 @@
 <template>
   <div class="flex p-6 flex-col gap-4 container m-auto w-full h-full">
-    <div class="flex w-full items-center justify-between">
+    <div class="flex bg-white p-4 rounded-xl w-full items-center justify-between">
       <h2 class="text-2xl font-semibold">Xodimlar</h2>
       <CButton
           type="button"

@@ -14,7 +14,7 @@
         </div>
 
         <!-- Title -->
-        <h1 class="text-6xl font-bold text-white mb-4 tracking-tight">
+        <h1 class="text-6xl font-bold text-white mb-4 uppercase tracking-tight">
           Photobook
         </h1>
         <p class="text-2xl text-white/90 mb-8 font-light">
@@ -44,7 +44,7 @@
     </div>
 
     <!-- Right Side - Login Form -->
-    <div class="w-full lg:w-1/2 premium-bg flex items-center justify-center p-8 relative">
+    <div class="w-full lg:w-1/2 premium-bg flex items-center justify-center p-4 relative">
       <div class="scan-line"></div>
       <div class="w-full max-w-lg relative z-10">
         <!-- Mobile Logo -->
@@ -52,7 +52,7 @@
           <div class="inline-flex items-center justify-center w-20 h-20 logo-glow rounded-2xl bg-white/10 backdrop-blur-xl mb-4">
             <img class="w-16 brightness-0 invert" src="../assets/camera.png" alt="">
           </div>
-          <h2 class="text-3xl font-bold text-white">Photobook</h2>
+          <h2 class="text-3xl font-bold text-white uppercase">Photobook</h2>
         </div>
 
         <!-- Login Card -->
@@ -178,7 +178,7 @@
 <!--            </p>-->
 <!--          </div>-->
 <!--        </div>-->
-        <div class="bg-white rounded-2xl flex flex-col w-[400px] p-4 max-w-md shadow-xl">
+        <div class="bg-white rounded-2xl flex flex-col w-full p-4 max-w-md shadow-xl">
           <div class="mb-8 flex flex-col p-4">
             <h2 class="text-3xl font-bold text-gray-800 mb-2">Xush kelibsiz! 👋</h2>
             <p class="text-gray-600">Davom ettirish uchun hisobingizga kiring</p>
@@ -212,18 +212,18 @@
                 variant="primary"
             />
           </form>
-          <span
-              class="mt-4 gap-2 flex items-center"
-          >
-            Registratsiyadan utish
-            <i class="fa-solid fa-arrow-right"></i>
-            <router-link
-                class="text-blue-500 text-md font-bold p-1.5 rounded contain-paint hover:bg-gray-200"
-                to="/register"
-            >
-              Register
-            </router-link>
-          </span>
+<!--          <span-->
+<!--              class="mt-4 gap-2 flex items-center"-->
+<!--          >-->
+<!--            Registratsiyadan utish-->
+<!--            <i class="fa-solid fa-arrow-right"></i>-->
+<!--            <router-link-->
+<!--                class="text-blue-500 text-md font-bold p-1.5 rounded contain-paint hover:bg-gray-200"-->
+<!--                to="/register"-->
+<!--            >-->
+<!--              Register-->
+<!--            </router-link>-->
+<!--          </span>-->
           <p class="text-center text-md mt-8">
             © 2026 PHOTOBOOK. Barcha huquqlar himoyalangan.
           </p>
@@ -236,8 +236,8 @@
 <script setup lang="ts">
 import AppInput from "@/components/ui/AppInput.vue";
 import CButton from "@/components/CButton.vue";
-import {onMounted, ref} from "vue";
-import {UserLogin} from "@/typeModules/useModules";
+import { ref } from "vue";
+import { UserLogin } from "@/typeModules/useModules";
 import {authService} from "@/service/authService";
 
 const useAuthService = authService();
@@ -249,8 +249,6 @@ const form = ref<UserLogin>({
   userName: "",
   password: "",
 })
-// const loginForm = ref({ username: '', password: '' });
-// const showPassword = ref(false);
 // const isLoading = ref(false);
 
 

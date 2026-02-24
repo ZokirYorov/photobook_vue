@@ -1,6 +1,6 @@
 <template>
   <div
-      class="w-full invisible sm:w-1/2 md:w-1/3 h-full pt-20 min-h-screen bg-gray-700 transition-all ease-in-out duration-300 fixed inset-0 z-40 top-0 left-0"
+      class="w-full invisible sm:w-1/2 md:w-1/3 h-full mt-20 pt-40 min-h-screen bg-gray-700 transition-all ease-in-out duration-300 fixed inset-0 z-999 left-0"
       @click="toggleMenu"
       :class="isMenuVisible ? 'visible' : 'invisible'"
   >
@@ -18,7 +18,7 @@
           @click="toggleMenu"
           active-class="bg-gray-600 text-white font-semibold"
           class="rounded-sm p-2 cursor-pointer hover:bg-gray-600 transition-colors duration-300 flex items-center gap-1"
-          :class="!isDesktop && index === mainMenuItems.length -1 ? 'hidden' : ''"
+          :class="!isDesktop && index === mainMenuItems.length -1 ? 'hidden' : 'of-hidden'"
       >
         <i :class="item.meta.icon"></i>
         {{item.name}}
