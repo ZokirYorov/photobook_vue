@@ -71,7 +71,7 @@
               'bg-gradient-to-br from-purple-400 to-teal-500'
             ]"
       >
-        <div class="flex items-center justify-between">
+        <div class="flex text-xl items-center justify-between">
           <div class="flex items-center gap-2">
             <i :class="item.icon"></i>
             {{item.label}}
@@ -81,11 +81,17 @@
         <div class="flex border-t border-gray-200 my-4"></div>
         <div class="grid grid-cols-2 gap-4">
           <div class="bg-white/10 rounded-lg p-3 backdrop-blur-sm">
-            <p class="text-sm mb-1">Kutilmoqda</p>
+            <div class="flex items-center justify-between">
+              <p class="text-sm mb-1">Kutilmoqda</p>
+              <i class="fa-regular fa-clock"></i>
+            </div>
             <p class="text-2xl font-bold">{{ item.pending }}</p>
           </div>
           <div class="bg-white/10 rounded-lg p-3 backdrop-blur-sm">
-            <p class="text-sm mb-1">Bajarilgan</p>
+            <div class="flex items-center justify-between">
+              <p class="text-sm mb-1">Bajarilgan</p>
+              <i class="fa-regular fa-circle-check"></i>
+            </div>
             <p class="text-2xl font-bold">{{ item.completed }}</p>
           </div>
         </div>
@@ -93,6 +99,7 @@
           <div class="flex items-center justify-between text-sm mb-2">
             <span class="">Bajarilish foizi</span>
             <span class="font-bold">
+              <i class="fa-solid fa-arrow-trend-up"></i>
             {{ item.total > 0 ? Math.round((Number(item.completed) / item.total) * 100) : 0 }}%
           </span>
           </div>
@@ -155,7 +162,10 @@
               <p class="text-lg font-semibold text-gray-700">{{ item.label }}</p>
             </div>
             <p class="text-4xl font-bold text-gray-900">{{ item.count }}</p>
-            <p class="text-sm text-gray-500 mt-1"><i class="fa-solid fa-tags"></i> Kategoriya</p>
+            <p class="text-sm text-gray-500 mt-1">
+              <i class="fa-solid fa-tags text-blue-400"></i>
+              Kategoriya
+            </p>
           </div>
         </div>
       </div>

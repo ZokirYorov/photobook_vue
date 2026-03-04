@@ -6,6 +6,8 @@ import App from './App.vue';
 import clickOutside from "@/directives/clickOutside";
 import Toast from "vue-toastification";
 import 'vue-toastification/dist/index.css';
+import PrimeVue from 'primevue/config';
+import Aura from '@primeuix/themes/aura';
 import axios from "axios";
 axios.defaults.baseURL = "";
 
@@ -14,5 +16,13 @@ createApp(App)
     .use(router)
     .use(pinia)
     .use(Toast)
+    .use(PrimeVue, {
+        theme: {
+            preset: Aura,
+            options: {
+                darkModeSelector: false
+            }
+        }
+    })
     .directive("clickOutside", clickOutside)
     .mount('#app')

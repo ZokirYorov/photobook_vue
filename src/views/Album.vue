@@ -183,14 +183,57 @@
                 v-model="itemForm.termData"
             />
           </div>
-          <AppSelect
-              v-model="itemForm.status"
-              :options="itemStatus"
-              disabledValue="Xolatni tanlang"
-              label="Status"
-              text-field="text"
-              value-field="value"
+          <div
+              class="flex items-center w-full gap-2"
+          >
+            <AppSelect
+                v-model="itemForm.status"
+                :options="itemStatus"
+                disabledValue="Xolatni tanlang"
+                label="Status"
+                text-field="text"
+                value-field="value"
+            />
+<!--            <AppInput-->
+<!--                label="Image"-->
+<!--                type="file"-->
+<!--                class="w-full"-->
+<!--                multiple="true"-->
+<!--                @change="changeImage($event)"-->
+<!--            />-->
+          </div>
+          <FileUpload
+              ref="fileUploadRef"
+              mode="advanced"
+              :customUpload="true"
+              :auto="false"
+              :multiple="false"
+              accept="image/*"
+
+              chooseLabel="Rasm tanlash"
+              :showUploadButton="false"
+              :showCancelButton="false"
+              :showClearButton="true"
+
+              @select="onFileSelect"
+              @clear="onFileRemove"
           />
+          <div
+              v-if="isEditing && itemForm.imageUrl && !removedOldImage"
+              class="mt-3 relative w-32 h-32"
+          >
+            <img
+                :src="itemForm.imageUrl"
+                class="w-full h-full object-cover rounded-xl border"
+            />
+            <button
+                type="button"
+                @click="onFileRemove"
+                class="absolute cursor-pointer -top-2 -right-2 bg-red-500 text-white w-7 h-7 rounded-full"
+            >
+              ✕
+            </button>
+          </div>
           <div class="flex flex-col sm:flex-row items-stretch lg:flex-row gap-2 sm:items-center justify-end w-full">
             <CButton
                 type="button"
@@ -207,7 +250,29 @@
         </form>
       </div>
     </CDialog>
-    <div class="bg-white w-full flex overflow-x-auto overflow-y-auto flex-col px-4 py-2 gap-3 min-h-0 rounded-xl shadow">
+    <div
+        v-if="previewImage"
+        class="fixed inset-0 z-[9999] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4"
+        @click="closePreview"
+    >
+      <div class="relative max-w-5xl w-full flex justify-center">
+
+        <button
+            @click.stop="closePreview"
+            class="absolute cursor-pointer top-2 right-2 sm:top-4 sm:right-4 md:top-4 md:right-4 lg:right-12 border-2 border-gray-50
+            bg-red-100  text-red-600 rounded-full w-10 h-10 flex items-center justify-center transition "
+        >
+          <i class="fa-solid fa-close text-lg"></i>
+        </button>
+        <img
+            alt=""
+            :src="previewImage"
+            class="max-h-[85vh] w-auto rounded-2xl shadow-2xl"
+            @click.stop
+        />
+      </div>
+    </div>
+    <div class="bg-white w-full flex flex-col px-4 py-2 gap-3 min-h-0 rounded-xl shadow">
       <div class="flex flex-col w-full border-b-2 border-gray-200">
         <h2 class="text-2xl font-semibold">Buyurtmalar jadvali</h2>
         <div class="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-5 w-[80%] items-end gap-4 py-2">
@@ -244,54 +309,79 @@
           />
         </div>
       </div>
-      <table
-          class="w-full rounded table-auto">
-        <colgroup>
-          <col style="width: 2%">
-          <col style="width: 13%">
-          <col style="width: 12%">
-          <col style="width: 12%">
-          <col style="width: 13%">
-          <col style="width: 14%">
-          <col style="width: 10%">
-          <col style="width: 10%">
-          <col style="width: 8%">
-          <col style="width: 6%">
-        </colgroup>
-        <thead class="bg-gray-200 rounded-2xl border-b border-gray-600 tracking-wider">
-        <tr>
-          <th class="px-2 py-3 text-start">№</th>
-          <th class="p-2 text-start">Buyurtma nomi</th>
-          <th class="p-2 text-start">Mijoz</th>
-          <th class="p-2 text-start">Qabul qilgan</th>
-          <th class="p-2 text-start">Mas'ul</th>
-          <th class="py-2 px-4 text-start">Jarayon</th>
-          <th class="p-3 text-start">Sana</th>
-          <th class="p-2 text-start">Muddat</th>
-          <th class="p-2 text-start">Holat</th>
-          <th class="p-2 text-start">Operations</th>
-        </tr>
-        </thead>
-        <tbody v-if="filteredAlbums.length > 0">
-        <tr
-            class="border-b border-gray-600 hover:bg-gray-100"
-            v-for="(album, index) in filteredAlbums" :key="index"
-        >
-          <td class="py-2 px-3">{{ index + 1 }}</td>
-<!--          <td class="p-2 ">-->
-<!--            <img :src="order.imgUrl" alt=""/>-->
-<!--          </td>-->
-          <td class="p-2 break-all">
-            <p class="font-semibold">{{ album.orderName }}</p>
-            <p class="text-gray-500 text-sm font-semibold">{{album.categoryName}}</p>
-            <p class="text-blue-600 text-sm font-semibold">{{album.itemType}}</p>
-          </td>
-          <td class="p-2">{{ album.customerName }}</td>
-          <td class="p-2">{{ album.receiverName }}</td>
-          <td class="p-2">{{ album.employeeName }}</td>
-          <td class="py-2 px-4">
-            <div class="flex flex-col gap-2">
-              <div class="w-full bg-gray-300 h-2 rounded-full overflow-hidden">
+      <div class="overflow-auto">
+        <table
+            class="w-full rounded table-auto overflow-auto">
+          <colgroup>
+            <col style="width: 2%">
+            <col style="width: 13%">
+            <col style="width: 12%">
+            <col style="width: 12%">
+            <col style="width: 12%">
+            <col style="width: 13%">
+            <col style="width: 14%">
+            <col style="width: 10%">
+            <col style="width: 10%">
+            <col style="width: 8%">
+            <col style="width: 6%">
+          </colgroup>
+          <thead class="bg-gray-200 rounded-2xl border-b border-gray-600 tracking-wider">
+          <tr>
+            <th class="px-2 py-3 text-start">№</th>
+            <th class="p-2 text-start">Buyurtma nomi</th>
+            <th class="p-2 text-center">Rasm</th>
+            <th class="p-2 text-start">Mijoz</th>
+            <th class="p-2 text-start">Qabul qilgan</th>
+            <th class="p-2 text-start">Mas'ul</th>
+            <th class="py-2 px-4 text-start">Jarayon</th>
+            <th class="p-3 text-start">Sana</th>
+            <th class="p-2 text-start">Muddat</th>
+            <th class="p-2 text-start">Holat</th>
+            <th class="p-2 text-start">Operations</th>
+          </tr>
+          </thead>
+          <tbody v-if="filteredAlbums.length > 0">
+          <tr
+              class="border-b border-gray-600 hover:bg-gray-100"
+              v-for="(album, index) in filteredAlbums" :key="index"
+          >
+            <td class="py-2 px-3">{{ index + 1 }}</td>
+            <td class="p-2 break-all">
+              <p class="font-semibold">{{ album.orderName }}</p>
+              <p class="text-gray-500 text-sm font-semibold">{{album.categoryName}}</p>
+              <p class="text-blue-600 text-sm font-semibold">{{album.itemType}}</p>
+            </td>
+            <td class="p-3 items-center justify-center flex">
+              <!--            <Image-->
+              <!--                v-if="album.imageUrl"-->
+              <!--                :src="album.imageUrl"-->
+              <!--                preview-->
+              <!--                class="w-15 h-15 flex p-2 m-2  bg-white rounded-xl object-cover"-->
+              <!--            >-->
+              <!--              <template #preview="{ style}">-->
+              <!--                <img-->
+              <!--                    v-if="album.imageUrl"-->
+              <!--                    alt="Rasm yuklanmadi"-->
+              <!--                    :src="album.imageUrl"-->
+              <!--                    class=" max-w-[1500px] max-h-[800px]"-->
+              <!--                    :style="style"-->
+              <!--                />-->
+              <!--                <span v-else>Rasm yuq</span>-->
+              <!--              </template>-->
+              <!--            </Image>-->
+              <img
+                  v-if="album.imageUrl"
+                  @click="openPreview(album.imageUrl)"
+                  class="w-14 h-14 cursor-pointer rounded-xl"
+                  :src="album.imageUrl" alt=""
+              />
+            </td>
+            <td class="p-2">{{ album.customerName }}</td>
+            <td class="p-2">{{ album.receiverName }}</td>
+            <td class="p-2">{{ album.employeeName }}</td>
+            <td class="py-2 px-4">
+              <div class="flex flex-col gap-2">
+                <div class="w-full bg-gray-300 h-2 rounded-full overflow-hidden">
                 <span
                     v-if="album.processNumber && album.amountNumber"
                     class="block h-full bg-blue-600 transition-all duration-300"
@@ -299,55 +389,56 @@
                     width: ((album.processNumber) / album.amountNumber * 100) + '%'
                   }"
                 ></span>
+                </div>
+                <div class="text-sm mt-1 flex items-center justify-between text-gray-600">
+                  <span>{{ album.processNumber || 0 }} / {{ album.amountNumber }}</span>
+                  <span>{{album.pageNumber || 0}}-Bet</span>
+                </div>
               </div>
-              <div class="text-sm mt-1 flex items-center justify-between text-gray-600">
-                <span>{{ album.processNumber || 0 }} / {{ album.amountNumber }}</span>
-                <span>{{album.pageNumber || 0}}-Bet</span>
-              </div>
-            </div>
-          </td>
-          <td class="py-2 px-1">{{ formatDate(album.createdData) }}</td>
-          <td class="p-2">{{ formatDate(album.termData) }}</td>
-          <td class="p-2"
-          >
+            </td>
+            <td class="py-2 px-1">{{ formatDate(album.createdData) }}</td>
+            <td class="p-2">{{ formatDate(album.termData) }}</td>
+            <td class="p-2"
+            >
             <span
                 :class="[statusColor[album.status],
                   'rounded-xl px-3 py-1 font-semibold text-sm',
                 ]">
               {{ album.status }}
             </span>
-          </td>
-          <td class="py-2 px-3">
-            <div
-                class="flex items-center gap-2"
+            </td>
+            <td class="py-2 px-3">
+              <div
+                  class="flex items-center gap-2"
+              >
+                <CButton
+                    type="button"
+                    text="Edit"
+                    variant="ghost-accent"
+                    @click="editForm(album)"
+                />
+                <CButton
+                    type="button"
+                    text="Delete"
+                    variant="danger"
+                    @click="deleteItem(album.id)"
+                />
+              </div>
+            </td>
+          </tr>
+          </tbody>
+          <tbody v-else>
+          <tr>
+            <td
+                colspan="10"
+                class="text-center py-6 text-gray-600 font-semibold"
             >
-              <CButton
-                  type="button"
-                  text="Edit"
-                  variant="ghost-accent"
-                  @click="editForm(album)"
-              />
-              <CButton
-                  type="button"
-                  text="Delete"
-                  variant="danger"
-                  @click="deleteItem(album.id)"
-              />
-            </div>
-          </td>
-        </tr>
-        </tbody>
-        <tbody v-else>
-        <tr>
-          <td
-              colspan="10"
-              class="text-center py-6 text-gray-600 font-semibold"
-          >
-            Buyurtma topilmadi!
-          </td>
-        </tr>
-        </tbody>
-      </table>
+              Buyurtma topilmadi!
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
 
@@ -364,6 +455,8 @@ import {useStore} from "@/stores/store";
 import { AllOrders } from "@/typeModules/useModules";
 import { useToast } from "vue-toastification";
 import DeleteConfirm from "@/components/DeleteConfirm.vue";
+import FileUpload from "primevue/fileupload";
+// import Image from 'primevue/image'
 
 const Toast = useToast();
 const dataStore = useStore();
@@ -378,7 +471,47 @@ const formStatus = ref<string | null>(null);
 const formData = ref<string | null>(null);
 const endData = ref<string | null>(null);
 const formFilter = ref<string | ''>('');
+const previewImage = ref<string | null>(null)
 
+const openPreview = (url: string) => {
+  previewImage.value = url;
+}
+const closePreview = () => {
+  previewImage.value = null;
+}
+const selectedFiles = ref<File[]>([])
+const previewUrl = ref<string | null>(null)
+const fileUploadRef = ref()
+const removedOldImage = ref(false)
+
+const onFileSelect = (event: any) => {
+  const file = event.files[0]
+  if (event.files.length > 1) {
+    fileUploadRef.value.clear()
+    return
+  }
+  selectedFiles.value = file;
+
+  previewUrl.value = URL.createObjectURL(file)
+
+  itemForm.value.imageUrl = previewUrl.value
+}
+
+const onFileRemove = () => {
+  selectedFiles.value = [];
+  previewUrl.value = null;
+  itemForm.value.imageUrl = ""
+  removedOldImage.value = true
+}
+
+watch(
+    () => isEditing.value,
+    (val) => {
+      if (val) {
+        removedOldImage.value = false
+      }
+    }
+)
 
 const filteredAlbums = computed(() => {
   let data = dataStore.state.albums
@@ -426,6 +559,7 @@ const itemForm = ref<AllOrders>({
   employeeName: '',
   termData: null,
   status: '',
+  imageUrl: '',
   // doneData: null,
   createdData: '',
   createdAt: null,
@@ -518,6 +652,18 @@ const visibleForm = () => {
   resetForm()
 };
 
+// const changeImage = async (event: Event) => {
+//   const input = event.target as HTMLInputElement
+//   if (!input.files?.length) return
+//
+//   const file = input.files[0]
+//
+//   console.log("Uploading file:", file)
+//   const url = await dataStore.uploadImage(file, 'albums')
+  //
+  // itemForm.value.imageUrl = URL.createObjectURL(file)
+// }
+
 const closeForm = () => {
   isVisible.value = false;
 }
@@ -548,6 +694,10 @@ const isValidForm = () => {
 const submitForm = async ( ) => {
   try {
   if (!isValidForm()) return;
+
+  if (selectedFiles.value.length > 0) {
+    itemForm.value.imageUrl = URL.createObjectURL( selectedFiles.value[0] );
+  }
     filteredAlbums.value.push(itemForm.value);
 
     if (isEditing.value) {
@@ -606,6 +756,7 @@ const resetForm = () => {
     employeeName: '',
     termData: null,
     status: '',
+    imageUrl: '',
     // doneData: null,
     createdData: '',
     createdAt: null,
@@ -625,8 +776,6 @@ const formatDate = (dateString?: string | null): string => {
   const month = (date.getMonth() + 1).toString().padStart(2,'0');
   return `${day}-${month}-${year}`;
 };
-
-
 
 onMounted(async () => {
   await dataStore.loadGetAlbum()

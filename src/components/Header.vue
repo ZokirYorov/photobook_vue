@@ -5,9 +5,11 @@
     <div
         class="w-full container m-auto h-20 py-2.5 px-2 2xl:px-4  text-white grid grid-cols-[1fr_auto_1fr] grid-flow-col-dense items-center shadow-md transition-colors"
     >
-      <div class="flex items-center gap-2">
-        <i class="fas fa-industry text-3xl"></i>
-        <h2>PHOTOBOOK</h2>
+      <div class="flex items-center h-full">
+        <div class="flex items-center">
+          <img class="w-17" src="../assets/logo.png" alt="">
+          <h2>PHOTOBOOK</h2>
+        </div>
       </div>
 
       <div

@@ -41,6 +41,7 @@ export interface AllOrders {
     processNumber: number | null; // jarayonda bajarilgan holati soni
     termData: string | null; // muddat tugash sanasi
     status: string; // holat
+    imageUrl: string;
     // doneData: number | null; // bajarildi
     createdData: string;
     createdAt: string | null; // yaratilgan kun

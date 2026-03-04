@@ -1,13 +1,16 @@
-import { defineStore} from "pinia";
+import {defineStore} from "pinia";
 import {
     AllCategory,
     AllOrders,
     ExpensesForm,
     IFormData,
-    IItems, IPicture, Order, UserForm,
+    IItems,
+    IPicture,
+    Order,
+    UserForm,
 } from '@/typeModules/useModules';
 import {ref, UnwrapRef} from "vue";
-import { collection, addDoc, query, Query, updateDoc, orderBy, where, getDocs, deleteDoc, doc } from 'firebase/firestore'
+import {addDoc, collection, deleteDoc, doc, getDocs, orderBy, query, updateDoc, where} from 'firebase/firestore'
 import { db } from '@/firebase'
 
 export const useStore = defineStore('item', () => {
