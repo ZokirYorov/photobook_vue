@@ -223,13 +223,14 @@
               class="mt-3 relative w-32 h-32"
           >
             <img
+                alt=""
                 :src="itemForm.imageUrl"
                 class="w-full h-full object-cover rounded-xl border"
             />
             <button
                 type="button"
                 @click="onFileRemove"
-                class="absolute cursor-pointer -top-2 -right-2 bg-red-500 text-white w-7 h-7 rounded-full"
+                class="absolute cursor-pointer -top-2 -right-2 hover:bg-red-600 bg-red-500 text-white w-7 h-7 rounded-full"
             >
               ✕
             </button>
@@ -259,8 +260,8 @@
 
         <button
             @click.stop="closePreview"
-            class="absolute cursor-pointer top-2 right-2 sm:top-4 sm:right-4 md:top-4 md:right-4 lg:right-12 border-2 border-gray-50
-            bg-red-100  text-red-600 rounded-full w-10 h-10 flex items-center justify-center transition "
+            class="absolute cursor-pointer top-2 right-2 sm:top-4 sm:right-4 md:top-4 md:right-4 lg:right-8 border-2 border-red-200
+            bg-red-100 hover:bg-orange-400  text-red-600 rounded-full w-10 h-10 flex items-center justify-center transition "
         >
           <i class="fa-solid fa-close text-lg"></i>
         </button>
