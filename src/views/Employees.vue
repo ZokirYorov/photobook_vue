@@ -1,7 +1,17 @@
 <template>
   <div class="flex p-6 flex-col gap-4 container m-auto w-full h-full">
     <div class="flex bg-white p-4 rounded-xl w-full items-center justify-between">
-      <h2 class="text-2xl font-semibold">Xodimlar</h2>
+      <div class="flex items-center gap-2">
+        <CButton
+            type="button"
+            text="Ortga"
+            is-has-fa-icon
+            variant="ghost-accent"
+            faClass="fa-solid fa-arrow-left"
+            @click="router.back()"
+        />
+        <span class="text-xl font-semibold">Xodimlar</span>
+      </div>
       <CButton
           type="button"
           text="Add user"
@@ -110,9 +120,8 @@
       />
     </CDialog>
     <div
-        class=" gap-5 flex-col w-full bg-white p-6 rounded-xl h-full"
+        class="animate-fade-in gap-5 flex-col w-full bg-white p-6 rounded-xl h-full"
     >
-<!--      <Loading v-if="isLoading"/>-->
       <div class="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5"
            v-if="allUsers.length"
       >
@@ -249,10 +258,11 @@ import CButton from "@/components/CButton.vue";
 import CDialog from "@/components/CDialog.vue";
 import { useStore } from "@/stores/store";
 import {Role, UserForm} from "@/typeModules/useModules";
-import Loading from "@/components/Loading.vue";
 import DeleteConfirm from "@/components/DeleteConfirm.vue";
 import AppSelect from "@/components/ui/AppSelect.vue";
+import { useRouter } from "vue-router";
 
+const router = useRouter();
 const store = useStore();
 
 const visibleShow = ref(false);
@@ -273,7 +283,7 @@ const form = ref<UserForm>({
   profession: '',
   isLogin: '',
   isPassword: '',
-  roles: '',
+  roles: [],
   phoneNumber: null,
   createdAt: null,
   updatedAt: null,
@@ -287,7 +297,7 @@ const clickVisibleForm = () => {
     profession: '',
     isLogin: '',
     isPassword: '',
-    roles: '',
+    roles: [],
     phoneNumber: null,
     createdAt: null,
     updatedAt: null,
@@ -356,7 +366,7 @@ const submitForm = async () => {
       profession: '',
       isLogin: '',
       isPassword: '',
-      roles: '',
+      roles: [],
       phoneNumber: null,
       createdAt: null,
       updatedAt: null,
@@ -409,7 +419,7 @@ const closeForm = () => {
     profession: '',
     isLogin: '',
     isPassword: '',
-    roles: '',
+    roles: [],
     phoneNumber: null,
     createdAt: null,
     updatedAt: null,
@@ -428,6 +438,22 @@ onMounted(async () => {
 });
 
 </script>
+<style scoped>
+.animate-fade-in {
+  animation: fadeIn 0.4s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+</style>
 <!--<style>-->
 <!--#imageItem {-->
 <!--  position: relative;-->

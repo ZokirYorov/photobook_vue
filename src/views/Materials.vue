@@ -75,7 +75,7 @@
       />
     </CDialog>
     <div
-        class="flex bg-white rounded-xl flex-col w-full p-4 gap-6"
+        class="flex animate-fade-in bg-white rounded-xl flex-col w-full p-4 gap-6"
     >
       <div
           v-if="materialItems.length"
@@ -121,7 +121,6 @@
               <span class="break-all">{{item.unitName}}</span>
             </div>
             <div v-if="item.updatedAt">
-<!--              <p>Yaratildi: {{dataItem(item.createdAt)}}</p>-->
               <p>Yangilandi: {{dataItem(item.updatedAt)}}</p>
             </div>
           </div>
@@ -332,5 +331,18 @@ onMounted(async () => {
 </script>
 
 <style scoped>
+.animate-fade-in {
+  animation: fadeIn 0.4s ease-in-out;
+}
 
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 </style>

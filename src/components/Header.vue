@@ -3,7 +3,7 @@
       class="flex flex-col overflow-x-auto bg-gray-800 w-full"
   >
     <div
-        class="w-full container m-auto h-20 py-2.5 px-2 2xl:px-4  text-white grid grid-cols-[1fr_auto_1fr] grid-flow-col-dense items-center shadow-md transition-colors"
+        class="w-full h-20 py-2.5 px-2 2xl:px-4  text-white grid grid-cols-[1fr_auto_1fr] grid-flow-col-dense items-center shadow-md transition-colors"
     >
       <div class="flex items-center h-full">
         <div class="flex items-center">

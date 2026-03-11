@@ -101,7 +101,7 @@ export interface UserForm {
     profession: string;
     isLogin: string;
     isPassword: string;
-    roles: string;
+    roles: Role[];
     phoneNumber: number | null;
     createdAt: string | null;
     updatedAt: string | null;

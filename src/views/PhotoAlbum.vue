@@ -16,7 +16,7 @@
       />
     </div>
     <div
-        class="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2 bg-gray-100 rounded-xl p-2 justify-between"
+        class="grid grid-cols-1 animate-fade-in sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2 bg-gray-100 rounded-xl p-2 justify-between"
     >
       <div
           class="flex flex-col gap-4 bg-white rounded-xl py-2 px-4 justify-between"
@@ -264,7 +264,7 @@
         />
       </div>
     </div>
-    <div class="bg-white w-full flex overflow-x-auto flex-col px-4 py-2 gap-2 min-h-0 rounded-xl shadow">
+    <div class="bg-white animate-fade-in w-full flex overflow-x-auto flex-col px-4 py-2 gap-2 min-h-0 rounded-xl shadow">
       <div class="flex flex-col w-full border-b-2 border-gray-200">
         <div class="flex items-center gap-4 py-2">
           <CButton
@@ -277,7 +277,7 @@
           />
           <h2 class="text-2xl font-semibold">Buyurtmalar jadvali</h2>
         </div>
-        <div class="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-5 w-[80%] items-end gap-4 py-2">
+        <div class="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-5 items-end gap-4 py-2">
           <AppSelect
               v-model="formStatus"
               :options="itemStatus"
@@ -326,7 +326,7 @@
           <col style="width: 8%">
           <col style="width: 6%">
         </colgroup>
-        <thead class="bg-gray-200 rounded-2xl border-b border-gray-600">
+        <thead class="bg-gray-200 rounded-2xl">
         <tr>
           <th class="px-2 py-3 text-start">№</th>
           <th class="p-2 text-start">Buyurtma nomi</th>
@@ -343,7 +343,7 @@
         </thead>
         <tbody v-if="filteredPictures.length > 0">
         <tr
-            class="border-b border-gray-600 hover:bg-gray-100"
+            class="border-t border-gray-600 hover:bg-gray-100"
             v-for="(album, index) in filteredPictures" :key="index"
         >
           <td class="p-2 ">{{ index + 1 }}</td>
@@ -686,7 +686,6 @@ const isValidForm = () => {
   const f = itemForm.value;
   return (
       f.amountNumber !== null &&
-      // f.processNumber !== null &&
       f.pageNumber !== null &&
       f.receiverName !== null &&
       f.categoryName !== null &&
@@ -758,7 +757,6 @@ const deleteItem = async (id: string | null) => {
 const resetForm = () => {
   itemForm.value = {
     id: '',
-    // imgUrl: null,
     categoryName: '',
     orderName: '',
     itemType: '',
@@ -804,3 +802,19 @@ onMounted(async () => {
 })
 
 </script>
+<style scoped>
+.animate-fade-in {
+  animation: fadeIn 0.4s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+</style>

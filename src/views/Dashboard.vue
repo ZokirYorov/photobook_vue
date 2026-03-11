@@ -1,5 +1,5 @@
 <template>
-  <div class="flex p-6 flex-col container m-auto gap-6 h-screen w-full">
+  <div class="flex p-6 flex-col animate-fade-in container m-auto gap-6 h-screen w-full">
     <div
         class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-5 items-center"
     >
@@ -464,5 +464,19 @@ onMounted(async (): Promise<void> => {
   // await getCategory();
 })
 </script>
-<style>
+<style scoped>
+.animate-fade-in {
+  animation: fadeIn 0.4s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 </style>

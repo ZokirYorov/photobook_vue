@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-col container m-auto w-full p-6">
     <div class="w-full flex bg-white flex-col px-4 py-2 gap-3 min-h-0 rounded-xl shadow">
-      <h2 class="text-2xl font-semibold p-4">Mening vazifalarim</h2>
+      <h2 class="text-2xl font-semibold p-4">Mening vazifalarim ( Hozircha test rejimida )</h2>
       <div
           class="overflow-auto"
       >
