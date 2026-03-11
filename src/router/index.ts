@@ -20,6 +20,15 @@ const routes: Array<RouteRecordRaw> = [
                 },
             },
             {
+                path: '/tasks',
+                name: 'Mening vazifalarim',
+                component: () => import('../views/MyTasks.vue'),
+                meta: {
+                    requiresAuth: true,
+                    icon: 'fa-solid fa-list-check'
+                }
+            },
+            {
                 path: "/album",
                 name: "Albom",
                 component: () =>import('../views/Album.vue'),

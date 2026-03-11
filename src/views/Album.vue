@@ -16,7 +16,7 @@
       />
     </div>
     <div
-        class="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 bg-gray-100 rounded-xl p-2 justify-between"
+        class="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 bg-gray-100 rounded-xl p-2 justify-between"
     >
       <div
           class="flex flex-col gap-4 bg-white rounded-xl py-2 px-4 justify-between"
@@ -114,17 +114,17 @@
           />
           <div
               v-if="isEditing && itemForm.imageUrl && !removedOldImage"
-              class="mt-3 relative w-32 h-25"
+              class="relative w-32 h-25"
           >
             <img
                 alt=""
                 :src="itemForm.imageUrl"
-                class="w-full h-full object-cover rounded-xl border"
+                class="object-cover rounded-xl border"
             />
             <button
                 type="button"
                 @click="onFileRemove"
-                class="absolute cursor-pointer -top-2 -right-2 hover:bg-red-600 bg-red-500 text-white w-7 h-7 rounded-full"
+                class="absolute cursor-pointer -top-2 -right-2 hover:bg-red-400 bg-red-300 text-red-800 w-7 h-7 rounded-full"
             >
               ✕
             </button>
@@ -157,7 +157,7 @@
                 class="w-full"
                 placeholder="Masalan: 10"
                 label="Bajarish soni"
-                v-model="itemForm.processNumber"
+                v-model="itemForm.processedCount"
             />
           </div>
           <div class="flex items-center justify-between w-full gap-2">
@@ -193,11 +193,12 @@
             />
           </div>
           <AppSelect
-              v-model="itemForm.employeeName"
+              v-model="selectedEmployeeNames"
               :options="allUsers"
               disabledValue="Xodimni tanlang"
               text-field="name"
               value-field="name"
+              isMultiple
               label="Mas'ul xodim"
           />
           <div
@@ -273,9 +274,19 @@
         />
       </div>
     </div>
-    <div class="bg-white w-full flex flex-col px-4 py-2 gap-3 min-h-0 rounded-xl shadow">
+    <div class="bg-white w-full flex flex-col px-4 py-2 gap-2 min-h-0 rounded-xl shadow">
       <div class="flex flex-col w-full border-b-2 border-gray-200">
-        <h2 class="text-2xl font-semibold">Buyurtmalar jadvali</h2>
+        <div class="flex items-center gap-2 py-2">
+          <CButton
+              text="Orqaga"
+              type="button"
+              is-has-fa-icon
+              variant="ghost-accent"
+              faClass="fa-solid fa-arrow-left"
+              @click="router.back()"
+          />
+          <h2 class="text-2xl font-semibold">Buyurtmalar jadvali</h2>
+        </div>
         <div class="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-5 w-[80%] items-end gap-4 py-2">
           <AppSelect
               v-model="formStatus"
@@ -338,7 +349,7 @@
             <th class="p-3 text-start">Sana</th>
             <th class="p-2 text-start">Muddat</th>
             <th class="p-2 text-start">Holat</th>
-            <th class="p-2 text-start">Operations</th>
+            <th class="p-2 text-start">Amallar</th>
           </tr>
           </thead>
           <tbody v-if="filteredAlbums.length > 0">
@@ -362,20 +373,42 @@
             </td>
             <td class="p-2">{{ album.customerName }}</td>
             <td class="p-2">{{ album.receiverName }}</td>
-            <td class="p-2">{{ album.employeeName }}</td>
+            <td class="px-1">
+              <div
+                  v-if="album.employees"
+                  v-for="emp in album.employees"
+                  :key="emp.id"
+                  class="flex text-sm items-center border-b border-gray-300 gap-2 pb-0.5"
+              >
+                <i
+                    v-if="emp.status === 'COMPLETED'"
+                    class="fa-solid fa-circle-check text-green-600"
+                />
+                <i
+                    v-else-if="emp.status === 'IN_PROGRESS'"
+                    class="fa-solid fa-play text-blue-600"
+                />
+                <i
+                    v-else
+                    class="fa-solid fa-circle-check text-green-600"
+
+                />
+                <span>{{ emp.name }}</span>
+              </div>
+            </td>
             <td class="py-2 px-4">
               <div class="flex flex-col gap-2">
                 <div class="w-full bg-gray-300 h-2 rounded-full overflow-hidden">
                 <span
-                    v-if="album.processNumber && album.amountNumber"
+                    v-if="album.processedCount && album.amountNumber"
                     class="block h-full bg-blue-600 transition-all duration-300"
                     :style="{
-                    width: ((album.processNumber) / album.amountNumber * 100) + '%'
+                    width: ((album.processedCount) / album.amountNumber * 100) + '%'
                   }"
                 ></span>
                 </div>
                 <div class="text-sm mt-1 flex items-center justify-between text-gray-600">
-                  <span>{{ album.processNumber || 0 }} / {{ album.amountNumber }}</span>
+                  <span>{{ album.processedCount || 0 }} / {{ album.amountNumber }}</span>
                   <span>{{album.pageNumber || 0}}-Bet</span>
                 </div>
               </div>
@@ -440,9 +473,10 @@ import { AllOrders } from "@/typeModules/useModules";
 import { useToast } from "vue-toastification";
 import DeleteConfirm from "@/components/DeleteConfirm.vue";
 import FileUpload from "primevue/fileupload";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 // import Image from 'primevue/image'
 
+const router = useRouter();
 const route = useRoute();
 const Toast = useToast();
 const dataStore = useStore();
@@ -458,6 +492,7 @@ const formData = ref<string | null>(null);
 const endData = ref<string | null>(null);
 const formFilter = ref<string | ''>('');
 const previewImage = ref<string | null>(null)
+const selectedEmployeeNames = ref<string[]>([])
 
 const openPreview = (url: string) => {
   previewImage.value = url;
@@ -509,7 +544,6 @@ const filteredAlbums = computed(() => {
         item.orderName?.toLowerCase().includes(search) ||
         item.categoryName?.toLowerCase().includes(search) ||
         item.customerName?.toLowerCase().includes(search) ||
-        item.employeeName?.toLowerCase().includes(search) ||
         item.amountNumber?.toFixed().includes(search) ||
         item.pageNumber?.toFixed().includes(search) ||
         item.receiverName?.toLowerCase().includes(search)
@@ -523,13 +557,13 @@ const filteredAlbums = computed(() => {
     return dateB - dateA  // oxirgi qo'shilgan birinchi
   })
 })
-
+// "PENDING" | "IN_PROGRESS" | "COMPLETED"
 const allUsers = ref([
-  {id: 1, name: 'Ali Usmonov'},
-  {id: 2, name: 'Elyor Usmonov'},
-  {id: 3, name: 'Akbar Salimov'},
-  {id: 4, name: 'Murod Xalilov'},
-  {id: 5, name: 'Samandar Kamolov'},
+  {id: 1, name: 'Ali Usmonov', status: 'PENDING'},
+  {id: 2, name: 'Elyor Usmonov', status: 'PENDING'},
+  {id: 3, name: 'Akbar Salimov', status: 'PENDING'},
+  {id: 4, name: 'Murod Xalilov', status: 'PENDING'},
+  {id: 5, name: 'Samandar Kamolov', status: 'PENDING'},
 ])
 
 const itemForm = ref<AllOrders>({
@@ -537,12 +571,13 @@ const itemForm = ref<AllOrders>({
   categoryName: '',
   orderName: '',
   itemType: '',
-  processNumber: null,
+  processedCount: null,
   pageNumber: null,
   amountNumber: null,
   customerName: '',
   receiverName: '',
-  employeeName: '',
+  employeeId: [],
+  employees: [],
   termData: null,
   status: '',
   imageUrl: '',
@@ -621,7 +656,7 @@ const getCategoryCount = (value: string) => {
 const getCount = (value: string) => {
   return filteredAlbums.value
       .filter(item => item.categoryName === value)
-      .reduce((total, item) => total + (item.processNumber || 0), 0)
+      .reduce((total, item) => total + (item.processedCount || 0), 0)
 }
 
 const getRemaining = (value: string) => {
@@ -629,10 +664,12 @@ const getRemaining = (value: string) => {
       .filter(item => item.categoryName === value)
       .reduce((total, item) => {
         const totalNum = item.amountNumber || 0
-        const processed = item.processNumber || 0
+        const processed = item.processedCount || 0
         return total + (totalNum - processed)
       }, 0)
 }
+
+// "PENDING" | "IN_PROGRESS" | "COMPLETED"
 
 const itemStatus = ref( [
   { value: 'Kutilmoqda', text: 'Kutilmoqda' },
@@ -660,6 +697,7 @@ const visibleForm = () => {
 const closeForm = () => {
   isVisible.value = false;
 }
+// "PENDING" | "IN_PROGRESS" | "COMPLETED"
 
 const statusColor: Record<string, string> = {
   Kutilmoqda: 'bg-yellow-100 text-yellow-700',
@@ -677,7 +715,7 @@ const isValidForm = () => {
       f.categoryName !== null &&
       f.orderName !== null &&
       f.customerName !== null &&
-      f.employeeName !== null &&
+      f.employees !== null &&
       f.createdData !== null &&
       f.termData !== null &&
       f.status !== null
@@ -692,6 +730,17 @@ const submitForm = async ( ) => {
     itemForm.value.imageUrl = URL.createObjectURL( selectedFiles.value[0] );
   }
     filteredAlbums.value.push(itemForm.value);
+
+  itemForm.value.employees = selectedEmployeeNames.value.map(name => {
+    const existing = itemForm.value.employees.find(e => e.name === name)
+    return existing ?? {
+      id: allUsers.value.find(u => u.name === name)?.id ?? 0,
+      name,
+      status: 'PENDING'
+    }
+  })
+
+    itemForm.value.employeeId = itemForm.value.employees.map(e => e.id)
 
     if (isEditing.value) {
       await dataStore.updateAlbum(itemForm.value.id, itemForm.value);
@@ -714,13 +763,14 @@ const editForm = async (item: AllOrders): Promise<void> => {
   isVisible.value = true;
   isEditing.value = true;
   itemForm.value = { ...item };
+  selectedEmployeeNames.value = (item.employees || []).map(e => e.name);
 };
 
 const deleteConfirmItem = async () => {
   if (!selectedItem.value) return;
   try {
     await dataStore.deleteAlbum(selectedItem.value)
-    Toast.info("Successfully deleted!");
+    Toast.info("Muvoffaqiyatli uchirildi!");
     showConfirmItem.value = false;
     selectedItem.value = null;
   }
@@ -741,12 +791,13 @@ const resetForm = () => {
     categoryName: '',
     orderName: '',
     itemType: '',
-    processNumber: null,
+    processedCount: null,
     pageNumber: null,
     amountNumber: null,
     customerName: '',
     receiverName: '',
-    employeeName: '',
+    employeeId: [],
+    employees: [],
     termData: null,
     status: '',
     imageUrl: '',
@@ -755,6 +806,7 @@ const resetForm = () => {
     createdAt: null,
     updatedAt: null,
   }
+  selectedEmployeeNames.value = [];
   isEditing.value = false
 }
 

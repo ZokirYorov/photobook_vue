@@ -282,7 +282,7 @@ const getAlbums = ref([
   { id: 1,
     name: 'Jami albom',
     itemCount: allAlbumCount.value,
-    icon: "fa-solid fa-boxes",
+    icon: "fa-solid fa-book",
     onclick: () => clickOpenPage('/album')
   },
   { id: 2,

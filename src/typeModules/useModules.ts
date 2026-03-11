@@ -28,6 +28,12 @@ export interface AllCategory {
     updatedAt: string | null;
 }
 
+export interface EmployeeStatus {
+    id: number;
+    name: string;
+    status: "PENDING" | "IN_PROGRESS" | "COMPLETED"
+}
+
 export interface AllOrders {
     id: string;
     categoryName: string | null; // buyurtma turi nomi
@@ -37,8 +43,9 @@ export interface AllOrders {
     amountNumber: number | null; //buyurtma soni
     customerName: string; // mijoz nomi
     receiverName: string; // qabul qiluvchi
-    employeeName: string; // xodim
-    processNumber: number | null; // jarayonda bajarilgan holati soni
+    employeeId: number[]; // xodim
+    employees: EmployeeStatus[];
+    processedCount: number | null; // jarayonda bajarilgan holati soni
     termData: string | null; // muddat tugash sanasi
     status: string; // holat
     imageUrl: string;
@@ -56,8 +63,9 @@ export interface Order {
     amountNumber: number | null;
     customerName: string;
     receiverName: string;
-    employeeName: string;
-    processNumber: number | null;
+    employeeId: number[];
+    employees: EmployeeStatus[];
+    processedCount: number | null;
     termData: string | null;
     status: string;
     imageUrl: string;
@@ -76,8 +84,9 @@ export interface IPicture {
     amountNumber: number | null;
     customerName: string;
     receiverName: string;
-    employeeName: string;
-    processNumber: number | null;
+    employeeId: number[]; // xodim
+    employees: EmployeeStatus[];
+    processedCount: number | null;
     termData: string | null;
     status: string;
     imageUrl: string;
