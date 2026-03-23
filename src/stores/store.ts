@@ -5,7 +5,7 @@ import {
     ExpensesForm,
     IFormData,
     IItems, IPaging,
-    Order, OrderCreateDto, OrderKind, OrderStatus, PagingRequest, PagingResponse, Role,
+    Order, OrderCreateDto, OrderKind, OrderStatus, PagingRequest, PagingResponse,
     UserForm, UserPagingRequest, UserTask,
 } from '@/typeModules/useModules';
 import {ref, UnwrapRef} from "vue";
@@ -124,46 +124,46 @@ export const useStore = defineStore('item', () => {
         await loadOrders(kind, params);
     };
 
-    const getOrderById = async (id: string): Promise<Order | null> => {
-        try {
-            const { data } = await axiosInstance.get<Order>(`/api/v1/orders/${id}`);
-            return data;
-        } catch (error) {
-            console.error("getOrderById error:", error);
-            return null;
-        }
-    };
+    // const getOrderById = async (id: string): Promise<Order | null> => {
+    //     try {
+    //         const { data } = await axiosInstance.get<Order>(`/api/v1/orders/${id}`);
+    //         return data;
+    //     } catch (error) {
+    //         console.error("getOrderById error:", error);
+    //         return null;
+    //     }
+    // };
 
-    const updateOrderStatus = async (
-        id: string,
-        kind: OrderKind,
-        status: OrderStatus
-    ): Promise<void> => {
-        await axiosInstance.put(`/api/v1/orders/${id}/status`, { status });
-        await loadOrders(kind);
-    };
+    // const updateOrderStatus = async (
+    //     id: string,
+    //     kind: OrderKind,
+    //     status: OrderStatus
+    // ): Promise<void> => {
+    //     await axiosInstance.put(`/api/v1/orders/${id}/status`, { status });
+    //     await loadOrders(kind);
+    // };
+    //
+    // const getStatusHistory = async (id: string) => {
+    //     try {
+    //         const { data } = await axiosInstance.get(`/api/v1/orders/${id}/status-history`);
+    //         return data;
+    //     } catch (error) {
+    //         console.error("getStatusHistory error:", error);
+    //         return [];
+    //     }
+    // };
 
-    const getStatusHistory = async (id: string) => {
-        try {
-            const { data } = await axiosInstance.get(`/api/v1/orders/${id}/status-history`);
-            return data;
-        } catch (error) {
-            console.error("getStatusHistory error:", error);
-            return [];
-        }
-    };
 
-
-    const loadGetUsers = async (filters: Partial<UserPagingRequest> = {} ) => {
-        const body: UserPagingRequest = {
-            page: state.value.users.pageNumber || 0,
-            size: state.value.users.pageSize || 100,
-            sort: ['acceptedDate', 'DESC'],
-            ...filters,
-        }
-        const response = await axiosInstance.post<PagingResponse<UserForm>>("/api/v1/users", body);
-            state.value.users = response.data;
-        };
+    // const loadGetUsers = async (filters: Partial<UserPagingRequest> = {} ) => {
+    //     const body: UserPagingRequest = {
+    //         page: state.value.users.pageNumber || 0,
+    //         size: state.value.users.pageSize || 100,
+    //         sort: ['acceptedDate', 'DESC'],
+    //         ...filters,
+    //     }
+    //     const response = await axiosInstance.post<PagingResponse<UserForm>>("/api/v1/users", body);
+    //         state.value.users = response.data;
+    //     };
 
     const loadUsers = async () => {
 
