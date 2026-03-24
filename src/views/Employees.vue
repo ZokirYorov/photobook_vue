@@ -115,7 +115,7 @@
           </p>
           <AppSelect
               v-model="selectedRoles"
-              :options="roles"
+              :options="rolesOptions"
               disabledValue="Role tanlang"
               text-field="name"
               value-field="id"
@@ -150,7 +150,7 @@
     </CDialog>
 
     <div class="animate-fade-in overflow-auto gap-5 flex-col w-full bg-white p-6 rounded-xl h-full">
-      <table class="overflow-auto table-auto">
+      <table class="overflow-auto table-auto w-full">
         <colgroup>
           <col style="width: 5%">
           <col style="width: 15%">
@@ -173,10 +173,10 @@
           <th class="p-2 text-start">Amallar</th>
         </tr>
         </thead>
-        <tbody v-if="allUsers.items.length">
+        <tbody v-if="allUsers.length">
         <tr
             class="border-t border-gray-600 text-sm hover:bg-gray-100"
-            v-for="(user, index) in allUsers.items"
+            v-for="(user, index) in allUsers"
             :key="user.id"
         >
           <td class="p-4">{{index + 1}}</td>
@@ -190,9 +190,9 @@
               <span
                   v-for="role in user.roles"
                   :key="role.id"
-                  class="bg-blue-100 text-blue-600 px-2 py-1 rounded text-xs"
+                  class="bg-blue-100 text-blue-600 px-2 py-1 rounded text-xs font-semibold"
               >
-                {{ role.name }}
+                {{ roleStatus[role.name] }}
               </span>
             </div>
           </td>
@@ -226,8 +226,8 @@
         </tbody>
         <tbody v-else>
         <tr>
-          <td>
-            <div class="flex items-center justify-center w-full text-gray-600 m-auto">
+          <td colspan="10">
+            <div class="flex p-4 items-center justify-center w-full text-gray-600 m-auto">
               Xodim topilmadi!
             </div>
           </td>
@@ -270,13 +270,36 @@ const selectedFile = ref<File | null>(null);
 const isEditing = ref(false);
 const avatarPreview = ref<string>("");
 
-// Eski upload key ni saqlab qo'yamiz (delete uchun)
 const oldUploadKey = ref<string | null>(null);
-// Yangi upload qilingandan keyin key ni saqlaymiz
 const newUploadId = ref<string | null>(null);
 
-const users: ComputedRef = computed(() => store.state.user);
+const users: ComputedRef = computed(() => store.state.user.items);
 const allUsers = computed(() => users.value);
+
+const roleLabels = [
+  { value: "ROLE_ADMIN", text: "ADMIN" },
+  { value: "ROLE_MANAGER", text: "MENEGER" },
+  { value: "ROLE_OPERATOR", text: "OPERATOR" },
+  { value: "ROLE_USER", text: "USER" },
+];
+
+const rolesOptions = computed(() => {
+  return roles.value.map((role: Role) => {
+    const found = roleLabels.find(r => r.value === role.name)
+
+    return {
+      id: role.id,
+      name: found?.text || role.name
+    }
+  })
+})
+
+const roleStatus:Record<string, string> = {
+  ROLE_MANAGER: "MENEJER",
+  ROLE_ADMIN: "ADMIN",
+  ROLE_USER: "USER",
+  ROLE_OPERATOR: "OPERATOR",
+}
 
 const emptyForm = (): UserForm => ({
   id: '',
@@ -390,7 +413,6 @@ const submitForm = async () => {
     oldUploadKey.value = null;
     form.value = emptyForm();
 
-    await store.loadUsers();
   } catch (error) {
     Toast.error("Xatolik yuz berdi");
     console.error(error);
@@ -437,19 +459,12 @@ const editItem = (user: UserForm) => {
   visibleShow.value = true;
 };
 
-// const extractKeyFromUrl = (url: string | undefined): string | null => {
-//   if (!url) return null;
-//   const parts = url.split('/');
-//   return parts[parts.length - 1] || null;
-// };
-
 const confirmDelete = async () => {
   if (!selectedUser.value) return;
 
   try {
     const user = allUsers.value.items.find((u: UserForm) => u.id === selectedUser.value);
     const uploadKey = user?.uploadId;
-    // const uploadKey = user?.uploadId || extractKeyFromUrl(user?.avatarUrl);
 
     if (uploadKey) {
       await deleteUpload(uploadKey);
@@ -471,7 +486,6 @@ const deleteItem = (id: string) => {
 };
 
 const resetForm = () => {
-  // Agar yangi upload qilingan bo'lsa, bekor qilamiz
   if (newUploadId.value) {
     deleteUpload(newUploadId.value);
     newUploadId.value = null;

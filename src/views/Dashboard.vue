@@ -34,7 +34,7 @@
               ]"
           >
             <i :class="item.icon"
-                class="">
+               class="">
             </i>
           </div>
           <i
@@ -81,7 +81,8 @@
         <div class="flex border-t border-gray-200 my-4"></div>
         <div class="grid grid-cols-2 gap-4">
           <div
-              @click="item.onClick('Jarayonda')"
+              @click="item.onClick('IN_PROGRESS')"
+
               class="bg-white/10 cursor-pointer rounded-lg p-3 backdrop-blur-sm transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-lg"
               :class="[
                   index % 3 === 0 ? 'border-2 border-blue-400 hover:border-blue-600' :
@@ -96,7 +97,7 @@
             <p class="text-2xl font-bold">{{ item.pending }}</p>
           </div>
           <div
-              @click="item.onClick('Bajarilgan')"
+              @click="item.onClick('COMPLETED')"
               class="bg-white/10 cursor-pointer rounded-lg p-3 backdrop-blur-sm transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-lg"
               :class="[
                   index % 3 === 0 ? 'border-2 border-blue-400 hover:border-blue-600' :
@@ -116,14 +117,14 @@
             <span class="">Bajarilish foizi</span>
             <span class="font-bold">
               <i class="fa-solid fa-arrow-trend-up"></i>
-<!--            {{ item.total > 0 ? Math.round((Number(item.completed) / item.total) * 100) : 0 }}%-->
+            {{ getPercent(item.completed, item.total) }}%
           </span>
           </div>
           <div class="w-full bg-gray-200 rounded-full h-2.5">
-<!--            <div-->
-<!--                class="bg-blue-500 h-2.5 rounded-full transition-all duration-500"-->
-<!--                :style="{ width: (item.total > 0 ? (Number(item.completed) / item.total) * 100 : 0) + '%' }"-->
-<!--            ></div>-->
+            <div
+                class="bg-blue-500 h-2.5 rounded-full transition-all duration-500"
+                :style="{ width: getPercent(item.completed, item.total) + '%' }"
+            ></div>
           </div>
         </div>
       </div>
@@ -137,7 +138,6 @@
             :key="item.id"
             class="flex flex-col items-center"
         >
-          <!-- Circular Progress -->
           <div class="relative inline-block mb-6">
             <svg width="180" height="180" class="transform -rotate-90">
               <circle
@@ -238,12 +238,24 @@ const clickOpenPage = (path: string, query?: any) => {
   });
 }
 
-const allAlbumCount = ref<string[]>([]);
+const allAlbumCount = ref<number>(0);
+const allVignetteCount = ref<number>(0);
+const photoCount = ref<number>(0);
 
 const getAlDashboardCounts = async () => {
   try {
-    const res = await axiosInstance.get("/api/v1/dashboard/summary")
-    allAlbumCount.value = res.data
+    const res = await axiosInstance.get("/api/v1/dashboard/orders-by-kind")
+    res.data?.forEach((item: any) => {
+      if (item.key === 'ALBUM') {
+        allAlbumCount.value = item.count
+      }
+      if (item.key === 'VIGNETTE') {
+        allVignetteCount.value = item.count
+      }
+      if (item.key === 'PICTURE') {
+        photoCount.value = item.count
+      }
+    })
     console.log('All counts',res.data)
   }
   catch (error) {
@@ -251,45 +263,77 @@ const getAlDashboardCounts = async () => {
   }
 }
 
-const albumPending = computed(() => {
-  // return dataStore.state.albums.items?.filter(item => item.status === 'Jarayonda').length || 0;
-})
+const getStatusCounts = async (type: "ALBUM" | "VIGNETTE" | "PICTURE") => {
+  const res = await axiosInstance.get("/api/v1/dashboard/orders-by-status",
+      {
+        params: {type}
+      }
+  )
 
-const albumCompleted = computed(() => {
-  // return dataStore.state.albums.items?.filter(
-  //     item => item.status === 'Bajarilgan'
-  // ).length || 0
-})
-const allVignetteCount = computed(() => {
-  // return dataStore.state.vignettes?.length || 0
-})
+  const result = {
+    total: 0,
+    pending: 0,
+    completed: 0,
+  }
 
-const vignettePending = computed(() => {
-  // return dataStore.state.vignettes?.filter(item => item.status === 'Jarayonda').length || 0
-})
-const vignetteCompleted = computed(() => {
-  // return dataStore.state.vignettes?.filter(item => item.status === 'Bajarilgan').length || 0
-})
+  res.data?.forEach((item: any) => {
+    if (item.key === "IN_PROGRESS") {
+      result.pending = item.count
+    }
 
-const photoCount = computed(() => {
-  // return dataStore.state.pictures?.length || 0
-})
+    if (item.key === "COMPLETED") {
+      result.completed = item.count
+    }
 
-const photoPending = computed(() => {
-  // return dataStore.state.pictures?.filter(item => item.status === 'Jarayonda').length || 0
-})
+    result.total += item.count
+  })
 
-const photoCompleted = computed(() => {
-  // return dataStore.state.pictures?.filter(item => item.status === 'Bajarilgan').length || 0
-})
+  return result
+}
 
-// const allUsers = computed(() => dataStore.state.users?.length || 0)
+const albumPending = ref<number>(0);
+const albumCompleted = ref<number>(0)
+
+const vignettePending = ref<number>(0)
+const vignetteCompleted = ref<number>(0)
+
+const photoPending = ref<number>(0)
+const photoCompleted = ref<number>(0)
+
+const loadAllStats = async () => {
+  const album = await getStatusCounts("ALBUM")
+  const vignette = await getStatusCounts("VIGNETTE")
+  const photo = await getStatusCounts("PICTURE")
+
+  albumPending.value = album.pending
+  console.log('Album pending',albumPending.value)
+  albumCompleted.value = album.completed
+
+  vignettePending.value = vignette.pending
+  vignetteCompleted.value = vignette.completed
+  console.log('Vignette pending', vignettePending.value)
+  photoPending.value = photo.pending
+  photoCompleted.value = photo.completed
+}
+
+const getExpenses = async () => {
+  try {
+    const res = await axiosInstance.get("/api/v1/dashboard/revenue-trend")
+    console.log('Expenses',res.data)
+  }
+  catch (error) {
+    console.error(error);
+  }
+}
+
+getExpenses()
+const allUsers = computed(() => dataStore.state.user?.items.length || 0)
 const allMaterialCount = computed(() => dataStore.state.items?.length || 0)
 const albumCategories = computed(() => dataStore.state.alCategory?.length || 0)
 const vignetteCategories = computed(() => dataStore.state.vignetteCategory?.length || 0)
 const photosCategories = computed(() => dataStore.state.photoCategory?.length || 0)
 
-const getAlbums = ref([
+const getAlbums = computed( () => [
   { id: 1,
     name: 'Jami albom',
     itemCount: allAlbumCount.value,
@@ -310,7 +354,7 @@ const getAlbums = ref([
   },
   { id: 4,
     name: 'Xodimlar',
-    itemCount: '0',
+    itemCount: allUsers.value,
     icon: 'fa-solid fa-users',
     onclick: () => clickOpenPage('/employee')
   },
@@ -340,7 +384,7 @@ const getAlbums = ref([
   }
 ])
 
-const allStatuses = ref([
+const allStatuses = computed(() =>[
   {
     id: 1,
     label: 'Albom',
@@ -348,11 +392,10 @@ const allStatuses = ref([
     total: allAlbumCount.value,
     pending: albumPending.value,
     completed: albumCompleted.value,
-    onClick: (status : "Jarayonda" | "Bajarilgan") => {
+    onClick: (status : "IN_PROGRESS" | "COMPLETED") => {
       const query = {
         status: status,
       };
-
       clickOpenPage('/album', query)
     },
   },
@@ -363,7 +406,7 @@ const allStatuses = ref([
     total: allVignetteCount.value,
     pending: vignettePending.value,
     completed: vignetteCompleted.value,
-    onClick: (status: "Jarayonda" | "Bajarilgan") => {
+    onClick: (status: "IN_PROGRESS" | "COMPLETED") => {
       const query = {
         status: status,
       }
@@ -377,7 +420,7 @@ const allStatuses = ref([
     total: photoCount.value,
     pending: photoPending.value,
     completed: photoCompleted.value,
-    onClick: (status: "Jarayonda" | "Bajarilgan") => {
+    onClick: (status: "IN_PROGRESS" | "COMPLETED") => {
       const query = {
         status: status,
       }
@@ -386,13 +429,15 @@ const allStatuses = ref([
   }
 ])
 
+const getPercent = (completed: number, total: number) => {
+  if (!total) return 0
+  return Math.round((completed / total) * 100)
+}
 
-// Umumiy kategoriyalar
 const totalCategories = computed(() =>
     albumCategories.value + vignetteCategories.value + photosCategories.value
 )
 
-// Foizlar
 const albumPercentage = computed(() =>
     totalCategories.value > 0
         ? Math.round((albumCategories.value / totalCategories.value) * 100)
@@ -411,7 +456,6 @@ const photosPercentage = computed(() =>
         : 0
 )
 
-// Kategoriya statistikasi
 const categoryStats = computed(() => [
   {
     id: 1,
@@ -473,7 +517,7 @@ const formatDate = (dateString?: string | null): string => {
 
 onMounted(async (): Promise<void> => {
   await getAlDashboardCounts()
-  // await getCategory();
+  await loadAllStats();
 })
 </script>
 <style scoped>

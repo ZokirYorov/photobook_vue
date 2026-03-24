@@ -1,7 +1,7 @@
 <template>
   <div class="flex items-center justify-center flex-col overflow-hidden w-full px-4 min-h-screen bg-gradient-to-br from-gray-200 to-gray-500 m-auto">
-    <div class="bg-white rounded-2xl flex overflow-hidden flex-col w-full max-w-md p-4 sm:p-6 shadow-xl">
-      <div class="flex items-start gap-2">
+    <div class="bg-white rounded-2xl flex overflow-hidden flex-col w-full max-w-md p-2 sm:p-2 shadow-xl">
+      <div class="flex items-center justify-between">
         <CButton
             type="button"
             text="Ortga"
@@ -10,12 +10,12 @@
             faClass="fa-solid fa-arrow-left"
             @click="router.back()"
         />
-        <h2 class="text-2xl pt-2 font-semibold">User Profile</h2>
+        <h2 class="text-2xl font-semibold">User Profile</h2>
       </div>
 
       <form
           @submit.prevent="profileSubmit"
-          class="flex flex-col gap-3 p-2 overflow-y-auto max-h-[70vh] sm:max-h-[80vh]"
+          class="flex flex-col gap-3 overflow-y-auto max-h-[80vh] p-4"
       >
         <div class="flex items-center gap-3 flex-col justify-center w-full">
           <div class="relative">

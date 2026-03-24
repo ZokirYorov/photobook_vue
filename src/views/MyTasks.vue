@@ -28,7 +28,6 @@
             </div>
           </div>
 
-          <!-- 📥 Input -->
           <div class="flex flex-col gap-2">
             <label>Bajarish</label>
             <input

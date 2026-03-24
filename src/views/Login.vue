@@ -35,6 +35,10 @@
             <i class="fa-solid fa-check"></i>
             <span class="text-lg">Omborxona nazorati</span>
           </div>
+          <div class="flex items-center justify-center gap-3">
+            <i class="fa-solid fa-check"></i>
+            <span class="text-lg">Xodimlar nazorati</span>
+          </div>
         </div>
 
         <!-- Decorative Elements -->
@@ -175,7 +179,6 @@ body {
   font-family: 'Poppins', sans-serif;
 }
 
-/* Premium Gradient Background */
 .premium-bg {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   position: relative;
@@ -199,7 +202,6 @@ body {
   100% { transform: translate(50px, 50px); }
 }
 
-/* Glassmorphism Card */
 .glass-premium {
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(40px);
@@ -207,7 +209,6 @@ body {
   box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
 }
 
-/* Floating Elements */
 .float {
   animation: float 6s ease-in-out infinite;
 }
@@ -217,7 +218,6 @@ body {
   50% { transform: translateY(-20px); }
 }
 
-/* Shimmer Effect */
 .shimmer {
   background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
   background-size: 200% 100%;
@@ -229,7 +229,6 @@ body {
   100% { background-position: 200% 0; }
 }
 
-/* Premium Input */
 .input-premium {
   background: rgba(103, 126, 234, 0.05);
   border: 2px solid rgba(103, 126, 234, 0.1);
@@ -243,7 +242,6 @@ body {
   transform: translateY(-2px);
 }
 
-/* Premium Button */
 .btn-premium {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   box-shadow: 0 10px 30px rgba(103, 126, 234, 0.4);
@@ -279,7 +277,6 @@ body {
   transform: translateY(-1px);
 }
 
-/* Particle Effect */
 .particle {
   position: absolute;
   background: rgba(255, 255, 255, 0.5);
@@ -302,7 +299,6 @@ body {
   }
 }
 
-/* Premium Logo Glow */
 .logo-glow {
   box-shadow: 0 0 40px rgba(103, 126, 234, 0.6),
   0 0 80px rgba(118, 75, 162, 0.4);
@@ -320,7 +316,6 @@ body {
   }
 }
 
-/* Scan Line Effect */
 .scan-line {
   position: absolute;
   width: 100%;
@@ -334,7 +329,6 @@ body {
   100% { top: 100%; }
 }
 
-/* Premium Checkbox */
 .checkbox-premium {
   appearance: none;
   width: 20px;
@@ -363,14 +357,12 @@ body {
   font-weight: bold;
 }
 
-/* Split Screen Layout */
 .split-left {
   background: linear-gradient(135deg, rgba(103, 126, 234, 0.95) 0%, rgba(118, 75, 162, 0.95) 100%);
   position: relative;
   overflow: hidden;
 }
 
-/* 3D Tilt Effect */
 .tilt-card {
   transform-style: preserve-3d;
   transition: transform 0.3s ease;
