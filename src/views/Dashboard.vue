@@ -5,7 +5,7 @@
           class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-5 items-center"
       >
         <div
-            class="flex flex-col cursor-pointer gap-2 bg-white shadow
+            class="flex flex-col cursor-pointer gap-2 bg-white shadow-md
             rounded-lg p-6 relative h-full
             border-2 border-gray-200 transition-all duration-300 ease-out
             hover:-translate-y-1 hover:shadow-lg
@@ -19,10 +19,14 @@
           :key="index"
           @click="item.onclick"
       >
+          <div class="absolute inset-0 opacity-0 group-hover:opacity-100 transition rounded-xl
+                bg-gradient-to-br from-blue-500/10 via-transparent to-purple-500/10"
+          >
+          </div>
         <div class="flex items-start justify-between">
           <div
               :class="[
-                  'text-white bg-blue-600 flex items-center justify-center w-10 h-10 rounded-xl text-xl',
+                  'text-white bg-blue-600 flex items-center justify-center w-12 h-12 rounded-xl text-xl',
                   index % 8 === 0 ? 'bg-gradient-to-br from-blue-500 to-cyan-600' :
                   index % 8 === 1 ? 'bg-gradient-to-br from-emerald-600 to-teal-600' :
                   index % 8 === 2 ? 'bg-gradient-to-br from-purple-500 to-pink-600' :
@@ -51,7 +55,10 @@
                   'bg-gradient-to-br from-green-500 to-emerald-600'
                   ,
               ]"
-                class="fa-solid fa-arrow-right bg-blue-500 p-2 rounded-md text-white text-xl group-hover:-translate-y-1 transition-all duration-300 ease-out"></i>
+              class="fa-solid fa-arrow-right p-2 rounded-lg text-white text-lg
+                  transition-all duration-300 group-hover:translate-x-1 group-hover:-translate-y-1"
+          >
+          </i>
           </div>
           <div class="flex gap-4 items-center justify-between">
             <span class="text-gray-600 text-lg font-semibold break-all">{{item.name}}</span>
@@ -167,6 +174,10 @@
               class="flex flex-col items-center"
           >
             <div class="relative inline-block mb-6">
+              <div class="absolute -inset-1 blur-xl opacity-20
+                    bg-gradient-to-r from-blue-500 to-purple-500"
+              >
+              </div>
               <svg width="180" height="180" class="transform -rotate-90">
                 <circle
                     cx="90"
@@ -218,7 +229,7 @@
         </div>
       </div>
     </div>
-    <div class="w-full text-white bg-black">
+    <div class="w-full text-white bg-gray-900 p-4">
       <div class="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-4 container m-auto gap-10 items-center justify-center w-full p-4">
         <div class="flex flex-col p-6 text-md gap-4">
           <h2 class="text-xl font-bold">Zakazlar</h2>
@@ -348,9 +359,11 @@ const photoPending = ref<number>(0)
 const photoCompleted = ref<number>(0)
 
 const loadAllStats = async () => {
-  const album = await getStatusCounts("ALBUM")
-  const vignette = await getStatusCounts("VIGNETTE")
-  const photo = await getStatusCounts("PICTURE")
+  const [album, vignette, photo] = await Promise.all([
+    getStatusCounts("ALBUM"),
+    getStatusCounts("VIGNETTE"),
+    getStatusCounts("PICTURE")
+  ])
 
   albumPending.value = album.pending
   console.log('Album pending',albumPending.value)
@@ -577,18 +590,18 @@ const getCircleProgress = (percentage: number) => {
   return { circumference, offset }
 }
 
-const formatDate = (dateString?: string | null): string => {
-  if (!dateString) return '';
-
-  const date = new Date(dateString);
-  if (isNaN(date.getTime())) return '';
-
-  const day = date.getDate().toString().padStart(2, '0');
-  const year = date.getFullYear();
-  const monthName = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
-  const month = monthName[date.getMonth()];
-  return `${day} ${month} ${year}`;
-};
+// const formatDate = (dateString?: string | null): string => {
+//   if (!dateString) return '';
+//
+//   const date = new Date(dateString);
+//   if (isNaN(date.getTime())) return '';
+//
+//   const day = date.getDate().toString().padStart(2, '0');
+//   const year = date.getFullYear();
+//   const monthName = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+//   const month = monthName[date.getMonth()];
+//   return `${day} ${month} ${year}`;
+// };
 
 onMounted(async (): Promise<void> => {
   await getAlDashboardCounts()
