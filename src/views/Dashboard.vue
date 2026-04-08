@@ -8,17 +8,17 @@
             class="flex flex-col cursor-pointer gap-2 bg-white shadow-md
             rounded-lg p-6 relative h-full
             border-2 border-gray-200 transition-all duration-300 ease-out
-            hover:-translate-y-1 hover:shadow-lg
-            hover:border-blue-400 group
+            hover:-translate-y-1 hover:shadow-lg group
             "
           :class="[
               'p-3 w-full h-12 rounded-xl text-xl',
-              borderColors[index % borderColors.length]
+              borderColors[index % borderColors.length].base,
+              borderColors[index % borderColors.length].full
             ]"
           v-for="(item, index) in getAlbums"
           :key="index"
           @click="item.onclick"
-      >
+        >
           <div class="absolute inset-0 opacity-0 group-hover:opacity-100 transition rounded-xl
                 bg-gradient-to-br from-blue-500/10 via-transparent to-purple-500/10"
           >
@@ -145,16 +145,23 @@
             </div>
           </div>
           <div class="p-4 flex flex-col text-gray-600">
-            <h2 class="bg-blue-100 text-sm font-semibold mb-2 rounded-lg p-3">Mahsulot turi buyicha hisobot</h2>
+            <div class="bg-gray-300 text-gray-800 text-sm font-semibold mb-4 rounded-lg p-3 flex items-center justify-between">
+              <h2>Mahsulot turi bo'yicha hisobot</h2>
+              <span>jami: {{ item.allItems.reduce((sum, i) => sum + Number(i.count), 0)}}</span>
+            </div>
             <div
-                v-for="status in item.allItems"
-                :key="status.name"
-                class="border-t border-gray-200"
+                v-for="(status, index) in item.allItems"
+                :key="status.id"
+                :class="index % 2 === 0 ? 'bg-gray-200' : ''"
+                class=""
             >
               <div
-                  class="flex justify-between p-2 cursor-pointer text-sm hover:bg-blue-100"
+                  class="flex justify-between p-3 text-sm hover:bg-gray-300"
               >
-                <span>{{ status.name }}</span>
+                <div class="flex items-center gap-2">
+                  <span>{{index + 1}}.</span>
+                  <span>{{ status.name }}</span>
+                </div>
                 <span>{{ status.count }}</span>
               </div>
             </div>
@@ -279,14 +286,14 @@ const dataStore = useStore();
 const router = useRouter();
 
 const borderColors = [
-  'border-l-blue-500',
-  'border-l-emerald-600',
-  'border-l-purple-500',
-  'border-l-orange-500',
-  'border-l-rose-500',
-  'border-l-indigo-500',
-  'border-l-teal-500',
-  'border-l-green-500'
+  {base: 'border-l-blue-500', full: 'hover:border-blue-500'},
+  {base: 'border-l-emerald-600', full: 'hover:border-emerald-600'},
+  {base: 'border-l-purple-500', full: 'hover:border-purple-500'},
+  {base: 'border-l-orange-500', full: 'hover:border-orange-500'},
+  {base: 'border-l-rose-500', full: 'hover:border-rose-500'},
+  {base: 'border-l-indigo-500', full: 'hover:border-indigo-500'},
+  {base: 'border-l-teal-500', full: 'hover:border-teal-500'},
+  {base: 'border-l-green-500', full: 'hover:border-green-500'},
 ]
 
 const clickOpenPage = (path: string, query?: any) => {
@@ -459,15 +466,15 @@ const allStatuses = computed(() =>[
       clickOpenPage('/album', query)
     },
     allItems: [
-      { id: 1, name: 'A3 albom', count: '300' },
-      { id: 2, name: 'A3 knijniy', count: '400'},
-      { id: 3, name: 'Kichik albom 6 betlik', count: '500'},
-      { id: 4, name: 'Kichik albom 8 betlik', count: '500'},
-      { id: 5, name: 'Kichik albom 10 betlik', count: '500'},
-      { id: 6, name: 'Kichik albom 14 betlik', count: '500'},
-      { id: 7, name: 'Kichik albom 120 betlik', count: '500'},
-      { id: 8, name: 'Kichik knijniy', count: '300'},
-      { id: 9, name: 'Ikki tomonlama', count: '200'}
+      { id: 1, name: 'A3 albom', count: 300 },
+      { id: 2, name: 'A3 knijniy', count: 400},
+      { id: 3, name: 'Kichik albom 6 betlik', count: 500},
+      { id: 4, name: 'Kichik albom 8 betlik', count: 500},
+      { id: 5, name: 'Kichik albom 10 betlik', count: 500},
+      { id: 6, name: 'Kichik albom 14 betlik', count: 500},
+      { id: 7, name: 'Kichik albom 120 betlik', count: 500},
+      { id: 8, name: 'Kichik knijniy', count: 300},
+      { id: 9, name: 'Ikki tomonlama', count: 200}
     ]
   },
   {
@@ -484,12 +491,12 @@ const allStatuses = computed(() =>[
       clickOpenPage('/vignette', query)
     },
     allItems: [
-      { id: 1, name: 'Bitiruvchi qora', count: '500'},
-      { id: 2, name: 'Bitiruvchi oq', count: '400'},
-      { id: 3, name: 'Kuk papka', count: '300'},
-      { id: 4, name: 'Yashil', count: '200'},
-      { id: 5, name: 'Sariq', count: '600'},
-      { id: 6, name: 'Qora papka', count: '600'},
+      { id: 1, name: 'Bitiruvchi qora', count: 500},
+      { id: 2, name: 'Bitiruvchi oq', count: 400},
+      { id: 3, name: 'Kuk papka', count: 300},
+      { id: 4, name: 'Yashil', count: 200},
+      { id: 5, name: 'Sariq', count: 600},
+      { id: 6, name: 'Qora papka', count: 600},
     ]
   },
   {
@@ -506,13 +513,13 @@ const allStatuses = computed(() =>[
       clickOpenPage('/photo', query)
     },
     allItems: [
-      { id: 1, name: 'A3 albom', count: '300'},
-      { id: 2, name: 'A3 knijniy', count: '200'},
-      { id: 3, name: 'Kichik albom', count: '400'},
-      { id: 4, name: 'Kichik knijniy', count: '500'},
-      { id: 5, name: 'Sredniy', count: '300'},
-      { id: 6, name: 'Kvadrat', count: '200'},
-      { id: 7, name: 'Ikki tomonlama', count: '300'},
+      { id: 1, name: 'A3 albom', count: 300},
+      { id: 2, name: 'A3 knijniy', count: 200},
+      { id: 3, name: 'Kichik albom', count: 400},
+      { id: 4, name: 'Kichik knijniy', count: 500},
+      { id: 5, name: 'Sredniy', count: 300},
+      { id: 6, name: 'Kvadrat', count: 200},
+      { id: 7, name: 'Ikki tomonlama', count: 300},
     ]
   }
 ])
