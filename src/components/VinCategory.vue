@@ -50,14 +50,14 @@
             <td class="py-4 px-6 text-left items-center flex">
               <button
                   @click="editItem(vin)"
-                  class="text-blue-600 cursor-pointer hover:text-blue-800 mr-3 transition-colors"
+                  class="text-blue-600 bg-blue-100 hover:bg-blue-200 rounded py-1 px-3 cursor-pointer hover:text-blue-800 mr-3 transition-colors"
                   title="Tahrirlash"
               >
                 <i class="fa-solid fa-pencil"></i>
               </button>
               <button
                   @click="deleteItem(vin)"
-                  class="text-red-600 hover:text-red-800 cursor-pointer transition-colors"
+                  class="text-red-600  bg-red-100 hover:bg-red-200 rounded px-3 py-1 cursor-pointer transition-colors"
                   title="O'chirish"
               >
                 <i class="fas fa-trash-can"></i>

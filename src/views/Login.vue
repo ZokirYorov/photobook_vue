@@ -15,7 +15,7 @@
           </div>
 
           <div class="space-y-6">
-            <p class="brand-kicker">Photo studio operations platform</p>
+            <span class="brand-kicker">Photobook amallari platformasi</span>
             <h1 class="brand-title">Buyurtma, xodim va ishlab chiqarish nazorati bitta joyda.</h1>
             <p class="brand-copy">
               Ichki jarayonlarni tezroq yuritish, statuslarni kuzatish va kundalik ish oqimini aniq boshqarish uchun yagona tizim.
@@ -68,7 +68,7 @@
         <div class="form-orb form-orb-two"></div>
 
         <div class="w-full max-w-[440px] relative z-10">
-          <div class="lg:hidden text-center mb-8">
+          <div class="lg:hidden text-center mb-4">
             <div class="mobile-brand-icon">
               <img class="w-12 brightness-0 invert" src="../assets/camera.png" alt="Photobook">
             </div>
@@ -161,7 +161,7 @@ const form = ref<UserLogin>({
 });
 
 const validateRegister = () => {
-  if (!form.value.username) return "Name is required";
+  if (!form.value.username) return "Login is required";
   if (!form.value.password) return "Password is required";
 
   return null;
@@ -274,10 +274,9 @@ const submitLogin = async () => {
 }
 
 .brand-title {
-  font-size: clamp(34px, 4vw, 56px);
+  font-size: clamp(24px, 4vw, 40px);
   line-height: 1;
   font-weight: 800;
-  max-width: 10ch;
 }
 
 .brand-copy {
@@ -418,12 +417,12 @@ const submitLogin = async () => {
 
 .auth-eyebrow {
   color: #0f766e;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
 }
 
 .auth-title,
 .mobile-brand-title {
-  font-size: clamp(24px, 3vw, 34px);
+  font-size: clamp(24px, 3vw, 30px);
   line-height: 1.05;
   font-weight: 800;
   color: #0f172a;

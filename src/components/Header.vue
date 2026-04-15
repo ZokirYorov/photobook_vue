@@ -34,51 +34,77 @@
       <div
           class="flex gap-2 items-center justify-end"
       >
-        <div class="relative" v-if="isDesktop">
+        <div class="relative">
           <button
               type="button"
               class="notify-button"
               @click="toggleNotifications"
           >
             <i class="fa-regular fa-bell"></i>
-            <span v-if="unreadCount > 0" class="notify-badge">{{ unreadCount > 9 ? '9+' : unreadCount }}</span>
+            <span v-if="unreadCount > 0" class="notify-badge">
+              {{ unreadCount > 9 ? '9+' : unreadCount }}
+            </span>
           </button>
-
-          <div v-if="isNotificationsOpen" class="notify-panel">
+          <div
+              v-if="isNotificationsOpen"
+              class="notify-overlay"
+              @click="isNotificationsOpen = false"
+          ></div>
+          <div v-if="isNotificationsOpen" class="notify-panel" :class="{ mobile: !isDesktop }">
             <div class="notify-head">
-              <div>
-                <h3>Bildirishnomalar</h3>
-                <p>{{ unreadCount }} ta o'qilmagan</p>
+              <div class="flex flex-col items-center w-full">
+                <div class="flex items-center w-full justify-between">
+                  <div>
+                    <h3>Bildirishnomalar</h3>
+                    <p>{{ unreadCount }} ta o'qilmagan</p>
+                  </div>
+                  <button
+                      type="button"
+                      class="notify-read-all cursor-pointer"
+                      @click="markAllAsRead"
+                      :disabled="unreadCount === 0"
+                  >
+                    Barchasini o'qildiga utkazish
+                  </button>
+                </div>
+                <div class="flex items-center w-full justify-around pt-4 text-sm font-bold text-gray-600">
+                  <button @click="activeTab = 'UNREAD'"
+                          class="cursor-pointer hover:text-gray-500"
+                          :class="activeTab === 'UNREAD' ? 'text-blue-500' : ''"
+                  >
+                    Yangi xabar
+                  </button>
+                  <button @click="activeTab = 'ALL'"
+                          class="cursor-pointer hover:text-gray-500"
+                          :class="activeTab === 'ALL' ? 'text-blue-500' : ''"
+                  >
+                    Barchasi
+                  </button>
+                </div>
               </div>
-              <button
-                  type="button"
-                  class="notify-read-all"
-                  @click="markAllAsRead"
-                  :disabled="unreadCount === 0"
-              >
-                Barchasini o'qildi qilish
-              </button>
             </div>
-
-            <div v-if="notifications.length" class="notify-list">
-              <button
-                  v-for="item in notifications"
-                  :key="item.id"
-                  type="button"
-                  class="notify-item"
-                  :class="{ unread: !item.read }"
-                  @click="handleNotificationClick(item.id, item.orderId)"
+            <div v-if="filteredNotifications.length" class="notify-list transition-all duration-200">
+              <div
+                   @click="markAllAsRead"
               >
-                <div class="notify-item-top">
-                  <strong>{{ item.title }}</strong>
-                  <span>{{ formatNotificationTime(item.createdAt) }}</span>
-                </div>
-                <p class="notify-message">{{ item.message }}</p>
-                <div class="notify-meta">
-                  <span>{{ item.orderName || "Buyurtma" }}</span>
-                  <span>{{ item.type }}</span>
-                </div>
-              </button>
+                <button
+                    v-for="item in filteredNotifications"
+                    :key="item.id"
+                    type="button"
+                    class="notify-item"
+                    :class="{ unread: !item.read }"
+                    @click="handleNotificationClick(item)"
+                >
+                  <div class="notify-item-top">
+                    <strong>{{ item.title }}</strong>
+                    <span>{{ formatNotificationTime(item.createdAt) }}</span>
+                  </div>
+                  <p class="notify-message">{{ item.message }}</p>
+                  <div class="notify-meta">
+                    <span>{{ item.orderName || "Buyurtma" }}</span>
+                  </div>
+                </button>
+              </div>
             </div>
 
             <div v-else class="notify-empty">
@@ -160,7 +186,7 @@
 <script setup lang="ts">
 import { useRouter } from "vue-router";
 import CButton from "@/components/CButton.vue";
-import {computed, ComputedRef, ref} from "vue";
+import {computed, ComputedRef, ref, watch} from "vue";
 import CDialog from "@/components/CDialog.vue";
 import { authService } from "@/service/authService";
 import { useStore } from "@/stores/store";
@@ -268,6 +294,13 @@ const isDesktop = computed(() => window.innerWidth > 768);
 const notifications = computed(() => appStore.state.notifications);
 const unreadCount = computed(() => appStore.unreadNotificationsCount);
 
+const filteredNotifications = computed(() => {
+  if (activeTab.value === "UNREAD") {
+    return notifications.value.filter(n => !n.read);
+  }
+  return notifications.value;
+});
+
 const toggleNotifications = () => {
   isNotificationsOpen.value = !isNotificationsOpen.value;
 }
@@ -277,19 +310,34 @@ const markAllAsRead = async () => {
   await appStore.markAllNotificationsRead();
 }
 
-const handleNotificationClick = async (id: string, orderId?: string) => {
-  const item = notifications.value.find(notification => notification.id === id);
+const activeTab = ref<"UNREAD" | "ALL">("UNREAD");
 
-  if (item && !item.read) {
-    await appStore.markNotificationRead(id);
+const audio = new Audio('/src/assets/sounds/note1.wav')
+
+const playSound = () => {
+  audio.currentTime = 0
+  audio.play()
+}
+
+watch(() => notifications.value.length, (newVal, oldVal) => {
+  if (newVal > oldVal) {
+    playSound()
+  }
+})
+
+
+const handleNotificationClick = async (item: any) => {
+
+  if (!item.read) {
+    await appStore.markNotificationRead(item.id);
   }
 
   isNotificationsOpen.value = false;
 
-  if (orderId) {
+  if (item.orderId) {
     await router.push("/tasks");
   }
-}
+};
 
 const formatNotificationTime = (value: string) => {
   if (!value) return "";
@@ -344,6 +392,13 @@ const formatNotificationTime = (value: string) => {
   z-index: 3;
 }
 
+.notify-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  z-index: 15;
+}
+
 .notify-panel {
   position: absolute;
   top: calc(100% + 10px);
@@ -359,12 +414,21 @@ const formatNotificationTime = (value: string) => {
   z-index: 20;
 }
 
+.notify-panel.mobile {
+  position: fixed;
+  top: 70px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 95vw;
+  max-height: 80vh;
+  border-radius: 16px;
+}
 .notify-head {
   display: flex;
   align-items: start;
   justify-content: space-between;
   gap: 12px;
-  padding: 16px;
+  padding: 16px 16px 0 16px;
   border-bottom: 1px solid rgba(226, 232, 240, 0.9);
 }
 
@@ -391,7 +455,7 @@ const formatNotificationTime = (value: string) => {
 }
 
 .notify-list {
-  max-height: calc(70vh - 73px);
+  max-height: calc(65vh - 73px);
   overflow: auto;
 }
 
@@ -436,8 +500,9 @@ const formatNotificationTime = (value: string) => {
   display: flex;
   gap: 8px;
   margin-top: 10px;
-  font-size: 11px;
-  color: #475569;
+  font-size: 12px;
+  color: #1E40AF;
+  font-weight: bold;
 }
 
 .notify-empty {

@@ -1,7 +1,7 @@
 <template>
   <div class="flex p-6 flex-col gap-4 container m-auto w-full h-full">
     <div class="flex bg-white p-4 rounded-xl w-full items-center justify-between">
-      <div class="flex items-center gap-2">
+      <div class="flex items-center gap-5">
         <CButton
             type="button"
             text="Ortga"
@@ -40,9 +40,9 @@
                   placeholder="Familiya kiriting"
                   v-model="form.firstName"
         />
-        <AppInput label="User nomi"
+        <AppInput label="Foydalanuvchi nomi"
                   type="text"
-                  placeholder="user kiriting"
+                  placeholder="foydalanuvchi ismini kiriting"
                   v-model="form.username"
         />
         <AppInput label="Kasbi"
@@ -50,12 +50,12 @@
                   placeholder="Kasbni kiriting"
                   v-model="form.profession"
         />
-        <AppInput label="Password"
+        <AppInput label="Parol"
                   type="text"
                   placeholder="123..."
                   v-model="form.password"
         />
-        <AppInput label="Phone number"
+        <AppInput label="Telefon nomer"
                   type="text"
                   placeholder="+998 -"
                   v-model="form.phone"
@@ -76,12 +76,12 @@
           />
         </div>
         <AppInput
-            label="Receipt image"
+            label="Rasm yuklash"
             type="file"
             accept="image/*"
             @change="changeFile($event)"
         />
-        <AppInput label="Bio"
+        <AppInput label="Izox uchun"
                   type="textarea"
                   placeholder="Enter Description"
                   v-model="form.bio"
@@ -148,6 +148,28 @@
           @confirm="confirmDelete"
       />
     </CDialog>
+    <div
+        v-if="previewImage"
+        class="fixed inset-0 z-[9999] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4"
+        @click="closePreview"
+    >
+      <div class="relative max-w-5xl w-full flex justify-center">
+
+        <button
+            @click.stop="closePreview"
+            class="absolute cursor-pointer top-[-50px] right-2 sm:right-4 md:top-4 md:right-4 lg:right-10 border-2 border-red-200
+            bg-red-100 hover:bg-red-300  text-red-600 rounded-full w-10 h-10 flex items-center justify-center transition "
+        >
+          <i class="fa-solid fa-close text-lg"></i>
+        </button>
+        <img
+            alt=""
+            :src="getAvatarUrl(previewImage)"
+            class="max-h-[85vh] w-auto rounded-2xl shadow-2xl"
+            @click.stop
+        />
+      </div>
+    </div>
 
     <div class="animate-fade-in overflow-auto gap-5 flex-col w-full bg-white p-6 rounded-xl h-full">
       <table class="overflow-auto table-auto w-full">
@@ -182,10 +204,13 @@
           <td class="p-4">{{index + 1}}</td>
           <td class="p-2">{{user.lastName}} {{user.firstName}}</td>
           <td class="p-2 flex items-center">
-            <img v-if="user.avatarUrl" class="w-16 h-10 lg:h-16 rounded-full object-cover" :src="getAvatarUrl(user.avatarUrl)" alt="">
+            <img
+                v-if="user.avatarUrl" class="w-16 h-10 lg:h-16 cursor-pointer rounded-full object-cover"
+                @click="openPreview(user.avatarUrl)"
+                :src="getAvatarUrl(user.avatarUrl)" alt="">
           </td>
           <td class="p-2">{{user.username}}</td>
-          <td class="p-3">
+          <td class="p-2">
             <div class="flex flex-wrap gap-1">
               <span
                   v-for="role in user.roles"
@@ -327,6 +352,16 @@ const clickVisibleForm = () => {
   isEditing.value = false;
   visibleShow.value = true;
 };
+
+const previewImage = ref<string | null>(null)
+
+const openPreview = (url: string) => {
+  previewImage.value = url;
+}
+
+const closePreview = () => {
+  previewImage.value = null;
+}
 
 const changeFile = (event: Event) => {
   const fileInput = event.target as HTMLInputElement;

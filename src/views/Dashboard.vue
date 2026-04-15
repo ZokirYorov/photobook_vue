@@ -245,7 +245,7 @@
     <div class="w-full text-white bg-gray-900 p-4">
       <div class="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-4 container m-auto gap-10 items-center justify-center w-full p-4">
         <div class="flex flex-col p-6 text-md gap-4">
-          <h2 class="text-xl font-bold">Zakazlar</h2>
+          <h2 class="text-xl font-bold">Buyurtmalar</h2>
           <div class="flex flex-col items-start gap-2 text-gray-400 font-semibold">
             <a href="/album" class="hover:text-purple-600">Albomlar nazorati</a>
             <a href="/vignette" class="hover:text-purple-600">Vinetkalar nazorati</a>

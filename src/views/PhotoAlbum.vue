@@ -256,7 +256,7 @@
         </button>
         <img
             alt=""
-            :src="previewImage"
+            :src="getAvatarUrl(previewImage)"
             class="max-h-[85vh] w-auto rounded-2xl shadow-2xl"
             @click.stop
         />
@@ -273,7 +273,7 @@
               faClass="fa-solid fa-arrow-left"
               @click="router.back()"
           />
-          <h2 class="text-xl font-semibold">Buyurtmalar jadvali</h2>
+          <h2 class="text-lg font-semibold">Buyurtmalar jadvali</h2>
         </div>
         <div class="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-1 xl:grid-cols-2 items-end gap-2 py-2">
           <AppInput
@@ -357,7 +357,7 @@
                 v-if="album.imageUrl"
                 @click="openPreview(album.imageUrl)"
                 class="w-14 h-10 sm:h-10 lg:h-12 cursor-pointer rounded-xl"
-                :src="album.imageUrl" alt=""
+                :src="getAvatarUrl(album.imageUrl)" alt=""
             />
           </td>
           <td class="p-2">{{ album.customerName }}</td>
@@ -525,6 +525,17 @@ const openPreview = (url: string) => {
 const closePreview = () => {
   previewImage.value = null;
 }
+
+const BASE_URL = import.meta.env.VITE_BASE_API
+
+const getAvatarUrl = (url: string | undefined): string => {
+  if (!url) return '';
+
+  if (url.startsWith('http')) return url;
+
+  return `${BASE_URL}${url}`;
+
+};
 const selectedFiles = ref<File[]>([])
 const previewUrl = ref<string | null>(null)
 const fileUploadRef = ref()

@@ -1,6 +1,6 @@
 <template>
   <div
-      class="w-full invisible h-full mt-20 pt-40 min-h-screen bg-black/30 transition-all ease-in-out duration-300 fixed inset-0 z-999 left-0"
+      class="w-full invisible h-full mt-16 pt-40 min-h-screen bg-black/30 transition-all ease-in-out duration-300 fixed inset-0 z-999 left-0"
       @click="toggleMenu"
       :class="isMenuVisible ? 'visible' : 'invisible'"
   >

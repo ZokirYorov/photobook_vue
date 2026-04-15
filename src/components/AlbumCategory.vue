@@ -52,23 +52,23 @@
               :key="index"
               class="border-t border-gray-300 hover:bg-gray-50 transition-colors"
           >
-            <td class="py-4 px-6 text-gray-600">{{ index + 1 }}</td>
-            <td class="py-4 px-6">
+            <td class="py-2 px-6 text-gray-600">{{ index + 1 }}</td>
+            <td class="py-2 px-6">
               <div class="font-semibold text-gray-800">{{ vin.name }}</div>
             </td>
-            <td class="py-4 px-6"> {{ vin.defaultPages }} </td>
-            <td class="py-4 px-6"> {{vin.size}} </td>
-            <td class="py-4 px-6 text-right items-center flex">
+            <td class="py-2 px-6"> {{ vin.defaultPages }} </td>
+            <td class="py-2 px-6"> {{vin.size}} </td>
+            <td class="py-4 px-6 text-right items-center flex gap-2">
               <button
                   @click="editItem(vin)"
-                  class="text-blue-600 cursor-pointer hover:text-blue-800 mr-3 transition-colors"
+                  class="text-blue-600 bg-blue-100 hover:bg-blue-200 rounded py-1 px-3 cursor-pointer hover:text-blue-800 mr-3 transition-colors"
                   title="Tahrirlash"
               >
                 <i class="fa-solid fa-pencil"></i>
               </button>
               <button
                   @click="deleteItem(vin)"
-                  class="text-red-600 hover:text-red-800 cursor-pointer transition-colors"
+                  class="text-red-600 hover:text-red-800 bg-red-100 hover:bg-red-200 rounded px-3 py-1 cursor-pointer transition-colors"
                   title="O'chirish"
               >
                 <i class="fas fa-trash-can"></i>
@@ -92,7 +92,7 @@
       <div class="bg-white rounded-2xl w-full max-w-md shadow-2xl">
         <div class="border-b border-gray-200 px-6 py-4 flex justify-between items-center">
           <h3 class="text-xl font-bold text-gray-800">
-            {{ isEditing ? "Formani Tahrirlash" : "Forma Qo'shish" }}
+            {{ isEditing ? "Kategoriyani tahrirlash" : "Kategoriya qo'shish" }}
           </h3>
           <button @click="closeModal" class="cursor-pointer text-gray-500 hover:text-gray-700 w-8 h-8 flex items-center justify-center border border-gray-600 rounded-full">
             <i class="fa-solid fa-close text-xl"></i>

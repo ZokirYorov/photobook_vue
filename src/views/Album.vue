@@ -97,29 +97,34 @@
           <h2 class=" text-2xl font-semibold">
             {{isEditing ? "Formani uzgartirish" : "Forma qo'shish"}}
           </h2>
-          <FileUpload
-              ref="fileUploadRef"
-              mode="advanced"
-              :customUpload="true"
-              :auto="false"
-              :multiple="false"
+<!--          <FileUpload-->
+<!--              ref="fileUploadRef"-->
+<!--              mode="advanced"-->
+<!--              :customUpload="true"-->
+<!--              :auto="false"-->
+<!--              :multiple="false"-->
+<!--              accept="image/*"-->
+
+<!--              chooseLabel="Rasm yuklash"-->
+<!--              :showUploadButton="false"-->
+<!--              :showCancelButton="false"-->
+<!--              :showClearButton="true"-->
+<!--              @select="onFileSelect"-->
+<!--              @clear="onFileRemove"-->
+<!--          />-->
+          <AppInput
+              label="Receipt image"
+              type="file"
               accept="image/*"
-
-              chooseLabel="Rasm yuklash"
-              :showUploadButton="false"
-              :showCancelButton="false"
-              :showClearButton="true"
-
-              @select="onFileSelect"
-              @clear="onFileRemove"
+              @change="changeFile($event)"
           />
           <div
-              v-if="isEditing && form.imageUrl && !removedOldImage"
+              v-if="avatarPreview || (isEditing && form.imageUrl && !removedOldImage)"
               class="relative w-32 h-25"
           >
             <img
                 alt=""
-                :src="form.imageUrl"
+                :src="avatarPreview || getAvatarUrl(form.imageUrl)"
                 class="object-cover rounded-xl border"
             />
             <button
@@ -225,13 +230,6 @@
                 text-field="text"
                 value-field="value"
             />
-<!--            <AppInput-->
-<!--                label="Image"-->
-<!--                type="file"-->
-<!--                class="w-full"-->
-<!--                multiple="true"-->
-<!--                @change="changeImage($event)"-->
-<!--            />-->
           </div>
           <div class="flex my-2 flex-col sm:flex-row items-stretch lg:flex-row gap-2 sm:items-center justify-end w-full">
             <CButton
@@ -265,7 +263,7 @@
         </button>
         <img
             alt=""
-            :src="previewImage"
+            :src="getAvatarUrl(previewImage)"
             class="max-h-[85vh] w-auto rounded-2xl shadow-2xl"
             @click.stop
         />
@@ -282,7 +280,7 @@
               faClass="fa-solid fa-arrow-left"
               @click="router.back()"
           />
-          <h2 class="text-xl font-semibold">Buyurtmalar jadvali</h2>
+          <h2 class="text-lg font-semibold">Buyurtmalar jadvali</h2>
         </div>
         <div class="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-1 xl:grid-cols-2 items-end gap-2 py-2">
           <AppInput
@@ -367,7 +365,7 @@
                   v-if="album.imageUrl"
                   @click="openPreview(album.imageUrl)"
                   class="w-14 h-10 sm:h-10 lg:h-12 cursor-pointer rounded-xl"
-                  :src="album.imageUrl" alt=""
+                  :src="getAvatarUrl(album.imageUrl)" alt=""
               />
             </td>
             <td class="p-2">{{ album.customerName }}</td>
@@ -376,7 +374,7 @@
               <div
                   v-for="emp in album.employees"
                   :key="emp.employeeId"
-                  class="border-b border-gray-300 py-1"
+                  class="flex justify-between border-b border-gray-300 py-1"
               >
                 <div class="flex text-sm gap-1 items-center">
                   <i
@@ -396,9 +394,9 @@
                 <div class="flex items-center justify-between text-sm">
                   <span>{{emp.processedCount}} ta</span>
                 </div>
-                <div v-if="emp.notes" class="pl-5 text-xs text-gray-500 break-words">
-                  Izoh: {{ emp.notes }}
-                </div>
+<!--                <div v-if="emp.notes" class="pl-5 text-xs text-gray-500 break-words">-->
+<!--                  Izoh: {{ emp.notes }}-->
+<!--                </div>-->
               </div>
             </td>
             <td class="py-2 px-4">
@@ -476,8 +474,8 @@ import {useStore} from "@/stores/store";
 import {Order, OrderCreateDto, OrderStatus} from "@/typeModules/useModules";
 import { useToast } from "vue-toastification";
 import DeleteConfirm from "@/components/DeleteConfirm.vue";
-import FileUpload from "primevue/fileupload";
 import { useRoute, useRouter } from "vue-router";
+import axiosInstance from "@/axios";
 
 const router = useRouter();
 const route = useRoute();
@@ -532,41 +530,70 @@ const openPreview = (url: string) => {
 const closePreview = () => {
   previewImage.value = null;
 }
-const selectedFiles = ref<File[]>([])
+const selectedFile = ref<File | null>(null);
 const previewUrl = ref<string | null>(null)
-const fileUploadRef = ref()
+const avatarPreview = ref<string>("");
 const removedOldImage = ref(false)
 
-const onFileSelect = async (event: any) => {
-  const file = event.files[0]
-  if (event.files.length > 1) {
-    fileUploadRef.value.clear()
-    return
+const BASE_URL = import.meta.env.VITE_BASE_API
+
+const getAvatarUrl = (url: string | undefined): string => {
+  if (!url) return '';
+
+  if (url.startsWith('http')) return url;
+
+  return `${BASE_URL}${url}`;
+
+};
+
+const changeFile = (event: Event) => {
+  const fileInput = event.target as HTMLInputElement;
+  if (!fileInput.files?.length) return;
+
+  const file = fileInput.files[0];
+  selectedFile.value = file;
+  avatarPreview.value = URL.createObjectURL(file);
+  removedOldImage.value = false;
+};
+
+const onFileRemove = async () => {
+  if (form.value.uploadId) {
+    await deleteUpload(form.value.uploadId);
+    selectedFile.value = null;
   }
-  selectedFiles.value = [file];
-
-  previewUrl.value = URL.createObjectURL(file)
-  form.value.imageUrl = previewUrl.value
-
-  try {
-    const uploaded = await dataStore.loadUploadImage(file)
-    form.value.uploadId = uploaded.id || ""
-    form.value.imageUrl = uploaded.url
-      ? (uploaded.url.startsWith("http") ? uploaded.url : `${import.meta.env.VITE_BASE_API}${uploaded.url}`)
-      : previewUrl.value
-  } catch (error) {
-    form.value.uploadId = ""
-    Toast.error("Rasmni yuklab bo'lmadi.")
-  }
-}
-
-const onFileRemove = () => {
-  selectedFiles.value = [];
   previewUrl.value = null;
   form.value.imageUrl = ""
   form.value.uploadId = ""
   removedOldImage.value = true
 }
+
+const uploadAvatar = async (): Promise<{ url: string; id: string } | null> => {
+  if (!selectedFile.value) return null;
+
+  const formData = new FormData();
+  formData.append("file", selectedFile.value);
+
+  const { data } = await axiosInstance.post("/api/v1/uploads", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data"
+    }
+  });
+
+  return {
+    url: data.url,
+    id: data.id
+  };
+};
+
+const deleteUpload = async (uploadId: string) => {
+  if (!uploadId) return;
+
+  try {
+    await axiosInstance.delete(`/api/v1/uploads/${uploadId}`);
+  } catch (error) {
+    console.error("Upload o'chirishda xatolik:", error);
+  }
+};
 
 watch(
     () => isEditing.value,
@@ -776,6 +803,13 @@ const submitForm = async () => {
 
   try {
     filteredAlbums.value
+    if (selectedFile.value) {
+      const uploaded = await uploadAvatar();
+      if (uploaded) {
+        form.value.imageUrl = uploaded.url;
+        form.value.uploadId = uploaded.id;
+      }
+    }
     const payload: OrderCreateDto = {
       ...form.value,
       employees: form.value.employees.map((id, index) => ({

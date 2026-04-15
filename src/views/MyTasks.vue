@@ -86,7 +86,7 @@
           </button>
           <img
               alt=""
-              :src="previewImage"
+              :src="getAvatarUrl(previewImage)"
               class="max-h-[85vh] w-auto rounded-2xl shadow-2xl"
               @click.stop
           />
@@ -101,10 +101,10 @@
             faClass="fa-solid fa-arrow-left"
             @click="router.back()"
         />
-        <h2 class="text-xl font-semibold">Barcha vazifalar</h2>
+        <h2 class="text-lg font-semibold">Barcha vazifalar</h2>
       </div>
       <div
-          class="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-5 border-b-2 border-gray-200 items-end gap-4 py-2"
+          class="grid grid-cols-1 text-sm sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-5 border-b-2 border-gray-200 items-end gap-4 py-2"
       >
         <AppSelect
             :options="itemStatus"
@@ -140,7 +140,7 @@
           class="overflow-auto"
       >
         <table
-            class="w-full table-auto overflow-auto"
+            class="w-full text-sm table-auto overflow-auto"
         >
           <colgroup>
             <col style="width: 3%">
@@ -187,7 +187,7 @@
                   @click="openPreview(task.imageUrl)"
                   v-if="task.imageUrl"
                   class="w-14 h-10 sm:h-10 lg:h-12 cursor-pointer rounded-xl"
-                  :src="task.imageUrl" alt="">
+                  :src="getAvatarUrl(task.imageUrl)" alt="">
             </td>
             <td class="p-2 text-blue-600 font-semibold text-sm">{{statusOrder[task.kind]}}</td>
             <td class="p-2">{{task.customerName}}</td>
@@ -296,6 +296,17 @@ const openPreview = (url: string) => {
 const closePreview = () => {
   previewImage.value = null;
 }
+
+const BASE_URL = import.meta.env.VITE_BASE_API
+
+const getAvatarUrl = (url: string | undefined): string => {
+  if (!url) return '';
+
+  if (url.startsWith('http')) return url;
+
+  return `${BASE_URL}${url}`;
+
+};
 
 const itemStatus = ref( [
   { value: 'PENDING', text: 'Kutilmoqda' },

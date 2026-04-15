@@ -151,7 +151,10 @@ export interface OrderCreateDto {
     customerId?: string;
     customerName: string;
     receiverName: string;
-    employees: EmployeeStatus[];
+    employees: {
+        employeeId: string;
+        stepOrder: number;
+    }[];
     pageCount: number | null;
     amount: number | null;
     acceptedDate: string;
@@ -160,27 +163,6 @@ export interface OrderCreateDto {
     imageUrl?: string;
     notes?: string;
     uploadId: string;
-}
-
-export interface IPicture {
-    id: string;
-    categoryName: string | null;
-    orderName: string;
-    itemType: string;
-    pageNumber: number | null;
-    amountNumber: number | null;
-    customerName: string;
-    receiverName: string;
-    employeeId: number[]; // xodim
-    employees: EmployeeStatus[];
-    processedCount: number | null;
-    termData: string | null;
-    status: string;
-    imageUrl: string;
-    //doneData: number | null;
-    createdData: string;
-    createdAt: string | null;
-    updatedAt: string | null;
 }
 export interface UserForm {
     id: string;

@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-col container m-auto h-full w-full p-6 gap-6">
     <div class="w-full flex bg-white p-4 rounded-xl items-center justify-between">
-      <div class="flex items-center gap-2">
+      <div class="flex items-center gap-4">
         <CButton
             type="button"
             text="Ortga"
@@ -14,12 +14,11 @@
       </div>
       <CButton
           type="button"
-          text="+Add"
+          text="Yangi qo'shish"
           @click="addTodoItem"
       />
     </div>
     <CDialog
-        title="Todo form"
         :show="visibleTodo"
         @close="visibleTodo = false"
         bodyClass="rounded-lg mt-20 !bg-bg-primary"
@@ -28,6 +27,7 @@
           class="flex flex-col w-full p-6 gap-6"
           @submit.prevent="createMaterial"
       >
+        <h2 class="text-lg font-bold">{{editId ? "Tovarni o'zgartirish" : "Tovar qo'shish"}}</h2>
         <AppInput label="Tovar nomi"
                   type="text"
                   placeholder="Tovar nomini kiriting"
@@ -52,13 +52,13 @@
         <div class="flex items-center gap-4 justify-center mt-4">
           <CButton
               type="button"
-              text="Cancel"
+              text="Bekor qilish"
               variant="ghost-accent"
               @click="closeForm"
           />
           <CButton
               type="submit"
-              text="Submit"
+              text="Saqlash"
           />
         </div>
       </form>
@@ -79,10 +79,10 @@
     >
       <div
           v-if="materialItems.length"
-          class=" grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 p-4"
+          class=" grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 py-4"
       >
         <div
-            class="flex flex-col gap-2 shadow-md rounded-xl p-4  bg-gradient-to-br from-blue-50 to-purple-50"
+            class="flex flex-col gap-2 shadow-md rounded-xl p-2 w-full h-full  bg-gradient-to-br from-blue-50 to-purple-50"
             v-for="(item, index) in materialItems"
             :key="index"
         >
@@ -118,7 +118,7 @@
                 class="flex items-center text-green-700 text-2xl gap-2 font-semibold"
             >
               <span class="break-all">{{item.quantity}}</span>
-              <span class="break-all">{{item.unitName}}</span>
+              <span class="break-all text-lg">{{item.unitName}}</span>
             </div>
             <div v-if="item.updatedAt">
               <p>Yangilandi: {{dataItem(item.updatedAt)}}</p>
@@ -183,6 +183,7 @@ const store = useStore();
 const visibleTodo = ref(false);
 const selectedId = ref<string | null>(null);
 const showForm = ref(false);
+const editId = ref(false);
 // const cards = ref([
 //   { title: "Card 1", text: "Content 1" },
 //   { title: "Card 2", text: "Content 2" },
@@ -215,6 +216,7 @@ const showForm = ref(false);
 const addTodoItem = () => {
   resetForm()
   visibleTodo.value = true;
+  editId.value = false;
 }
 
 const materialItems = computed(() => store.state.items);
@@ -252,6 +254,7 @@ const createMaterial = async () => {
     await store.loadMaterials()
     visibleTodo.value = false;
     closeForm();
+    editId.value = false;
   }
   catch (error) {
     console.log(error);
@@ -261,6 +264,7 @@ const createMaterial = async () => {
 const editItem = (item: IItems) => {
   form.value = { ...item }
   visibleTodo.value = true;
+  editId.value = true;
 };
 
 const confirmDelete = async () => {

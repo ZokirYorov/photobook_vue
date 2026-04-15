@@ -145,7 +145,7 @@ const profileImageInput = ref<HTMLInputElement>();
 
 const currentUploadKey = ref<string>("");
 
-const BASE_URL = axiosInstance.defaults.baseURL || import.meta.env.VITE_BASE_API || "";
+const BASE_URL = import.meta.env.VITE_BASE_API
 
 const form = reactive<UserForm>({
   id: "",

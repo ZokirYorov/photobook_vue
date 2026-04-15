@@ -15,7 +15,7 @@
       class="scrollBtn bg-red-800 hover:bg-red-700"
       @click="scrollToTop"
   />
-  <div class="flex flex-col mt-20 w-full flex-1 relative bg-gray-50">
+  <div class="flex flex-col mt-16 w-full flex-1 relative bg-gray-50">
     <Sidebar
         :isMenuVisible="isMenuVisible"
         @toggleMenu="toggleMenu"
