@@ -31,6 +31,9 @@ export default defineConfig(({ mode }) => {
                     ws: true
                 }
             }
+        },
+        preview: {
+            allowedHosts: true
         }
     }
 })
