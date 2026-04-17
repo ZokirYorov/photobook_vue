@@ -130,46 +130,68 @@
               ✕
             </button>
           </div>
-          <AppSelect
-              v-model="itemForm.categoryId"
-              :options="photoCategory"
-              disabledValue="Tanlang"
-              text-field="text"
-              value-field="value"
-              label="Albom turi"
-          />
+          <div class="flex flex-col">
+            <AppSelect
+                v-model="itemForm.categoryId"
+                :options="photoCategory"
+                disabledValue="Tanlang"
+                text-field="text"
+                value-field="value"
+                label="Albom turi"
+                @change="clearError('categoryId')"
+            />
+            <p v-if="errors.categoryId" class="text-red-500 text-sm">
+              {{errors.categoryId}}
+            </p>
+          </div>
           <div class="flex w-full gap-2 px-1 items-center justify-between">
-            <AppInput
-                label="Betlar soni"
-                type="number"
-                step="2"
-                class="w-full"
-                placeholder="2,4,6,10,...,"
-                v-model="itemForm.pageCount"
-            />
-            <AppInput
-                type="number"
-                class="w-full"
-                placeholder="Masalan: 10"
-                label="Buyurtma soni"
-                v-model="itemForm.amount"
-            />
+            <div class="flex flex-col w-full">
+              <AppInput
+                  label="Betlar soni"
+                  type="number"
+                  step="2"
+                  class="w-full"
+                  placeholder="2,4,6,10,...,"
+                  v-model="itemForm.pageCount"
+                  @input="clearError('pageCount')"
+              />
+              <p v-if="errors.pageCount" class="text-red-500 text-sm">{{errors.pageCount}}</p>
+            </div>
+            <div class="flex flex-col w-full">
+              <AppInput
+                  type="number"
+                  class="w-full"
+                  placeholder="Masalan: 10"
+                  label="Buyurtma soni"
+                  v-model="itemForm.amount"
+                  @input="clearError('amount')"
+              />
+              <p v-if="errors.amount" class="text-red-500 text-sm">{{errors.amount}}</p>
+            </div>
           </div>
           <div class="flex items-center justify-between w-full gap-2">
-            <AppInput
-                type="text"
-                placeholder="Masalan: Maktab"
-                label="Nomi"
-                class="w-full"
-                v-model="itemForm.orderName"
-            />
-            <AppInput
-                type="text"
-                placeholder="Masalan: Qizil koja"
-                label="Turi"
-                class="w-full"
-                v-model="itemForm.itemType"
-            />
+            <div class="flex flex-col w-full">
+              <AppInput
+                  type="text"
+                  placeholder="Masalan: Maktab"
+                  label="Nomi"
+                  class="w-full"
+                  v-model="itemForm.orderName"
+                  @input="clearError('orderName')"
+              />
+              <p v-if="errors.orderName" class="text-red-500 text-sm">{{errors.orderName}}</p>
+            </div>
+            <div class="flex flex-col w-full">
+              <AppInput
+                  type="text"
+                  placeholder="Masalan: Qizil koja"
+                  label="Turi"
+                  class="w-full"
+                  v-model="itemForm.itemType"
+                  @input="clearError('itemType')"
+              />
+              <p v-if="errors.itemType" class="text-red-500 text-sm">{{errors.itemType}}</p>
+            </div>
           </div>
          <div class="flex w-full gap-2 items-center justify-between">
            <AppInput
@@ -179,42 +201,60 @@
                label="Mijoz ismi"
                class="w-full"
            />
-           <AppSelect
-               :options="oderReceiver"
-               v-model="itemForm.receiverName"
-               disabledValue="Tanlang"
-               text-field="text"
-               value-field="value"
-               label="Qabul qiluvchi"
-           />
+           <div class="flex flex-col w-full">
+             <AppSelect
+                 :options="oderReceiver"
+                 v-model="itemForm.receiverName"
+                 disabledValue="Tanlang"
+                 text-field="text"
+                 value-field="value"
+                 label="Qabul qiluvchi"
+                 @change="clearError('receiverName')"
+             />
+             <p v-if="errors.receiverName" class="text-red-500 text-sm">{{errors.receiverName}}</p>
+           </div>
          </div>
-          <AppSelect
-              :model-value="itemForm.employees"
-              @update:modelValue="handleEmployeeChange"
-              :options="orderedUsers"
-              disabledValue="Xodimni tanlang"
-              text-field="lastName"
-              value-field="id"
-              isMultiple
-              @click.stop
-              required
-              label="Mas'ul xodim"
-          />
+          <div class="flex flex-col w-full">
+            <AppSelect
+                :model-value="itemForm.employees"
+                @update:modelValue="(val) => {
+                  handleEmployeeChange(val)
+                  clearError('employees')
+                }"
+                :options="orderedUsers"
+                disabledValue="Xodimni tanlang"
+                text-field="lastName"
+                value-field="id"
+                isMultiple
+                @click.stop
+                required
+                label="Mas'ul xodim"
+            />
+            <p v-if="errors.employees" class="text-red-500 text-sm">{{errors.employees}}</p>
+          </div>
           <div
               class="flex items-center w-full gap-2"
           >
-            <AppInput
-                v-model="itemForm.acceptedDate"
-                label="Qabul qilingan sana"
-                type="date"
-                class="w-full"
-            />
-            <AppInput
-                label="Tugash sanasi"
-                type="date"
-                class="w-full"
-                v-model="itemForm.deadline"
-            />
+            <div class="flex flex-col w-full">
+              <AppInput
+                  v-model="itemForm.acceptedDate"
+                  label="Qabul qilingan sana"
+                  type="date"
+                  class="w-full"
+                  @input="clearError('acceptedDate')"
+              />
+              <p v-if="errors.acceptedDate" class="text-red-500 text-sm">{{errors.acceptedDate}}</p>
+            </div>
+            <div class="flex flex-col w-full">
+              <AppInput
+                  label="Tugash sanasi"
+                  type="date"
+                  class="w-full"
+                  v-model="itemForm.deadline"
+                  @input="clearError('deadline')"
+              />
+              <p v-if="errors.deadline" class="text-red-500 text-sm">{{errors.deadline}}</p>
+            </div>
           </div>
           <AppSelect
               v-model="itemForm.status"
@@ -552,6 +592,7 @@ const endData = ref<string | null>(null);
 const formFilter = ref<string | ''>('');
 const previewImage = ref<string | null>(null)
 const isLoading = ref(false);
+const errors = ref<Record<string, string>>({})
 
 const openPreview = (url: string) => {
   previewImage.value = url;
@@ -804,26 +845,36 @@ const closeForm = () => {
   isVisible.value = false;
 }
 
-const isValidForm = () => {
-  const f = itemForm.value;
-  return (
-      f.amount !== null &&
-      f.pageCount !== null &&
-      f.receiverName !== null &&
-      f.categoryId !== null &&
-      f.orderName !== null &&
-      f.customerName !== null &&
-      f.employees !== null &&
-      f.acceptedDate !== null &&
-      f.deadline !== null &&
-      f.status !== null
-  );
-};
+const clearError = (key: string) => {
+  delete errors.value[key]
+}
+
+const validateForm = () => {
+  errors.value = {}
+
+  const f = itemForm.value
+
+  if (!f.orderName) errors.value.orderName = "Buyurtma nomi majburiy"
+  if (!f.categoryId) errors.value.categoryId = "Kategoriya tanlanishi shart"
+  if (!f.amount) errors.value.amount = "Buyurtma soni kiritilmadi"
+  if (!f.pageCount) errors.value.pageCount = "Betlar soni kiritilmadi"
+  if (!f.receiverName) errors.value.receiverName = "Qabul qiluvchi tanlanmadi"
+  if (!f.status) errors.value.status = "Status tanlanmadi"
+  if (!f.itemType) errors.value.itemType = "Buyurtma turi kiritilmadi"
+  if (!f.acceptedDate) errors.value.acceptedDate = "Sana kiritilmadi"
+  if (!f.deadline) errors.value.deadline = "Muddat kiritilmadi"
+  if (!f.employees.length) errors.value.employees = "Kamida 1 xodim tanlang"
+
+  return Object.keys(errors.value).length === 0
+}
 
 const submitForm = async () => {
   isLoading.value = true;
 
-  if (!isValidForm()) return;
+  if (!validateForm()) {
+    isLoading.value = false
+    return
+  }
 
   try {
 

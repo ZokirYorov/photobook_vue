@@ -113,7 +113,7 @@
 <!--              @clear="onFileRemove"-->
 <!--          />-->
           <AppInput
-              label="Receipt image"
+              label="Rasm yuklash"
               type="file"
               accept="image/*"
               @change="changeFile($event)"
@@ -135,46 +135,78 @@
               ✕
             </button>
           </div>
-          <AppSelect
-              v-model="form.categoryId"
-              :options="allCategory"
-              disabledValue="Tanlang"
-              text-field="text"
-              value-field="value"
-              label="Albom turi"
-          />
+          <div class="flex flex-col w-full">
+            <AppSelect
+                v-model="form.categoryId"
+                :options="allCategory"
+                disabledValue="Tanlang"
+                text-field="text"
+                value-field="value"
+                label="Albom turi"
+                @change="clearError('categoryId')"
+                :errorText="errors.categoryId"
+            />
+            <p v-if="errors.categoryId" class="text-red-500 text-sm">
+              {{errors.categoryId}}
+            </p>
+          </div>
           <div class="flex w-full gap-2 px-1 items-center justify-between">
-            <AppInput
-                label="Betlar turi"
-                type="number"
-                step="2"
-                class="w-full"
-                placeholder="2,4,6,10,...,"
-                v-model="form.pageCount"
-            />
-            <AppInput
-                type="number"
-                class="w-full"
-                placeholder="Masalan: 10"
-                label="Buyurtma soni"
-                v-model="form.amount"
-            />
+            <div class="flex w-full flex-col">
+              <AppInput
+                  label="Betlar turi"
+                  type="number"
+                  step="2"
+                  class="w-full"
+                  @input="clearError('pageCount')"
+                  placeholder="2,4,6,10,...,"
+                  v-model="form.pageCount"
+                  :class="{'border-red-500' : errors.pageCount}"
+              />
+              <p v-if="errors.pageCount" class="text-red-500 text-sm">
+                {{errors.pageCount}}
+              </p>
+            </div>
+            <div class="flex flex-col w-full">
+              <AppInput
+                  type="number"
+                  class="w-full"
+                  placeholder="Masalan: 10"
+                  label="Buyurtma soni"
+                  v-model="form.amount"
+                  @input="clearError('amount')"
+              />
+              <p v-if="errors.amount" class="text-red-500 text-sm">
+                {{errors.amount}}
+              </p>
+            </div>
           </div>
           <div class="flex items-center justify-between w-full gap-2">
-            <AppInput
-                type="text"
-                placeholder="Masalan: Maktab"
-                label="Nomi"
-                class="w-full"
-                v-model="form.orderName"
-            />
-            <AppInput
-                type="text"
-                placeholder="Masalan: Qora koja"
-                label="Turi"
-                class="w-full"
-                v-model="form.itemType"
-            />
+            <div class="flex flex-col w-full">
+              <AppInput
+                  type="text"
+                  placeholder="Masalan: Maktab"
+                  label="Nomi"
+                  class="w-full"
+                  v-model="form.orderName"
+                  @input="clearError('orderName')"
+              />
+              <p v-if="errors.orderName" class="text-red-500 text-sm">
+                {{errors.orderName}}
+              </p>
+            </div>
+            <div class="flex flex-col w-full">
+              <AppInput
+                  type="text"
+                  placeholder="Masalan: Qora koja"
+                  label="Turi"
+                  class="w-full"
+                  v-model="form.itemType"
+                  @input="clearError('itemType')"
+              />
+              <p v-if="errors.itemType" class="text-red-500 text-sm">
+                {{errors.itemType}}
+              </p>
+            </div>
           </div>
           <div class="flex w-full gap-2 items-center justify-between">
             <AppInput
@@ -184,40 +216,66 @@
                 label="Mijoz ismi"
                 class="w-full"
             />
-            <AppSelect
-                :options="oderReceiver"
-                v-model="form.receiverName"
-                disabledValue="Tanlang"
-                text-field="text"
-                value-field="value"
-                label="Qabul qiluvchi"
-            />
+            <div class="flex flex-col w-full">
+              <AppSelect
+                  :options="oderReceiver"
+                  v-model="form.receiverName"
+                  disabledValue="Tanlang"
+                  text-field="text"
+                  value-field="value"
+                  label="Qabul qiluvchi"
+                  @change="clearError('receiverName')"
+              />
+              <p v-if="errors.receiverName" class="text-red-500 text-sm">
+                {{errors.receiverName}}
+              </p>
+            </div>
           </div>
-          <AppSelect
-              :model-value="form.employees"
-              @update:modelValue="handleEmployeeChange"
-              :options="orderedUsers"
-              disabledValue="Xodimni tanlang"
-              text-field="lastName"
-              value-field="id"
-              isMultiple
-              label="Mas'ul xodim"
-          />
+          <div class="flex flex-col w-full">
+            <AppSelect
+                :model-value="form.employees"
+                @update:modelValue="(val) => {
+                  handleEmployeeChange(val)
+                  clearError('employees')
+                }"
+                :options="orderedUsers"
+                disabledValue="Xodimni tanlang"
+                text-field="lastName"
+                value-field="id"
+                isMultiple
+                label="Mas'ul xodim"
+            />
+            <p v-if="errors.employees" class="text-red-500 text-sm">
+              {{errors.employees}}
+            </p>
+          </div>
           <div
               class="flex items-center w-full gap-2"
           >
-            <AppInput
-                v-model="form.acceptedDate"
-                label="Qabul qilingan sana"
-                type="date"
-                class="w-full"
-            />
-            <AppInput
-                label="Tugash sanasi"
-                type="date"
-                class="w-full"
-                v-model="form.deadline"
-            />
+            <div class="flex flex-col w-full">
+              <AppInput
+                  v-model="form.acceptedDate"
+                  label="Qabul qilingan sana"
+                  type="date"
+                  class="w-full"
+                  @input="clearError('acceptedDate')"
+              />
+              <p v-if="errors.acceptedDate" class="text-red-500 text-sm">
+                {{errors.acceptedDate}}
+              </p>
+            </div>
+            <div class="flex flex-col w-full">
+              <AppInput
+                  label="Tugash sanasi"
+                  type="date"
+                  class="w-full"
+                  v-model="form.deadline"
+                  @input="clearError('deadline')"
+              />
+              <p v-if="errors.deadline" class="text-red-500 text-sm">
+                {{errors.deadline}}
+              </p>
+            </div>
           </div>
           <div
               class="flex items-center w-full gap-2"
@@ -614,6 +672,8 @@ const avatarPreview = ref<string>("");
 const removedOldImage = ref(false)
 const isLoading = ref(false)
 
+const errors = ref<Record<string, string>>({})
+
 const BASE_URL = import.meta.env.VITE_BASE_API
 
 const getAvatarUrl = (url: string | undefined): string => {
@@ -821,6 +881,10 @@ watch([formStatus, formData, endData, formFilter], (_newValue, _oldValue, onClea
   onCleanup(() => window.clearTimeout(timer))
 })
 
+const clearError = (key: string) => {
+  delete errors.value[key]
+}
+
 const closeFilter = () => {
   formStatus.value = null;
   formFilter.value = '';
@@ -880,26 +944,32 @@ const statusColor: Record<string, string> = {
   COMPLETED: 'bg-blue-100 text-blue-700',
 }
 
-const isValidForm = () => {
-  const f = form.value;
-  return (
-      f.amount !== null &&
-      f.pageCount !== null &&
-      f.receiverName !== null &&
-      f.categoryId !== null &&
-      f.orderName !== null &&
-      f.customerName !== null &&
-      f.employees !== null &&
-      f.acceptedDate !== null &&
-      f.deadline !== null &&
-      f.status !== null
-  );
-};
+const validateForm = () => {
+  errors.value = {}
+
+  const f = form.value
+
+  if (!f.orderName) errors.value.orderName = "Buyurtma nomi majburiy"
+  if (!f.categoryId) errors.value.categoryId = "Kategoriya tanlanishi shart"
+  if (!f.amount) errors.value.amount = "Buyurtma soni kiritilmadi"
+  if (!f.pageCount) errors.value.pageCount = "Betlar soni kiritilmadi"
+  if (!f.receiverName) errors.value.receiverName = "Qabul qiluvchi tanlanmadi"
+  if (!f.status) errors.value.status = "Status tanlanmadi"
+  if (!f.itemType) errors.value.itemType = "Buyurtma turi kiritilmadi"
+  if (!f.acceptedDate) errors.value.acceptedDate = "Sana kiritilmadi"
+  if (!f.deadline) errors.value.deadline = "Muddat kiritilmadi"
+  if (!f.employees.length) errors.value.employees = "Kamida 1 xodim tanlang"
+
+  return Object.keys(errors.value).length === 0
+}
 
 const submitForm = async () => {
   isLoading.value = true;
 
-  if (!isValidForm()) return;
+  if (!validateForm()) {
+    isLoading.value = false
+    return
+  }
 
   try {
     if (selectedFile.value) {
