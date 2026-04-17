@@ -1,5 +1,75 @@
 <template>
-  <div class="flex flex-col w-full h-screen">
+  <div v-if="isLoading" class="p-6 container m-auto space-y-6 animate-pulse">
+
+    <!-- TOP CARDS -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-5">
+      <div
+          v-for="i in 8"
+          :key="i"
+          class="bg-white rounded-xl p-6 shadow flex flex-col gap-4"
+      >
+        <div class="flex justify-between items-center">
+          <div class="w-10 h-10 bg-gray-300 rounded-xl"></div>
+          <div class="w-6 h-6 bg-gray-300 rounded"></div>
+        </div>
+
+        <div class="flex justify-between items-center">
+          <div class="w-32 h-4 bg-gray-300 rounded"></div>
+          <div class="w-10 h-6 bg-gray-300 rounded"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STATUS CARDS -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
+      <div
+          v-for="i in 3"
+          :key="i"
+          class="bg-white rounded-xl shadow overflow-hidden"
+      >
+        <!-- header -->
+        <div class="h-20 bg-gray-300"></div>
+
+        <div class="p-4 space-y-4">
+          <!-- small cards -->
+          <div class="grid grid-cols-2 gap-4">
+            <div class="h-20 bg-gray-200 rounded-lg"></div>
+            <div class="h-20 bg-gray-200 rounded-lg"></div>
+          </div>
+
+          <!-- progress -->
+          <div class="space-y-2">
+            <div class="w-full h-3 bg-gray-200 rounded-full"></div>
+            <div class="w-1/2 h-3 bg-gray-200 rounded"></div>
+          </div>
+
+          <!-- list -->
+          <div class="space-y-2">
+            <div v-for="j in 4" :key="j" class="h-8 bg-gray-200 rounded"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CATEGORY STATS -->
+    <div class="bg-white rounded-xl p-6 shadow space-y-6">
+      <div class="w-64 h-5 bg-gray-300 rounded"></div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div
+            v-for="i in 3"
+            :key="i"
+            class="flex flex-col items-center space-y-4"
+        >
+          <div class="w-[180px] h-[180px] bg-gray-200 rounded-full"></div>
+          <div class="w-24 h-4 bg-gray-300 rounded"></div>
+          <div class="w-16 h-6 bg-gray-300 rounded"></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  <div v-else-if="getAlbums.length" class="flex flex-col w-full h-screen">
     <div class="flex p-6 flex-col animate-fade-in container m-auto gap-6 w-full">
       <div
           class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-5 items-center"
@@ -278,6 +348,9 @@
 
     </div>
   </div>
+  <div v-else class="flex w-full items-center justify-center">
+    Sahifa ma'lumotlari topilmadi!
+  </div>
 
 </template>
 
@@ -315,6 +388,8 @@ const photoCount = ref<number>(0);
 const albumItems = ref<{ id: number; name: string; count: number }[]>([]);
 const vignetteItems = ref<{ id: number; name: string; count: number }[]>([]);
 const photoItems = ref<{ id: number; name: string; count: number }[]>([]);
+
+const isLoading = ref(false);
 
 const getAlDashboardCounts = async () => {
   try {
@@ -610,16 +685,22 @@ const getCircleProgress = (percentage: number) => {
 // };
 
 onMounted(async (): Promise<void> => {
-  await Promise.all([
-    getAlDashboardCounts(),
-    loadAllStats(),
-    loadBreakdowns(),
-    dataStore.loadUsers(),
-    dataStore.loadMaterials(),
-    dataStore.loadCategory("ALBUM"),
-    dataStore.loadCategory("VIGNETTE"),
-    dataStore.loadCategory("PICTURE"),
-  ]);
+  isLoading.value = true
+  try {
+    await Promise.all([
+      getAlDashboardCounts(),
+      loadAllStats(),
+      loadBreakdowns(),
+      dataStore.loadUsers(),
+      dataStore.loadMaterials(),
+      dataStore.loadCategory("ALBUM"),
+      dataStore.loadCategory("VIGNETTE"),
+      dataStore.loadCategory("PICTURE"),
+    ]);
+    isLoading.value = false
+  } catch (error) {
+    console.log('Dashboard load error',error)
+  }
 })
 </script>
 <style scoped>
