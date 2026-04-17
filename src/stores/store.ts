@@ -27,9 +27,9 @@ export const useStore = defineStore('item', () => {
         } as PagingResponse<Order>,
 
         paging: {
-            ALBUM: { pageNumber: 0, pageSize: 100, totalElements: 0, totalPages: 0 , last: true },
-            VIGNETTE: { pageNumber: 0, pageSize: 100, totalElements: 0, totalPages: 0 , last: true },
-            PICTURE: { pageNumber: 0, pageSize: 100, totalElements: 0, totalPages: 0 , last: true },
+            ALBUM: { pageNumber: 0, pageSize: 15, totalElements: 0, totalPages: 0 , last: true },
+            VIGNETTE: { pageNumber: 0, pageSize: 15, totalElements: 0, totalPages: 0 , last: true },
+            PICTURE: { pageNumber: 0, pageSize: 15, totalElements: 0, totalPages: 0 , last: true },
         },
 
         user: {

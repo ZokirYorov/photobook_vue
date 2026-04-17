@@ -450,7 +450,7 @@
               class="border-t border-gray-600 text-sm hover:bg-gray-100"
               v-for="(album, index) in paginatedAlbums" :key="album.id"
           >
-            <td class="py-2 px-3">{{ (page - 1) * size + index + 1 }}</td>
+            <td class="py-2 px-3">{{ index + 1 }}</td>
             <td class="p-2 break-all">
               <p class="font-semibold">{{ album.orderName }}</p>
               <p class="text-gray-500 text-sm font-semibold">{{album.categoryName}}</p>
@@ -555,18 +555,15 @@
         </table>
         <div
             v-if="totalPages > 1"
-            class="flex h-20 items-center sticky overflow-y-auto bottom-0 z-10 justify-center mt-4 pb-2 gap-2 bg-white"
+            class="flex h-20 items-center sticky bottom-0 z-10 justify-center mt-4 pb-2 gap-2 bg-white border-t"
         >
           <button
               type="button"
               @click="changePage(page - 1)"
               :disabled="page === 1"
-              class="flex w-10 h-10 justify-center items-center rounded-full transition"
-              :class="page === 1
-                ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                : 'bg-gray-700 text-white cursor-pointer hover:bg-gray-800'"
+              class="flex w-10 h-10 justify-center items-center rounded-full transition disabled:opacity-50 disabled:cursor-not-allowed bg-gray-700 text-white hover:bg-gray-800"
           >
-            <i class="fa-solid fa-backward text-sm"></i>
+            <i class="fa-solid fa-chevron-left text-sm"></i>
           </button>
           <div
               v-for="(pageItem, idx) in allPagesNumbers"
@@ -590,7 +587,7 @@
                 ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
                 : 'bg-gray-700 text-white cursor-pointer hover:bg-gray-800'"
           >
-            <i class="fa-solid fa-forward text-sm"></i>
+            <i class="fa-solid fa-chevron-right text-sm"></i>
           </button>
         </div>
       </div>
@@ -827,13 +824,11 @@ const form = ref<OrderForm>({
 //   dataStore.loadGetAlbum()
 // }
 
-const currentPage = computed(() => dataStore.state.paging.ALBUM.pageNumber)
-const page = computed(() => currentPage.value + 1)
-const size = computed(() => dataStore.state.paging.ALBUM.pageSize)
+const currentPage = computed(() => dataStore.state.paging.ALBUM.pageNumber);
+const page = computed(() => currentPage.value + 1);
 const totalPages = computed(() => dataStore.state.paging.ALBUM.totalPages)
 
 const orderFilters = computed(() => ({
-  size: size.value,
   status: formStatus.value || undefined,
   from: formData.value || undefined,
   to: endData.value || undefined,
@@ -890,7 +885,7 @@ const closeFilter = () => {
   formFilter.value = '';
   formData.value = null;
   endData.value = null;
-  dataStore.loadOrders('ALBUM', { page: 0, size: size.value });
+  dataStore.loadOrders('ALBUM', { page: 0});
 }
 
 const pageProcessed = computed(() => {
