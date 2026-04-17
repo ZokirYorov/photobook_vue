@@ -104,7 +104,7 @@
           class=" grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 py-4"
       >
         <div
-            class="flex flex-col gap-2 shadow-md rounded-xl p-2 w-full h-full  bg-gradient-to-br from-blue-50 to-purple-50"
+            class="flex flex-col gap-2 shadow-md rounded-xl px-2 py-4 w-full h-full  bg-gradient-to-br from-blue-50 to-purple-50"
             v-for="(item, index) in materialItems"
             :key="index"
         >
@@ -137,13 +137,13 @@
               class="flex items-center justify-between"
           >
             <div
-                class="flex items-center text-green-700 text-2xl gap-2 font-semibold"
+                class="flex items-center text-green-700 text-xl gap-2 font-semibold"
             >
               <span class="break-all">{{item.quantity}}</span>
               <span class="break-all text-lg">{{item.unitName}}</span>
             </div>
             <div v-if="item.updatedAt">
-              <p>Yangilandi: {{dataItem(item.updatedAt)}}</p>
+              <p class="text-sm">Yangilandi: {{dataItem(item.updatedAt)}}</p>
             </div>
           </div>
         </div>
