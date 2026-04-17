@@ -349,12 +349,12 @@
             <th class="p-2 text-start">Amallar</th>
           </tr>
           </thead>
-          <tbody v-if="filteredAlbums.length > 0">
+          <tbody v-if="paginatedAlbums.length > 0">
           <tr
               class="border-t border-gray-600 text-sm hover:bg-gray-100"
-              v-for="(album, index) in filteredAlbums" :key="index"
+              v-for="(album, index) in paginatedAlbums" :key="album.id"
           >
-            <td class="py-2 px-3">{{ index + 1 }}</td>
+            <td class="py-2 px-3">{{ (page - 1) * size + index + 1 }}</td>
             <td class="p-2 break-all">
               <p class="font-semibold">{{ album.orderName }}</p>
               <p class="text-gray-500 text-sm font-semibold">{{album.categoryName}}</p>
@@ -457,6 +457,46 @@
           </tr>
           </tbody>
         </table>
+        <div
+            v-if="totalPages > 1"
+            class="flex h-20 items-center sticky overflow-y-auto bottom-0 z-10 justify-center mt-4 pb-2 gap-2 bg-white"
+        >
+          <button
+              type="button"
+              @click="changePage(page - 1)"
+              :disabled="page === 1"
+              class="flex w-10 h-10 justify-center items-center rounded-full transition"
+              :class="page === 1
+                ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                : 'bg-gray-700 text-white cursor-pointer hover:bg-gray-800'"
+          >
+            <i class="fa-solid fa-backward text-sm"></i>
+          </button>
+          <div
+              v-for="(pageItem, idx) in allPagesNumbers"
+              :key="idx"
+              class="flex justify-center items-center px-3 py-1 h-11 w-11 rounded-3xl select-none"
+              :class="{
+                'bg-blue-500 text-white font-bold': pageItem === page,
+                'cursor-pointer hover:bg-gray-300': pageItem !== '...' && pageItem !== page,
+                'text-gray-400 cursor-default text-lg': pageItem === '...',
+              }"
+              @click="pageItem !== '...' && changePage(pageItem)"
+          >
+            {{ pageItem }}
+          </div>
+          <button
+              type="button"
+              @click="changePage(page + 1)"
+              :disabled="page >= totalPages"
+              class="flex w-10 h-10 justify-center items-center rounded-full transition"
+              :class="page >= totalPages
+                ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                : 'bg-gray-700 text-white cursor-pointer hover:bg-gray-800'"
+          >
+            <i class="fa-solid fa-forward text-sm"></i>
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -466,7 +506,7 @@
 
 <script setup lang="ts">
 import CButton from "@/components/CButton.vue";
-import {computed, ComputedRef, onMounted, ref, watch} from "vue";
+import {computed, onMounted, ref, watch} from "vue";
 import CDialog from "@/components/CDialog.vue";
 import AppInput from "@/components/ui/AppInput.vue";
 import AppSelect from "@/components/ui/AppSelect.vue";
@@ -482,8 +522,8 @@ const route = useRoute();
 const Toast = useToast();
 const dataStore = useStore();
 
-const allUsers: ComputedRef = computed(() => dataStore.state.user.items);
-const allCategory: ComputedRef = computed(() => dataStore.state.alCategory)
+const allUsers = computed(() => dataStore.state.user.items);
+const allCategory = computed(() => dataStore.state.alCategory)
 
 const orderedUsers = computed(() => {
   const selected = form.value.employees
@@ -518,10 +558,10 @@ const isEditing = ref(false);
 const isVisible = ref(false);
 const selectedItem = ref<string | null>(null);
 const showConfirmItem = ref(false);
-const formStatus = ref<string | null>(null);
+const formStatus = ref<OrderStatus | string | null>((route.query.status as OrderStatus) || null);
 const formData = ref<string | null>(null);
 const endData = ref<string | null>(null);
-const formFilter = ref<string | ''>('');
+const formFilter = ref('');
 const previewImage = ref<string | null>(null)
 
 const openPreview = (url: string) => {
@@ -604,25 +644,7 @@ watch(
     }
 )
 
-const filteredAlbums = computed(() => {
-
-  let data = [...dataStore.state.albums.items]
-
-  if (formFilter.value) {
-    const search = formFilter.value.toLowerCase()
-
-    data = data.filter(item =>
-        item.orderName?.toLowerCase().includes(search) ||
-        item.categoryName?.toLowerCase().includes(search) ||
-        item.customerName?.toLowerCase().includes(search) ||
-        item.receiverName?.toLowerCase().includes(search)
-    )
-  }
-  return data.sort((a,b) =>
-      new Date(b.acceptedDate).getTime() -
-      new Date(a.acceptedDate).getTime()
-  )
-})
+const filteredAlbums = computed(() => dataStore.state.albums.items)
 
 const categoryStatus = computed(() => {
   return allCategory.value.map((cat: any) => {
@@ -706,33 +728,70 @@ const form = ref<OrderForm>({
 //   dataStore.loadGetAlbum()
 // }
 
-watch(
-    [formStatus, formData, endData],
-    async () => {
+const currentPage = computed(() => dataStore.state.paging.ALBUM.pageNumber)
+const page = computed(() => currentPage.value + 1)
+const size = computed(() => dataStore.state.paging.ALBUM.pageSize)
+const totalPages = computed(() => dataStore.state.paging.ALBUM.totalPages)
 
-      await dataStore.loadOrders("ALBUM",{
-        status: formStatus.value || undefined,
-        from: formData.value || undefined,
-        to: endData.value || undefined,
-        search: formFilter.value || undefined
-      })
+const orderFilters = computed(() => ({
+  size: size.value,
+  status: formStatus.value || undefined,
+  from: formData.value || undefined,
+  to: endData.value || undefined,
+  search: formFilter.value || undefined,
+}))
 
+const allPagesNumbers = computed(() => {
+  const total = totalPages.value
+  const current = page.value
+  const delta = 2
+  const pages: (number | '...')[] = []
+
+  for (let i = 1; i <= total; i++) {
+    if (
+        i === 1 ||
+        i === total ||
+        (i >= current - delta && i <= current + delta)
+    ) {
+      pages.push(i)
+    } else if (pages[pages.length - 1] !== '...') {
+      pages.push('...')
     }
-)
+  }
+
+  return pages
+})
+
+const changePage = async (targetPage: number | '...') => {
+  if (targetPage === '...' || typeof targetPage !== 'number') return
+  if (targetPage < 1 || targetPage > totalPages.value) return
+
+  await dataStore.changePage("ALBUM", targetPage - 1, orderFilters.value)
+}
+
+const paginatedAlbums = computed(() => dataStore.state.albums.items)
+
+watch([formStatus, formData, endData, formFilter], (_newValue, _oldValue, onCleanup) => {
+  const timer = window.setTimeout(() => {
+    dataStore.loadOrders("ALBUM", {
+      ...orderFilters.value,
+      page: 0,
+    })
+  }, 300)
+
+  onCleanup(() => window.clearTimeout(timer))
+})
 
 const closeFilter = () => {
-  formStatus.value = '';
+  formStatus.value = null;
   formFilter.value = '';
-  formData.value = '';
-  endData.value = '';
-  dataStore.loadOrders('ALBUM');
+  formData.value = null;
+  endData.value = null;
+  dataStore.loadOrders('ALBUM', { page: 0, size: size.value });
 }
 
 const pageProcessed = computed(() => {
-  return filteredAlbums.value.reduce(
-      (sum, item) => sum + (item.amount || 0),
-      0
-  )
+  return dataStore.state.paging.ALBUM.totalElements
 })
 
 const itemStatus = ref( [
@@ -802,7 +861,6 @@ const submitForm = async () => {
   if (!isValidForm()) return;
 
   try {
-    filteredAlbums.value
     if (selectedFile.value) {
       const uploaded = await uploadAvatar();
       if (uploaded) {
@@ -901,17 +959,14 @@ const formatDate = (dateString?: string | null): string => {
   return `${day}-${month}-${year}`;
 };
 
-onMounted(() => {
-  if (route.query.status) {
-    formStatus.value = route.query.status as OrderStatus;
-  }
-})
-
 onMounted(async () => {
   await Promise.all([
-      await dataStore.loadOrders('ALBUM'),
-      await dataStore.loadCategory('ALBUM'),
-      await dataStore.loadUsers()
+      dataStore.loadOrders('ALBUM', {
+        ...orderFilters.value,
+        page: 0,
+      }),
+      dataStore.loadCategory('ALBUM'),
+      dataStore.loadUsers()
   ])
 
 })

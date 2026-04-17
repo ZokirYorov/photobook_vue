@@ -162,21 +162,26 @@ export const useStore = defineStore('item', () => {
         )
 
         const mapped: PagingResponse<Order> = {
-            items: data.content,
-            pageNumber: data.pageNumber,
-            pageSize: data.pageSize,
-            totalElements: data.totalElements,
-            totalPages: data.totalPages,
-            last: data.last,
+            items: data.content || data.items || [],
+            pageNumber: data.pageNumber ?? data.number ?? body.page,
+            pageSize: data.pageSize ?? data.size ?? body.size,
+            totalElements: data.totalElements ?? 0,
+            totalPages: data.totalPages ?? 0,
+            last: data.last ?? true,
         }
 
         if (kind === "ALBUM") state.value.albums = mapped
         if (kind === "VIGNETTE") state.value.vignettes = mapped
         if (kind === "PICTURE") state.value.pictures = mapped
 
-        state.value.paging[kind].pageNumber = mapped.pageNumber
-        state.value.paging[kind].totalElements = mapped.totalElements
-        state.value.paging[kind].totalPages = mapped.totalPages
+        state.value.paging[kind] = {
+            ...state.value.paging[kind],
+            pageNumber: mapped.pageNumber,
+            pageSize: mapped.pageSize,
+            totalElements: mapped.totalElements,
+            totalPages: mapped.totalPages,
+            last: mapped.last,
+        }
     }
 
 // ─── CRUD — barchasi faqat kind bilan chaqiradi ───────────────────────────────
@@ -203,9 +208,8 @@ export const useStore = defineStore('item', () => {
         page: number,
         params: Partial<PagingRequest> = {}  // ✅ optional
     ) => {
-        const key = kind as OrderKind;
-        state.value.paging[key].pageNumber = page;
-        await loadOrders(kind, params);
+        state.value.paging[kind].pageNumber = page;
+        await loadOrders(kind, {...params, page});
     };
 
     // const getOrderById = async (id: string): Promise<Order | null> => {

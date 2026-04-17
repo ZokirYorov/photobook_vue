@@ -5,3 +5,19 @@ declare module '*.vue' {
     const component: DefineComponent<{}, {}, any>
     export default component
 }
+
+declare namespace SocketIOClient {
+    interface Socket {
+        connected: boolean
+        on(event: string, callback: (...args: any[]) => void): this
+        emit(event: string, ...args: any[]): this
+        connect(): this
+        disconnect(): this
+        removeAllListeners(): this
+    }
+}
+
+declare module 'socket.io-client' {
+    function io(url: string, options?: Record<string, unknown>): SocketIOClient.Socket
+    export default io
+}

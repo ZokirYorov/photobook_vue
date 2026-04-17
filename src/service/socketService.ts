@@ -13,6 +13,10 @@ class SocketService {
     private isAuthenticated = false;
     private hasShownConnectionError = false;
 
+    private isSocketEnabled() {
+        return String(import.meta.env.VITE_ENABLE_SOCKET || "").trim().toLowerCase() === "true";
+    }
+
     private resolveSocketBaseUrl() {
         const baseApi = String(import.meta.env.VITE_BASE_API || "").trim();
 
@@ -73,7 +77,7 @@ class SocketService {
     }
 
     connect(token: string) {
-        if (!token) return;
+        if (!token || !this.isSocketEnabled()) return;
 
         this.token = token;
 
