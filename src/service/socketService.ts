@@ -11,7 +11,6 @@ class SocketService {
     private token: string | null = null;
     private listeners = new Set<NotificationListener>();
     private isAuthenticated = false;
-    private hasShownConnectionError = false;
 
     private isSocketEnabled() {
         return String(import.meta.env.VITE_ENABLE_SOCKET || "").trim().toLowerCase() === "true";
@@ -41,7 +40,6 @@ class SocketService {
 
         this.socket.on("connect", () => {
             this.isAuthenticated = false;
-            this.hasShownConnectionError = false;
 
             if (this.token) {
                 this.socket?.emit("authenticate", { token: this.token });
@@ -59,7 +57,6 @@ class SocketService {
 
         this.socket.on("connect_error", (_error: any) => {
             this.isAuthenticated = false;
-            this.hasShownConnectionError = true;
         });
 
         this.socket.on("notification", async (payload: SocketNotification) => {
@@ -68,9 +65,9 @@ class SocketService {
 
             toast.info(title ? `${title}${message ? `: ${message}` : ""}` : (message || "Yangi xabarnoma bor."));
 
-            for (const listener of this.listeners) {
-                await listener(payload);
-            }
+            await Promise.allSettled(
+                Array.from(this.listeners).map(listener => listener(payload))
+            );
         });
 
         return this.socket;

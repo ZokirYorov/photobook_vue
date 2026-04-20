@@ -50,6 +50,7 @@ const routes: Array<RouteRecordRaw> = [
             },
             {
                 path: "/photo",
+                alias: "/picture",
                 name: "Rasmli albom",
                 component: () =>import('../views/PhotoAlbum.vue'),
                 meta: {

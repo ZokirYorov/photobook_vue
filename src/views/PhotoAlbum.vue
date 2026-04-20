@@ -955,12 +955,12 @@ const submitForm = async () => {
 
     const payload: OrderCreateDto = {
       ...itemForm.value,
+      kind: "PICTURE",
       employees: itemForm.value.employees.map((id, index) => ({
         employeeId: id,
         stepOrder: index + 1
       }))
     }
-    console.log('Payload', payload)
 
     if (isEditing.value) {
       await dataStore.updateOrder(itemId.value, payload)
@@ -988,6 +988,7 @@ const editForm = (item: Order) => {
 
   itemForm.value = {
     ...item,
+    kind: "PICTURE",
     employees: item.employees?.map(e => e.employeeId) || []
   }
   itemId.value = item.id;

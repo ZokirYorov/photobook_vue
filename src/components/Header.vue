@@ -50,75 +50,28 @@
               class="notify-overlay"
               @click="isNotificationsOpen = false"
           ></div>
-          <div v-if="isNotificationsOpen" class="notify-panel" :class="{ mobile: !isDesktop }">
-            <div class="notify-head">
-              <div class="flex flex-col items-center w-full">
-                <div class="flex items-center w-full justify-between">
-                  <div>
-                    <h3>Bildirishnomalar</h3>
-                    <p>{{ unreadCount }} ta o'qilmagan</p>
-                  </div>
-                  <button
-                      type="button"
-                      class="notify-read-all cursor-pointer"
-                      @click="markAllAsRead"
-                      :disabled="unreadCount === 0"
-                  >
-                    Barchasini o'qildiga utkazish
-                  </button>
-                </div>
-                <div class="flex items-center gap-2 w-full justify-around pt-4 text-sm font-bold text-gray-600">
-                  <button @click="activeTab = 'UNREAD'"
-                          class="cursor-pointer flex w-full hover:text-gray-500"
-                  >
-                    <span
-                        class="border-b-2 p-1 flex w-full hover:bg-blue-100 justify-center"
-                        :class="activeTab === 'UNREAD' ? 'text-blue-500 border-blue-500' : 'border-transparent'"
-                    >
-                      Yangi xabar
-                    </span>
-                  </button>
-                  <button @click="activeTab = 'ALL'"
-                          class="cursor-pointer flex- w-full hover:text-gray-500"
-                  >
-                    <span
-                        class="p-1 flex w-full hover:bg-blue-100 border-b-2 justify-center"
-                        :class="activeTab === 'ALL' ? 'text-blue-500 border-blue-500' : 'border-transparent'"
-                    >
-                      Barchasi
-                    </span>
-                  </button>
-                </div>
-              </div>
-            </div>
-            <div v-if="filteredNotifications.length" class="notify-list transition-all duration-200">
-              <div
-                   @click="markAllAsRead"
-              >
-                <button
-                    v-for="item in filteredNotifications"
-                    :key="item.id"
-                    type="button"
-                    class="notify-item"
-                    :class="{ unread: !item.read }"
-                    @click="handleNotificationClick(item)"
-                >
-                  <div class="notify-item-top">
-                    <strong>{{ item.title }}</strong>
-                    <span>{{ formatNotificationTime(item.createdAt) }}</span>
-                  </div>
-                  <p class="notify-message">{{ item.message }}</p>
-                  <div class="notify-meta">
-                    <span>{{ item.orderName || "Buyurtma" }}</span>
-                  </div>
-                </button>
-              </div>
-            </div>
-
-            <div v-else class="notify-empty">
-              Hozircha bildirishnoma yo'q.
-            </div>
-          </div>
+          <NotificationPanel
+              v-if="isNotificationsOpen"
+              :notifications="filteredNotifications"
+              :paging="notificationsPaging"
+              :unread-count="unreadCount"
+              :error="notificationsError"
+              :loading="isNotificationsLoading"
+              :sound-enabled="isNotificationSoundEnabled"
+              :is-desktop="isDesktop"
+              :active-tab="activeTab"
+              :search="notificationSearch"
+              :type="notificationTypeFilter"
+              :type-options="notificationTypeOptions"
+              @update:active-tab="selectNotificationTab"
+              @update:search="notificationSearch = $event"
+              @update:type="notificationTypeFilter = $event"
+              @mark-all-read="markAllAsRead"
+              @retry="retryNotifications"
+              @toggle-sound="toggleNotificationSound"
+              @notification-click="handleNotificationClick"
+              @load-more="loadMoreNotifications"
+          />
         </div>
         <button
             v-if="isDesktop"
@@ -194,17 +147,14 @@
 <script setup lang="ts">
 import { useRouter } from "vue-router";
 import CButton from "@/components/CButton.vue";
-import {computed, ComputedRef, ref, watch} from "vue";
+import {computed, ComputedRef, ref} from "vue";
 import CDialog from "@/components/CDialog.vue";
 import { authService } from "@/service/authService";
-import { useStore } from "@/stores/store";
+import NotificationPanel from "@/components/notifications/NotificationPanel.vue";
+import { useNotifications } from "@/composables/useNotifications";
 
 const authStore = authService();
-const appStore = useStore();
 const router = useRouter();
-
-const profileName = ref<string>('')
-const isNotificationsOpen = ref(false);
 
 const emits = defineEmits(["toggleMenu"]);
 const props = defineProps({
@@ -235,13 +185,15 @@ const isManager = computed(() => {
 const searchName = computed(() => {
   const roles = authStore.state.roles || [];
   if (roles.includes("ROLE_ADMIN")) {
-    profileName.value = "ADMIN";
-  } else if (roles.includes("ROLE_OPERATOR")) {
-    profileName.value = "OPERATOR";
-  } else if (roles.includes("ROLE_MANAGER")) {
-    profileName.value = "MANAGER";
+    return "ADMIN";
   }
-  return profileName.value;
+  if (roles.includes("ROLE_OPERATOR")) {
+    return "OPERATOR";
+  }
+  if (roles.includes("ROLE_MANAGER")) {
+    return "MANAGER";
+  }
+  return "";
 })
 
 const mainRoutes: ComputedRef = computed(() => {
@@ -299,69 +251,26 @@ const openToProfile = () => {
   router.push("/profile");
 }
 const isDesktop = computed(() => window.innerWidth > 768);
-const notifications = computed(() => appStore.state.notifications);
-const unreadCount = computed(() => appStore.unreadNotificationsCount);
-
-const filteredNotifications = computed(() => {
-  if (activeTab.value === "UNREAD") {
-    return notifications.value.filter(n => !n.read);
-  }
-  return notifications.value;
-});
-
-const toggleNotifications = () => {
-  isNotificationsOpen.value = !isNotificationsOpen.value;
-}
-
-const markAllAsRead = async () => {
-  if (!unreadCount.value) return;
-  await appStore.markAllNotificationsRead();
-}
-
-const activeTab = ref<"UNREAD" | "ALL">("UNREAD");
-
-const audio = new Audio(new URL('@/assets/sounds/note1.wav', import.meta.url).href)
-audio.preload = 'auto'
-
-const playSound = async () => {
-  try {
-    audio.currentTime = 0
-    await audio.play()
-  } catch (err) {
-    console.warn("Audio blocked:", err)
-  }
-}
-
-watch(() => notifications.value[0]?.id, (newVal, oldVal) => {
-  if (newVal && newVal !== oldVal) {
-    playSound()
-  }
-})
-
-
-const handleNotificationClick = async (item: any) => {
-
-  if (!item.read) {
-    await appStore.markNotificationRead(item.id);
-  }
-
-  isNotificationsOpen.value = false;
-
-  if (item.orderId) {
-    await router.push("/tasks");
-  }
-};
-
-const formatNotificationTime = (value: string) => {
-  if (!value) return "";
-
-  return new Intl.DateTimeFormat("uz-UZ", {
-    day: "2-digit",
-    month: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-  }).format(new Date(value));
-}
+const {
+  activeTab,
+  filteredNotifications,
+  handleNotificationClick,
+  isNotificationSoundEnabled,
+  isNotificationsLoading,
+  isNotificationsOpen,
+  loadMoreNotifications,
+  markAllAsRead,
+  notificationSearch,
+  notificationTypeFilter,
+  notificationTypeOptions,
+  notificationsError,
+  notificationsPaging,
+  retryNotifications,
+  selectNotificationTab,
+  toggleNotificationSound,
+  toggleNotifications,
+  unreadCount,
+} = useNotifications();
 
 </script>
 
@@ -410,119 +319,6 @@ const formatNotificationTime = (value: string) => {
   inset: 0;
   background: rgba(0,0,0,0.4);
   z-index: 15;
-}
-
-.notify-panel {
-  position: absolute;
-  top: calc(100% + 10px);
-  right: 0;
-  width: min(420px, 90vw);
-  max-height: 70vh;
-  overflow: hidden;
-  border-radius: 18px;
-  background: #fff;
-  color: #0f172a;
-  box-shadow: 0 20px 60px rgba(15, 23, 42, 0.28);
-  border: 1px solid rgba(148, 163, 184, 0.2);
-  z-index: 20;
-}
-
-.notify-panel.mobile {
-  position: fixed;
-  top: 70px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 95vw;
-  max-height: 80vh;
-  border-radius: 16px;
-}
-.notify-head {
-  display: flex;
-  align-items: start;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 16px 16px 0 16px;
-  border-bottom: 1px solid rgba(226, 232, 240, 0.9);
-}
-
-.notify-head h3 {
-  font-size: 16px;
-  font-weight: 700;
-}
-
-.notify-head p {
-  margin-top: 4px;
-  font-size: 12px;
-  color: #64748b;
-}
-
-.notify-read-all {
-  color: #2563eb;
-  font-size: 12px;
-  font-weight: 700;
-}
-
-.notify-read-all:disabled {
-  opacity: 0.45;
-  cursor: not-allowed;
-}
-
-.notify-list {
-  max-height: calc(65vh - 73px);
-  overflow: auto;
-}
-
-.notify-item {
-  width: 100%;
-  padding: 14px 16px;
-  text-align: left;
-  border-bottom: 1px solid rgba(241, 245, 249, 1);
-  background: #fff;
-}
-
-.notify-item.unread {
-  background: #eff6ff;
-}
-
-.notify-item-top {
-  display: flex;
-  align-items: start;
-  justify-content: space-between;
-  gap: 12px;
-}
-
-.notify-item-top strong {
-  font-size: 14px;
-  line-height: 1.35;
-}
-
-.notify-item-top span {
-  flex-shrink: 0;
-  font-size: 11px;
-  color: #64748b;
-}
-
-.notify-message {
-  margin-top: 6px;
-  color: #334155;
-  font-size: 13px;
-  line-height: 1.45;
-}
-
-.notify-meta {
-  display: flex;
-  gap: 8px;
-  margin-top: 10px;
-  font-size: 12px;
-  color: #1E40AF;
-  font-weight: bold;
-}
-
-.notify-empty {
-  padding: 24px 16px;
-  text-align: center;
-  color: #64748b;
-  font-size: 14px;
 }
 
 .user-chip {

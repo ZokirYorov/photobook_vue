@@ -32,6 +32,12 @@ export interface SocketAuthenticatedPayload {
 export interface SocketNotification {
     id?: string;
     type: NotificationType;
+    kind?: OrderKind;
+    orderKind?: OrderKind;
+    targetType?: string;
+    targetId?: string;
+    targetKind?: OrderKind;
+    route?: string;
     title: string;
     message: string;
     orderId: string;
@@ -52,6 +58,16 @@ export interface NotificationItem extends SocketNotification {
     id: string;
     read: boolean;
     readAt?: string | null;
+}
+
+export interface NotificationPagingRequest {
+    page?: number;
+    size?: number;
+    sort?: string;
+    search?: string;
+    type?: NotificationType;
+    isRead?: boolean;
+    actionRequired?: boolean;
 }
 
 export interface AllCategory {

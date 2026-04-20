@@ -978,6 +978,7 @@ const submitForm = async () => {
     }
     const payload: OrderCreateDto = {
       ...form.value,
+      kind: "ALBUM",
       employees: form.value.employees.map((id, index) => ({
         employeeId: id,
         stepOrder: index + 1
@@ -1010,6 +1011,7 @@ const editForm = (item: Order) => {
 
   form.value = {
     ...item,
+    kind: "ALBUM",
     employees: item.employees?.map(e => e.employeeId) || []
   }
   itemId.value = item.id;

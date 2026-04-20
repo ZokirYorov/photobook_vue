@@ -5,12 +5,16 @@ import {
     ExpensesForm,
     IFormData,
     IItems, IPaging,
-    NotificationItem,
-    Order, OrderCreateDto, OrderKind, OrderStatus, PagingRequest, PagingResponse, SocketNotification,
-    UserForm, UserPagingRequest, UserTask,
+    NotificationItem, NotificationPagingRequest,
+    Order, OrderCreateDto, OrderKind, PagingRequest, PagingResponse, SocketNotification,
+    UserForm, UserTask,
 } from '@/typeModules/useModules';
 import {computed, ref, UnwrapRef} from "vue";
 import router from "@/router";
+
+const NOTIFICATION_LIMIT = 100;
+const REALTIME_NOTIFICATION_CLOCK_SKEW_MS = 5000;
+
 export const useStore = defineStore('item', () => {
     const state = ref({
 
@@ -58,10 +62,21 @@ export const useStore = defineStore('item', () => {
         expenses: [] as ExpensesForm[],
         customers: [] as IFormData[],
         notifications: [] as NotificationItem[],
+        notificationsPaging: {
+            items: [] as NotificationItem[],
+            pageNumber: 0,
+            pageSize: 10,
+            totalElements: 0,
+            totalPages: 0,
+            last: true,
+        } as PagingResponse<NotificationItem>,
+        notificationsUnreadCount: 0,
+        notificationsLoadedAt: Date.now(),
+        lastRealtimeNotification: null as { key: string; item: NotificationItem } | null,
     });
 
     const unreadNotificationsCount = computed(
-        () => state.value.notifications.filter(item => !item.read).length
+        () => state.value.notificationsUnreadCount
     );
 
     const buildNotificationKey = (item: Partial<SocketNotification>) =>
@@ -78,6 +93,12 @@ export const useStore = defineStore('item', () => {
         type: item?.type || "ORDER_UPDATED",
         title: item?.title || "Bildirishnoma",
         message: item?.message || "",
+        kind: item?.kind || item?.orderKind || item?.order_kind,
+        orderKind: item?.orderKind || item?.order_kind || item?.kind,
+        targetType: item?.targetType || item?.target_type || "",
+        targetId: item?.targetId || item?.target_id || item?.orderId || item?.order_id || "",
+        targetKind: item?.targetKind || item?.target_kind || item?.orderKind || item?.order_kind || item?.kind,
+        route: item?.route || "",
         orderId: item?.orderId || item?.order_id || "",
         orderName: item?.orderName || item?.order_name || "",
         orderStatus: item?.orderStatus || item?.order_status || "IN_PROGRESS",
@@ -87,7 +108,7 @@ export const useStore = defineStore('item', () => {
         workStatus: item?.workStatus || item?.work_status || "PENDING",
         actionRequired: Boolean(item?.actionRequired ?? item?.action_required),
         createdAt: item?.createdAt || item?.created_at || new Date().toISOString(),
-        read: Boolean(item?.read ?? item?.isRead),
+        read: Boolean(item?.read ?? item?.isRead ?? item?.is_read),
         readAt: item?.readAt || item?.read_at || null,
     });
 
@@ -97,38 +118,119 @@ export const useStore = defineStore('item', () => {
 
         if (index === -1) {
             state.value.notifications.unshift(normalized);
+            state.value.notifications = state.value.notifications.slice(0, NOTIFICATION_LIMIT);
+            if (!normalized.read) {
+                state.value.notificationsUnreadCount += 1;
+            }
             return normalized;
         }
+
+        const wasRead = state.value.notifications[index].read;
 
         state.value.notifications[index] = {
             ...state.value.notifications[index],
             ...normalized,
+            read: state.value.notifications[index].read || normalized.read,
         };
+
+        if (!wasRead && state.value.notifications[index].read) {
+            state.value.notificationsUnreadCount = Math.max(0, state.value.notificationsUnreadCount - 1);
+        }
 
         const [existing] = state.value.notifications.splice(index, 1);
         state.value.notifications.unshift(existing);
+        state.value.notifications = state.value.notifications.slice(0, NOTIFICATION_LIMIT);
         return existing;
     };
 
     const clearNotifications = () => {
         state.value.notifications = [];
+        state.value.notificationsUnreadCount = 0;
+        state.value.lastRealtimeNotification = null;
+        state.value.notificationsLoadedAt = Date.now();
+        state.value.notificationsPaging = {
+            items: [],
+            pageNumber: 0,
+            pageSize: 10,
+            totalElements: 0,
+            totalPages: 0,
+            last: true,
+        };
     };
 
-    const loadNotifications = async () => {
-        const { data } = await axiosInstance.get("/api/v1/notifications/me");
-        const notifications = Array.isArray(data) ? data.map(normalizeNotification) : [];
+    const normalizePaging = <T>(data: any, fallbackPage: number, fallbackSize: number, items: T[]): PagingResponse<T> => {
+        const totalElements = data.totalElements ?? data.total_elements ?? items.length;
+        const pageSize = data.pageSize ?? data.size ?? data.page_size ?? fallbackSize;
+        const totalPages = data.totalPages ?? data.total_pages ?? Math.ceil(totalElements / pageSize);
 
-        state.value.notifications = notifications.sort((a, b) =>
-            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        return {
+            items,
+            pageNumber: data.pageNumber ?? data.number ?? data.page_number ?? fallbackPage,
+            pageSize,
+            totalElements,
+            totalPages,
+            last: data.last ?? fallbackPage + 1 >= totalPages,
+        };
+    };
+
+    const refreshUnreadNotificationsCount = async () => {
+        const { data } = await axiosInstance.get("/api/v1/notifications/me/unread-count");
+        state.value.notificationsUnreadCount = Number(data?.count ?? 0);
+    };
+
+    const loadNotifications = async (filters: NotificationPagingRequest = {}, append = false) => {
+        const page = filters.page ?? (append ? state.value.notificationsPaging.pageNumber + 1 : 0);
+        const size = filters.size ?? state.value.notificationsPaging.pageSize ?? 10;
+        const sort = filters.sort || "createdAt,desc";
+        const { page: _page, size: _size, sort: _sort, ...body } = filters;
+        const requestBody = Object.fromEntries(
+            Object.entries(body).filter(([, value]) => value !== undefined && value !== "")
         );
+
+        const { data } = await axiosInstance.post(
+            "/api/v1/notifications/me/paging",
+            requestBody,
+            {
+                params: {
+                    page,
+                    size,
+                    sort,
+                },
+            }
+        );
+
+        const notifications = (data.content || data.items || []).map(normalizeNotification);
+        const paging = normalizePaging(data, page, size, notifications);
+        const nextItems = append
+            ? [...state.value.notifications, ...notifications]
+            : notifications;
+
+        state.value.notifications = nextItems
+            .filter((item, index, list) => list.findIndex(current => current.id === item.id) === index)
+            .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+            .slice(0, NOTIFICATION_LIMIT);
+
+        state.value.notificationsPaging = {
+            ...paging,
+            items: state.value.notifications,
+        };
+
+        if (requestBody.isRead === false) {
+            state.value.notificationsUnreadCount = paging.totalElements;
+        } else {
+            await refreshUnreadNotificationsCount();
+        }
+
+        state.value.notificationsLoadedAt = Date.now();
     };
 
     const markNotificationRead = async (id: string) => {
         await axiosInstance.put(`/api/v1/notifications/${id}/read`);
         const target = state.value.notifications.find(item => item.id === id);
-        if (target) {
+        if (target && !target.read) {
             target.read = true;
             target.readAt = new Date().toISOString();
+            state.value.notificationsUnreadCount = Math.max(0, state.value.notificationsUnreadCount - 1);
         }
     };
 
@@ -139,6 +241,7 @@ export const useStore = defineStore('item', () => {
             read: true,
             readAt: item.readAt || new Date().toISOString(),
         }));
+        state.value.notificationsUnreadCount = 0;
     };
 
     const loadOrders = async (
@@ -151,13 +254,13 @@ export const useStore = defineStore('item', () => {
         const size = params.size ?? params.pageSize ?? paging.pageSize
 
         const body: PagingRequest = {
+            ...params,
             page,
             size,
             pageNumber: page,
             pageSize: size,
             kind,
             sort: "acceptedDate",
-            ...params,
             acceptedDate: params.acceptedDate ?? params.from,
             deadline: params.deadline ?? params.to ?? params.deadlineTo,
         }
@@ -174,7 +277,7 @@ export const useStore = defineStore('item', () => {
             }
         )
 
-        const items = data.content || data.items || []
+        const items = (data.content || data.items || []).filter((item: Order) => item.kind === kind)
         const totalElements = data.totalElements ?? data.total_elements ?? items.length
         const pageSize = data.pageSize ?? data.size ?? data.page_size ?? size
 
@@ -219,57 +322,14 @@ export const useStore = defineStore('item', () => {
         await loadOrders(kind)
     }
 
-// ─── Pagination — filter parametrlarini ham oladi ────────────────────────────
     const changePage = async (
         kind: OrderKind,
         page: number,
-        params: Partial<PagingRequest> = {}  // ✅ optional
+        params: Partial<PagingRequest> = {}
     ) => {
         state.value.paging[kind].pageNumber = page;
         await loadOrders(kind, {...params, page});
     };
-
-    // const getOrderById = async (id: string): Promise<Order | null> => {
-    //     try {
-    //         const { data } = await axiosInstance.get<Order>(`/api/v1/orders/${id}`);
-    //         return data;
-    //     } catch (error) {
-    //         console.error("getOrderById error:", error);
-    //         return null;
-    //     }
-    // };
-
-    // const updateOrderStatus = async (
-    //     id: string,
-    //     kind: OrderKind,
-    //     status: OrderStatus
-    // ): Promise<void> => {
-    //     await axiosInstance.put(`/api/v1/orders/${id}/status`, { status });
-    //     await loadOrders(kind);
-    // };
-    //
-    // const getStatusHistory = async (id: string) => {
-    //     try {
-    //         const { data } = await axiosInstance.get(`/api/v1/orders/${id}/status-history`);
-    //         return data;
-    //     } catch (error) {
-    //         console.error("getStatusHistory error:", error);
-    //         return [];
-    //     }
-    // };
-
-
-    // const loadGetUsers = async (filters: Partial<UserPagingRequest> = {} ) => {
-    //     const body: UserPagingRequest = {
-    //         page: state.value.users.pageNumber || 0,
-    //         size: state.value.users.pageSize || 100,
-    //         sort: ['acceptedDate', 'DESC'],
-    //         ...filters,
-    //     }
-    //     const response = await axiosInstance.post<PagingResponse<UserForm>>("/api/v1/users", body);
-    //         state.value.users = response.data;
-    //     };
-
     const loadUsers = async () => {
 
         const { data } = await axiosInstance.get<UserForm[]>("/api/v1/users")
@@ -332,7 +392,18 @@ export const useStore = defineStore('item', () => {
     }
 
     const refreshFromNotification = async (notification: SocketNotification) => {
-        upsertNotification(notification);
+        const normalized = upsertNotification(notification);
+        const createdAtTime = new Date(normalized.createdAt).getTime();
+        const isNewRealtimeNotification =
+            !Number.isNaN(createdAtTime) &&
+            createdAtTime >= state.value.notificationsLoadedAt - REALTIME_NOTIFICATION_CLOCK_SKEW_MS;
+
+        if (isNewRealtimeNotification) {
+            state.value.lastRealtimeNotification = {
+                key: `${normalized.id}:${Date.now()}`,
+                item: normalized,
+            };
+        }
 
         const currentPath = router.currentRoute.value.path;
 
@@ -341,17 +412,21 @@ export const useStore = defineStore('item', () => {
             return;
         }
 
+        const kindByPath: Record<string, OrderKind> = {
+            "/album": "ALBUM",
+            "/vignette": "VIGNETTE",
+            "/photo": "PICTURE",
+            "/picture": "PICTURE",
+        };
+
+        const currentOrderKind = kindByPath[currentPath];
         const shouldRefreshOrders =
-            ["/album", "/vignette", "/photo"].includes(currentPath) &&
+            Boolean(currentOrderKind) &&
             ["ORDER_UPDATED", "ORDER_STATUS_CHANGED"].includes(notification.type);
 
         if (!shouldRefreshOrders) return;
 
-        await Promise.all([
-            loadOrders("ALBUM"),
-            loadOrders("VIGNETTE"),
-            loadOrders("PICTURE"),
-        ]);
+        await loadOrders(currentOrderKind);
     }
 
     // const loadRole = async () => {
