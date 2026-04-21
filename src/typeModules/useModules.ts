@@ -256,8 +256,6 @@ export interface IPaging {
     sort?: string[];
     search: string;
     statuses: OrderStatus[];
-    from: string;
-    to: string;
     deadlineFrom: string;
     deadlineTo: string;
 }

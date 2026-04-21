@@ -458,7 +458,7 @@
                     v-else
                     class="fa-regular fa-circle text-gray-400"
                 />
-                <span class="flex p-1">{{ emp.employeeName }}</span>
+                <span class="flex p-1">{{ getFullName(emp.employeeName) }}</span>
               </div>
               <div class="flex items-center justify-between text-sm">
                 <span>{{emp.processedCount}} ta</span>
@@ -530,6 +530,9 @@
           v-if="totalPages > 1"
           class="flex h-20 items-center sticky bottom-0 z-10 justify-center mt-4 pb-2 gap-2 bg-white border-t"
       >
+        <div class="text-sm text-gray-800 rounded p-2 border border-gray-100 mr-4">
+          {{paginationInfo.from}} - {{paginationInfo.to}} dan {{paginationInfo.total}}
+        </div>
         <button
             type="button"
             @click="changePage(page - 1)"
@@ -742,6 +745,29 @@ const categoryStatus = computed(() => {
       remaining
     }
   })
+})
+
+const getFullName = (name: string) => {
+  if (!name) return ''
+
+  const [firstName, lastName] = name.split(' ')
+
+  return `${lastName} ${firstName}`
+}
+
+const paginationInfo = computed(() => {
+  const total = dataStore.state.paging.ALBUM.totalElements || 0
+  const current = currentPage.value
+  const size = pageSize.value
+
+  const from = total === 0 ? 0 : current * size + 1
+  const to = Math.min((current + 1) * size, total)
+
+  return {
+    from,
+    to,
+    total
+  }
 })
 
 const getProcessedCount = (album: any) => {

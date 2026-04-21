@@ -419,8 +419,6 @@ export const useStore = defineStore('item', () => {
             {
                 search: filters.search || '',
                 statuses: filters.statuses || [],
-                from: filters.from,
-                to: filters.to,
                 deadlineFrom: filters.deadlineFrom,
                 deadlineTo: filters.deadlineTo,
             },

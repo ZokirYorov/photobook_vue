@@ -33,12 +33,12 @@
         <AppInput label="Ism"
                   type="text"
                   placeholder="Ism kiriting"
-                  v-model="form.lastName"
+                  v-model="form.firstName"
         />
         <AppInput label="Familiya"
                   type="text"
                   placeholder="Familiya kiriting"
-                  v-model="form.firstName"
+                  v-model="form.lastName"
         />
         <AppInput label="Foydalanuvchi nomi"
                   type="text"
@@ -506,7 +506,7 @@ const confirmDelete = async () => {
   if (!selectedUser.value) return;
 
   try {
-    const user = allUsers.value.items.find((u: UserForm) => u.id === selectedUser.value);
+    const user = allUsers.value.find((u: UserForm) => u.id === selectedUser.value);
     const uploadKey = user?.uploadId;
 
     if (uploadKey) {

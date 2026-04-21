@@ -186,22 +186,15 @@
             <td class="p-2"><div class="h-4 w-20 bg-gray-200 rounded animate-pulse"></div></td>
             <td class="p-2"><div class="h-4 w-24 bg-gray-200 rounded animate-pulse"></div></td>
             <td class="p-2"><div class="h-4 w-24 bg-gray-200 rounded animate-pulse"></div></td>
-
             <td class="p-2"><div class="h-4 w-20 bg-gray-200 rounded animate-pulse"></div></td>
             <td class="p-2"><div class="h-4 w-20 bg-gray-200 rounded animate-pulse"></div></td>
-
-            <!-- progress -->
             <td class="p-2">
               <div class="w-full bg-gray-200 h-2 rounded-full animate-pulse"></div>
               <div class="h-3 w-16 mt-2 bg-gray-200 rounded animate-pulse"></div>
             </td>
-
-            <!-- status -->
             <td class="p-2">
               <div class="h-6 w-20 bg-gray-200 rounded-full animate-pulse"></div>
             </td>
-
-            <!-- button -->
             <td class="p-2">
               <div class="h-8 w-24 bg-gray-200 rounded-lg animate-pulse"></div>
             </td>
@@ -324,7 +317,6 @@ const closeFilter = () => {
   formData.value = null;
   endData.value = null;
 
-  dataStore.loadGetUserTasks();
 }
 
 const openPreview = (url: string) => {
@@ -347,10 +339,10 @@ const getAvatarUrl = (url: string | undefined): string => {
 };
 
 const itemStatus = ref( [
-  { value: 'PENDING', text: 'Kutilmoqda' },
-  { value: 'IN_PROGRESS', text: 'Jarayonda' },
-  { value: 'PAUSED', text: 'To‘xtatilgan' },
-  { value: 'COMPLETED', text: 'Bajarilgan' },
+  { value: 'PENDING', text: "Kutilmoqda" },
+  { value: 'IN_PROGRESS', text: "Jarayonda" },
+  { value: 'PAUSED', text: "To‘xtatilgan" },
+  { value: 'COMPLETED', text: "Bajarilgan" },
 ])
 
 const statusOrder: Record<string, string> = {
@@ -405,23 +397,11 @@ const form = ref({
 
 const filteredOrders = computed(() => {
 
-  let data = [...dataStore.state.tasks.content]
+  let data = [...(dataStore.state.tasks.content || [])]
 
-  if (formFilter.value) {
-    const search = formFilter.value.toLowerCase()
-
-    data = data.filter(item =>
-        item.orderName?.toLowerCase().includes(search) ||
-        item.categoryName?.toLowerCase().includes(search) ||
-        item.customerName?.toLowerCase().includes(search) ||
-        item.receiverName?.toLowerCase().includes(search) ||
-        item.itemType?.toLowerCase().includes(search) ||
-        item.kind?.toLowerCase().includes(search)
-    )
-  }
-  return data.sort((a,b) =>
-      new Date(b.acceptedDate).getTime() -
-      new Date(a.acceptedDate).getTime()
+  return data.sort((a, b) =>
+      new Date(b.acceptedDate || 0).getTime() -
+      new Date(a.acceptedDate || 0).getTime()
   )
 })
 
@@ -476,19 +456,28 @@ const completedTask = async () => {
 
 watch(
     [formStatus, formFilter, formData, endData],
-    async () => {
-      isLoading.value = true
-      try {
-        await dataStore.loadGetUserTasks({
-          statuses: formStatus.value ? [formStatus.value] : [],
-          from: formData.value || undefined,
-          deadlineTo: endData.value || undefined,
-          search: formFilter.value ?? null
-        })
-        isLoading.value = false
-      } catch (error) {
-        console.log(error)
-      }
+    (_newVal, _oldVal, onCleanup) => {
+      const timer = setTimeout(async () => {
+        isLoading.value = true
+        try {
+          await dataStore.loadGetUserTasks({
+            search: formFilter.value || '',
+            statuses: formStatus.value ? [formStatus.value] : [],
+            deadlineFrom: formData.value || undefined,
+            deadlineTo: endData.value || undefined,
+            page: 0,
+            size: 100
+          })
+        }
+        catch (error) {
+          console.error("Filtrlashda xatolik:", error)
+        }
+        finally {
+          isLoading.value = false
+        }
+      }, 500)
+
+      onCleanup(() => clearTimeout(timer))
     }
 )
 

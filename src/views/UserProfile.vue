@@ -172,7 +172,7 @@
             <div class="mt-8 flex flex-col-reverse gap-3 border-t border-gray-200 pt-6 sm:flex-row sm:justify-end">
               <CButton
                   type="button"
-                  text="Clear"
+                  text="Tozalash"
                   variant="ghost-accent"
                   class="w-full sm:w-auto"
                   @click="clearForm"
@@ -232,7 +232,7 @@ const form = reactive<UserForm>({
 });
 
 const profileTitle = computed(() => {
-  const fullName = `${form.firstName || ""} ${form.lastName || ""}`.trim();
+  const fullName = `${form.lastName || ""} ${form.firstName || ""}`.trim();
   return fullName || form.username || "User Profile";
 });
 
