@@ -804,11 +804,11 @@ const itemForm = ref<OrderForm>({
   uploadId: ""
 })
 
-const orderSnapshotFields = computed<OrderFormSnapshotFields>(() => ({
+const orderSnapshotFields = computed((): OrderFormSnapshotFields => ({
   categoryId: itemForm.value.categoryId,
   orderName: itemForm.value.orderName,
-  itemType: itemForm.value.itemType,
-  customerId: itemForm.value.customerId,
+  itemType: itemForm.value.itemType ?? "",
+  customerId: itemForm.value.customerId ?? "",
   customerName: itemForm.value.customerName,
   receiverName: itemForm.value.receiverName,
   employees: itemForm.value.employees,
@@ -817,8 +817,8 @@ const orderSnapshotFields = computed<OrderFormSnapshotFields>(() => ({
   acceptedDate: itemForm.value.acceptedDate,
   deadline: itemForm.value.deadline,
   status: itemForm.value.status,
-  imageUrl: itemForm.value.imageUrl,
-  notes: itemForm.value.notes,
+  imageUrl: itemForm.value.imageUrl ?? "",
+  notes: itemForm.value.notes ?? "",
   uploadId: itemForm.value.uploadId,
 }));
 
@@ -877,7 +877,7 @@ const allPagesNumbers = computed(() => {
 })
 
 const changePage = async (targetPage: number | '...') => {
-  if (targetPage === '...' || typeof targetPage !== 'number') return
+  if (targetPage === '...') return
   if (targetPage < 1 || targetPage > totalPages.value) return
 
   await dataStore.changePage("PICTURE", targetPage - 1, orderFilters.value)

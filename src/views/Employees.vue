@@ -284,7 +284,7 @@
             v-for="(user, index) in allUsers"
             :key="user.id"
         >
-          <td class="p-4">{{index + 1}}</td>
+          <td class="p-4">{{ Number(index) + 1 }}</td>
           <td class="p-2">{{user.lastName}} {{user.firstName}}</td>
           <td class="p-2 flex items-center">
             <img
@@ -648,10 +648,10 @@ const submitForm = async () => {
     }
 
     if (isEditing.value) {
-      await store.updateUser(form.value.id, payload as UserForm);
+      await store.updateUser(form.value.id, payload as unknown as UserForm);
       Toast.success("Xodim ma'lumotlari yangilandi");
     } else {
-      await store.addUser(payload as UserForm);
+      await store.addUser(payload as unknown as UserForm);
       Toast.success("Xodim qo'shildi");
     }
 

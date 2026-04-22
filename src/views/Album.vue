@@ -796,11 +796,11 @@ const albumImageDisplaySrc = computed(() => {
   return ""
 })
 
-const orderSnapshotFields = computed<OrderFormSnapshotFields>(() => ({
+const orderSnapshotFields = computed((): OrderFormSnapshotFields => ({
   categoryId: form.value.categoryId,
   orderName: form.value.orderName,
-  itemType: form.value.itemType,
-  customerId: form.value.customerId,
+  itemType: form.value.itemType ?? "",
+  customerId: form.value.customerId ?? "",
   customerName: form.value.customerName,
   receiverName: form.value.receiverName,
   employees: form.value.employees,
@@ -809,8 +809,8 @@ const orderSnapshotFields = computed<OrderFormSnapshotFields>(() => ({
   acceptedDate: form.value.acceptedDate,
   deadline: form.value.deadline,
   status: form.value.status,
-  imageUrl: form.value.imageUrl,
-  notes: form.value.notes,
+  imageUrl: form.value.imageUrl ?? "",
+  notes: form.value.notes ?? "",
   uploadId: form.value.uploadId,
 }));
 
@@ -894,7 +894,7 @@ const allPagesNumbers = computed(() => {
 })
 
 const changePage = async (targetPage: number | '...') => {
-  if (targetPage === '...' || typeof targetPage !== 'number') return
+  if (targetPage === '...') return
   if (targetPage < 1 || targetPage > totalPages.value) return
 
   await dataStore.changePage("ALBUM", targetPage - 1, orderFilters.value)

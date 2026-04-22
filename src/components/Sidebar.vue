@@ -20,7 +20,7 @@
           class="rounded-md p-2 cursor-pointer hover:bg-pb-sidebar-hover transition-colors duration-300 flex items-center gap-1 text-white/90"
           :class="!isDesktop && index === mainMenuItems.length -1 ? 'hidden' : 'of-hidden'"
       >
-        <i :class="item.meta.icon"></i>
+        <i v-if="item.meta?.icon" :class="item.meta.icon"></i>
         {{ (item.meta as { title?: string } | undefined)?.title ?? item.name }}
       </router-link>
       <div class="gap-2">

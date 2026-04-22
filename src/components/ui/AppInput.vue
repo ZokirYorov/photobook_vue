@@ -47,7 +47,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, defineExpose, watch } from 'vue';
+import { ref, watch } from "vue";
 // import {useI18n} from "vue-i18n";
 
 const model = defineModel<string | null | number>();

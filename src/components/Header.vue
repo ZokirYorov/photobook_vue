@@ -29,7 +29,7 @@
           class="p-2 gap-1 text-md flex max-lg:p-1 items-center text-center rounded-md text-white/90 hover:bg-white/10 hover:text-white transition duration-200"
             :class="index === mainRoutes.length - 1 ? 'hidden' : 'of-hidden'"
         >
-          <i class="w-4 text-sm h-3 flex" v-if="route.meta.icon" :class="route.meta.icon"></i>
+          <i class="w-4 text-sm h-3 flex" v-if="route.meta?.icon" :class="route.meta?.icon"></i>
           <span class="">{{ route.meta?.title ?? route.name }}</span>
         </router-link>
 
@@ -160,7 +160,7 @@ import { useNotifications } from "@/composables/useNotifications";
 type HeaderMenuRoute = {
   path: string;
   name?: string | symbol | null;
-  meta: RouteMeta;
+  meta?: RouteMeta;
 };
 
 const authStore = authService();
