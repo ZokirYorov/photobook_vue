@@ -511,7 +511,7 @@
         </table>
       </div>
         <div
-            v-if="totalPages > 1"
+            v-if="paginationInfo.total > 10"
             class="mt-4 flex h-20 shrink-0 items-center justify-center gap-2 border-t border-pb-border bg-pb-surface pb-2"
         >
           <div class="mr-4 rounded-lg border border-pb-border bg-pb-elevated px-3 py-2 text-sm text-pb-text">{{paginationInfo.from}} - {{paginationInfo.to}} dan {{paginationInfo.total}}</div>
