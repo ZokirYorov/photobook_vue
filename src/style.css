@@ -68,3 +68,10 @@
   background-color: color-mix(in srgb, var(--color-pb-accent) 26%, transparent);
   color: var(--color-pb-text);
 }
+
+/* vue-toastification: toastlar fixed header (h-16) ostida, panel bilan ustma-ust tushmasin */
+.Vue-Toastification__container.top-left,
+.Vue-Toastification__container.top-right,
+.Vue-Toastification__container.top-center {
+  top: calc(4rem + 10px) !important;
+}

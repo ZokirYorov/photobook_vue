@@ -21,7 +21,7 @@
         <AppInput
             label="Parol"
             type="password"
-            placeholder="Parol o'ylab toping"
+            placeholder="Kamida 4 belgi"
             v-model="form.password"
             required
         />
@@ -70,6 +70,7 @@ const validateRegister = () => {
   if (!form.value.name.trim()) return "Ism yoki foydalanuvchi nomini kiriting";
   if (!form.value.email.trim()) return "Elektron pochtani kiriting";
   if (!form.value.password.trim()) return "Parolni kiriting";
+  if (form.value.password.trim().length < 4) return "Parol kamida 4 belgi bo'lishi kerak";
 
   return null;
 };

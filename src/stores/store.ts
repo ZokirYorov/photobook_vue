@@ -12,6 +12,7 @@ import {
 } from '@/typeModules/useModules';
 import {computed, ref, UnwrapRef} from "vue";
 import router from "@/router";
+import { localizeOrderStatusTokens } from "@/utils/localizeOrderStatusTokens";
 
 const NOTIFICATION_LIMIT = 100;
 const REALTIME_NOTIFICATION_CLOCK_SKEW_MS = 5000;
@@ -41,6 +42,7 @@ const NOTIFICATION_PARSE_ORDER: readonly NotificationType[] = [
     "ORDER_STATUS_CHANGED",
     "ADMIN_TASK_STEP_COMPLETED",
     "ADMIN_TASK_HANDOFF",
+    "ADMIN_ORDER_WORK_COMPLETED",
 ];
 
 const ORDER_LIST_REFRESH_NOTIFICATION_TYPES = new Set<NotificationType>([
@@ -50,6 +52,7 @@ const ORDER_LIST_REFRESH_NOTIFICATION_TYPES = new Set<NotificationType>([
     "TASK_ACTIVATED",
     "ADMIN_TASK_STEP_COMPLETED",
     "ADMIN_TASK_HANDOFF",
+    "ADMIN_ORDER_WORK_COMPLETED",
 ]);
 
 const parseNotificationType = (item: any): NotificationType => {
@@ -150,8 +153,8 @@ export const useStore = defineStore('item', () => {
     const normalizeNotification = (item: any): NotificationItem => ({
         id: item?.id || buildNotificationKey(item) || crypto.randomUUID(),
         type: parseNotificationType(item),
-        title: item?.title || "Bildirishnoma",
-        message: item?.message || "",
+        title: localizeOrderStatusTokens(String(item?.title || "Bildirishnoma").trim() || "Bildirishnoma"),
+        message: localizeOrderStatusTokens(String(item?.message || "")),
         kind: item?.kind || item?.orderKind || item?.order_kind,
         orderKind: item?.orderKind || item?.order_kind || item?.kind,
         targetType: item?.targetType || item?.target_type || "",

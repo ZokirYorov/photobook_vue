@@ -14,6 +14,7 @@ export const notificationTypeOptions: { value: NotificationType; text: string }[
     { value: "ORDER_STATUS_CHANGED", text: "Holat o'zgardi" },
     { value: "ADMIN_TASK_STEP_COMPLETED", text: "Bosqich tugadi (admin)" },
     { value: "ADMIN_TASK_HANDOFF", text: "Navbat o'tdi (admin)" },
+    { value: "ADMIN_ORDER_WORK_COMPLETED", text: "Buyurtma ishi yakunlandi (admin)" },
 ];
 
 export const notificationTypeConfig: Record<NotificationType, NotificationPresentation> = {
@@ -35,6 +36,10 @@ export const notificationTypeConfig: Record<NotificationType, NotificationPresen
     },
     ADMIN_TASK_HANDOFF: {
         label: "Navbat o'tdi (admin)",
+        tone: "admin",
+    },
+    ADMIN_ORDER_WORK_COMPLETED: {
+        label: "Buyurtma ishi yakunlandi (admin)",
         tone: "admin",
     },
     NOTIFICATION_MISC: {

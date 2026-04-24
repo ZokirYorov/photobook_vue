@@ -489,7 +489,7 @@ const fieldErrors = ref<Record<EmployeeFieldKey, string>>({
 const passwordPlaceholder = computed(() =>
   isEditing.value
     ? "Yangi parol (bo'sh qoldiring agar o'zgarmasin)"
-    : "Kamida 6 belgi",
+    : "Kamida 4 belgi",
 );
 
 const revokePreviewUrl = () => {
@@ -524,13 +524,13 @@ const validateEmployeeForm = (): boolean => {
   }
   const pwd = String(f.password ?? "").trim();
   if (!isEditing.value) {
-    if (pwd.length < 6) {
-      fieldErrors.value.password = "Parol kamida 6 belgi bo'lishi kerak.";
+    if (pwd.length < 4) {
+      fieldErrors.value.password = "Parol kamida 4 belgi bo'lishi kerak.";
       ok = false;
     }
-  } else if (pwd.length > 0 && pwd.length < 6) {
+  } else if (pwd.length > 0 && pwd.length < 4) {
     fieldErrors.value.password =
-      "Yangi parol kamida 6 belgi bo'lishi kerak yoki bo'sh qoldiring.";
+      "Yangi parol kamida 4 belgi bo'lishi kerak yoki bo'sh qoldiring.";
     ok = false;
   }
   return ok;
