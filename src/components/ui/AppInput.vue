@@ -22,6 +22,8 @@
           :id="id"
           v-model="model"
           :type="type"
+          :name="name"
+          :autocomplete="autocomplete"
           :min="min"
           :step="step"
           :max="max"
@@ -54,6 +56,9 @@ const model = defineModel<string | null | number>();
 // const { t } = useI18n();
 interface IProps {
   id?: string;
+  name?: string;
+  /** Brauzer parol/passkey noto'g'ri rejimga tushmasin — login: username, current-password */
+  autocomplete?: string;
   label: string;
   type?: string;
   hasIcon?: boolean;

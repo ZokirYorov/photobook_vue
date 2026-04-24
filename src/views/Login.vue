@@ -95,17 +95,22 @@
             </div>
 
             <form
+                autocomplete="on"
                 @submit.prevent="submitLogin"
                 class="flex flex-col gap-4"
             >
               <AppInput
                   type="text"
                   label="Login"
+                  name="username"
+                  autocomplete="username"
                   v-model="form.username"
                   placeholder="Foydalanuvchi nomini kiriting"
               />
               <AppInput
                   label="Parol"
+                  name="password"
+                  autocomplete="current-password"
                   :type="isPasswordVisible ? 'text' : 'password'"
                   :hasIcon="isPasswordEyeOpen"
                   :iconSrc="isPasswordVisible ? 'images/svg/eye-open.svg' : 'images/svg/eye-password-hide-svgrepo-com.svg'"

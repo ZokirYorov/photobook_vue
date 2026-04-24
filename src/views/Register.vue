@@ -3,24 +3,31 @@
     <div class="bg-pb-surface rounded-2xl gap-4 flex flex-col w-[400px] max-w-md p-8 shadow-xl border border-pb-border">
       <h2 class="text-xl font-semibold text-pb-text">Ro'yxatdan o'tish</h2>
       <form
+          autocomplete="on"
           @submit.prevent="submitForm"
           class="flex flex-col gap-4"
       >
         <AppInput
             type="text"
             label="Ism yoki foydalanuvchi nomi"
+            name="username"
+            autocomplete="username"
             v-model="form.name"
             placeholder="Ismingizni kiriting"
         />
         <AppInput
             label="Elektron pochta"
             type="email"
+            name="email"
+            autocomplete="email"
             placeholder="email@misol.uz"
             v-model="form.email"
         />
         <AppInput
             label="Parol"
             type="password"
+            name="new-password"
+            autocomplete="new-password"
             placeholder="Kamida 4 belgi"
             v-model="form.password"
             required
