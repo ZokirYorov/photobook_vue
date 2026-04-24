@@ -13,7 +13,10 @@
       <p class="notify-message">{{ item.message }}</p>
       <div class="notify-meta">
         <span>{{ item.orderName || "Buyurtma" }}</span>
-        <span>{{ config.label }}</span>
+        <span
+            class="type-badge"
+            :class="{ 'type-badge--admin': presentation.tone === 'admin' }"
+        >{{ presentation.label }}</span>
       </div>
     </div>
     <span v-if="!item.read" class="unread-dot"></span>
@@ -22,7 +25,7 @@
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { notificationTypeConfig } from "@/constants/notificationTypes";
+import { getNotificationPresentation } from "@/constants/notificationTypes";
 import type { NotificationItem } from "@/typeModules/useModules";
 
 const props = defineProps<{
@@ -33,7 +36,7 @@ defineEmits<{
   click: [item: NotificationItem];
 }>();
 
-const config = computed(() => notificationTypeConfig[props.item.type] || notificationTypeConfig.ORDER_UPDATED);
+const presentation = computed(() => getNotificationPresentation(props.item.type));
 
 const formattedTime = computed(() => {
   if (!props.item.createdAt) return "";
@@ -111,6 +114,18 @@ const formattedTime = computed(() => {
 
 .notify-meta span {
   min-width: 0;
+}
+
+.type-badge {
+  font-weight: 600;
+  border-radius: 6px;
+  padding: 2px 6px;
+}
+
+.type-badge--admin {
+  color: var(--color-pb-muted);
+  border: 1px solid color-mix(in srgb, var(--color-pb-muted) 45%, var(--color-pb-border));
+  background: color-mix(in srgb, var(--color-pb-muted) 6%, var(--color-pb-surface));
 }
 
 .unread-dot {

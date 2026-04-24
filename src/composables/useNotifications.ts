@@ -1,5 +1,5 @@
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
-import { useRouter } from "vue-router";
+import { useRouter, type RouteLocationRaw } from "vue-router";
 import { notificationTypeOptions } from "@/constants/notificationTypes";
 import { notificationSoundService } from "@/service/notificationSoundService";
 import { authService } from "@/service/authService";
@@ -108,20 +108,28 @@ export const useNotifications = () => {
         isNotificationSoundEnabled.value = notificationSoundService.toggle();
     };
 
-    const resolveNotificationRoute = (item: NotificationItem | any) => {
+    const resolveNotificationRoute = (item: NotificationItem | any): RouteLocationRaw => {
+        const orderIdRaw = item.orderId || item.order_id;
+        const orderQuery =
+            orderIdRaw !== undefined && orderIdRaw !== null && String(orderIdRaw).trim() !== ""
+                ? { orderId: String(orderIdRaw).trim() }
+                : {};
+
         if (authStore.state.roles.includes("ROLE_OPERATOR")) {
-            return "/tasks";
+            return Object.keys(orderQuery).length ? { path: "/tasks", query: orderQuery } : { path: "/tasks" };
         }
 
         if (item.route) {
-            return item.route;
+            const path = String(item.route).trim();
+            return Object.keys(orderQuery).length ? { path, query: orderQuery } : { path };
         }
 
         const kind = normalizeKind(
             item.targetKind || item.target_kind || item.kind || item.orderKind || item.order_kind
         );
 
-        return kind ? notificationRouteByKind[kind] : "/tasks";
+        const path = kind ? notificationRouteByKind[kind] : "/tasks";
+        return Object.keys(orderQuery).length ? { path, query: orderQuery } : { path };
     };
 
     const handleNotificationClick = async (item: NotificationItem | any) => {

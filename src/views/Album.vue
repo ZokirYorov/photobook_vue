@@ -403,6 +403,7 @@
           </tbody>
           <tbody v-else-if="paginatedAlbums.length > 0">
           <tr
+              :id="'pb-order-' + album.id"
               class="border-t border-pb-border text-sm transition hover:bg-pb-elevated"
               v-for="(album, index) in paginatedAlbums" :key="album.id"
           >
@@ -901,6 +902,23 @@ const changePage = async (targetPage: number | '...') => {
 }
 
 const paginatedAlbums = computed(() => dataStore.state.albums.items)
+
+const scrollToOrderFromQuery = () => {
+  const raw = route.query.orderId;
+  const oid = typeof raw === "string" ? raw.trim() : Array.isArray(raw) && typeof raw[0] === "string" ? raw[0].trim() : "";
+  if (!oid) return;
+  const el = document.getElementById(`pb-order-${oid}`);
+  el?.scrollIntoView({ behavior: "smooth", block: "center" });
+};
+
+watch(
+    () =>
+        [route.query.orderId, paginatedAlbums.value.map((a) => a.id).join(",")] as const,
+    () => {
+      void nextTick(() => scrollToOrderFromQuery());
+    },
+    { flush: "post" },
+)
 
 watch([formStatus, formData, endData, formFilter], (_newValue, _oldValue, onCleanup) => {
   const timer = window.setTimeout(() => {

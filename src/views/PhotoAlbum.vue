@@ -385,8 +385,9 @@
         </tbody>
         <tbody v-else-if="filteredPictures.length > 0">
         <tr
+            :id="'pb-order-' + album.id"
             class="border-t border-pb-border transition hover:bg-pb-elevated"
-            v-for="(album, index) in filteredPictures" :key="index"
+            v-for="(album, index) in filteredPictures" :key="album.id"
         >
           <td class="p-2 ">{{ rowNumber(index) }}</td>
           <td class="py-1 px-2 break-all">
@@ -708,6 +709,23 @@ const filteredPictures = computed(() => {
       new Date(a.acceptedDate).getTime()
   )
 })
+
+const scrollToOrderFromQuery = () => {
+  const raw = route.query.orderId;
+  const oid = typeof raw === "string" ? raw.trim() : Array.isArray(raw) && typeof raw[0] === "string" ? raw[0].trim() : "";
+  if (!oid) return;
+  const el = document.getElementById(`pb-order-${oid}`);
+  el?.scrollIntoView({ behavior: "smooth", block: "center" });
+};
+
+watch(
+    () =>
+        [route.query.orderId, filteredPictures.value.map((a) => a.id).join(",")] as const,
+    () => {
+      void nextTick(() => scrollToOrderFromQuery());
+    },
+    { flush: "post" },
+)
 
 const categoryStatus = computed(() => {
   return photoCategory.value.map((cat: any) => {

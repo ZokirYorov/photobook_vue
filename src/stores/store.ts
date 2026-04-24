@@ -33,12 +33,24 @@ const ORDER_STATUSES: OrderStatus[] = ["PENDING", "IN_PROGRESS", "PAUSED", "COMP
 const parseOrderStatus = (value?: string): OrderStatus =>
     (value && ORDER_STATUSES.includes(value as OrderStatus) ? value : "IN_PROGRESS") as OrderStatus;
 
-const NOTIFICATION_TYPES: NotificationType[] = [
+/** REST/socket dan kelgan `type` qiymatini tanish */
+const NOTIFICATION_PARSE_ORDER: readonly NotificationType[] = [
     "ORDER_ASSIGNED",
     "TASK_ACTIVATED",
     "ORDER_UPDATED",
     "ORDER_STATUS_CHANGED",
+    "ADMIN_TASK_STEP_COMPLETED",
+    "ADMIN_TASK_HANDOFF",
 ];
+
+const ORDER_LIST_REFRESH_NOTIFICATION_TYPES = new Set<NotificationType>([
+    "ORDER_UPDATED",
+    "ORDER_STATUS_CHANGED",
+    "ORDER_ASSIGNED",
+    "TASK_ACTIVATED",
+    "ADMIN_TASK_STEP_COMPLETED",
+    "ADMIN_TASK_HANDOFF",
+]);
 
 const parseNotificationType = (item: any): NotificationType => {
     const raw = item?.type ?? item?.notification_type ?? item?.notificationType;
@@ -46,7 +58,9 @@ const parseNotificationType = (item: any): NotificationType => {
         return "ORDER_UPDATED";
     }
     const normalized = String(raw).trim().toUpperCase().replace(/-/g, "_");
-    return (NOTIFICATION_TYPES.find(t => t === normalized) ?? "ORDER_UPDATED") as NotificationType;
+    const hit = NOTIFICATION_PARSE_ORDER.find(t => t === normalized);
+    if (hit) return hit;
+    return "NOTIFICATION_MISC";
 };
 
 const parseNotificationRead = (item: any): boolean => {
@@ -641,9 +655,7 @@ export const useStore = defineStore('item', () => {
         const currentOrderKind = kindByPath[currentPath];
         const shouldRefreshOrders =
             Boolean(currentOrderKind) &&
-            ["ORDER_UPDATED", "ORDER_STATUS_CHANGED", "ORDER_ASSIGNED", "TASK_ACTIVATED"].includes(
-                notification.type
-            );
+            ORDER_LIST_REFRESH_NOTIFICATION_TYPES.has(normalized.type);
 
         if (!shouldRefreshOrders) return;
 

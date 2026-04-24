@@ -388,8 +388,9 @@
         </tbody>
         <tbody v-else-if="filteredOrders.length > 0">
         <tr
+            :id="'pb-order-' + order.id"
             class="border-t border-pb-border text-sm text-gray-600 transition hover:bg-pb-elevated hover:bg-gray-100"
-            v-for="(order, index) in filteredOrders" :key="index"
+            v-for="(order, index) in filteredOrders" :key="order.id"
         >
           <td class="p-1">{{ rowNumber(index) }}</td>
           <td class="p-2 break-all">
@@ -698,6 +699,23 @@ const filteredOrders = computed(() => {
       new Date(a.acceptedDate).getTime()
   )
 })
+
+const scrollToOrderFromQuery = () => {
+  const raw = route.query.orderId;
+  const oid = typeof raw === "string" ? raw.trim() : Array.isArray(raw) && typeof raw[0] === "string" ? raw[0].trim() : "";
+  if (!oid) return;
+  const el = document.getElementById(`pb-order-${oid}`);
+  el?.scrollIntoView({ behavior: "smooth", block: "center" });
+};
+
+watch(
+    () =>
+        [route.query.orderId, filteredOrders.value.map((o) => o.id).join(",")] as const,
+    () => {
+      void nextTick(() => scrollToOrderFromQuery());
+    },
+    { flush: "post" },
+)
 
 const categoryStatus = computed(() => {
   return vignetteCategory.value.map((cat: any) => {

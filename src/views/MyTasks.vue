@@ -291,17 +291,18 @@
 <script setup lang="ts">
 import { useStore } from "@/stores/store";
 import CButton from "@/components/CButton.vue";
-import {computed, onMounted, ref, watch} from "vue";
+import {computed, nextTick, onMounted, ref, watch} from "vue";
 import {OrderStatus, UserTask, WorkStatus} from "@/typeModules/useModules";
 import axiosInstance from "@/axios";
 import CDialog from "@/components/CDialog.vue";
 import { useToast } from "vue-toastification";
 import AppInput from "@/components/ui/AppInput.vue";
 import AppSelect from "@/components/ui/AppSelect.vue";
-import { useRouter } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import { snapshotTaskProgressDialog } from "@/utils/updateFormDirty";
 
 const router = useRouter();
+const route = useRoute();
 const dataStore = useStore();
 const Toast = useToast();
 
@@ -436,6 +437,22 @@ const activeFormTask = (task: UserTask) => {
   taskProgressBaseline.value = snapshotTaskProgressDialog(task.notes || "", 0);
 }
 
+const queryOrderId = () => {
+  const raw = route.query.orderId;
+  if (typeof raw === "string" && raw.trim()) return raw.trim();
+  if (Array.isArray(raw) && typeof raw[0] === "string" && raw[0].trim()) return raw[0].trim();
+  return "";
+};
+
+const openTaskFromRouteQuery = async () => {
+  const oid = queryOrderId();
+  if (!oid) return;
+  const task = filteredOrders.value.find(t => String(t.orderId) === oid);
+  if (!task) return;
+  activeFormTask(task);
+  await router.replace({ path: "/tasks" });
+};
+
 const completedTask = async () => {
   isLoading.value = true;
   try {
@@ -501,10 +518,31 @@ watch(
     }
 )
 
+watch(
+    () => route.query.orderId,
+    async () => {
+      await nextTick();
+      await openTaskFromRouteQuery();
+    },
+    { flush: "post" },
+);
+
+watch(
+    () => dataStore.state.tasks.content,
+    async () => {
+      if (!queryOrderId()) return;
+      await nextTick();
+      await openTaskFromRouteQuery();
+    },
+    { flush: "post" },
+);
+
 onMounted(async () => {
   isLoading.value = true;
   try {
     await dataStore.loadGetUserTasks();
+    await nextTick();
+    await openTaskFromRouteQuery();
   } catch {
   } finally {
     isLoading.value = false;

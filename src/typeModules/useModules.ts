@@ -22,7 +22,15 @@ export interface IItems {
 export type OrderKind = "ALBUM" | "VIGNETTE" | "PICTURE";
 export type OrderStatus = 'PENDING' | 'IN_PROGRESS' | 'PAUSED' | 'COMPLETED';
 export type WorkStatus = 'PENDING' | 'STARTED' | 'COMPLETED';
-export type NotificationType = 'ORDER_ASSIGNED' | 'TASK_ACTIVATED' | 'ORDER_UPDATED' | 'ORDER_STATUS_CHANGED';
+export type NotificationType =
+    | 'ORDER_ASSIGNED'
+    | 'TASK_ACTIVATED'
+    | 'ORDER_UPDATED'
+    | 'ORDER_STATUS_CHANGED'
+    | 'ADMIN_TASK_STEP_COMPLETED'
+    | 'ADMIN_TASK_HANDOFF'
+    /** Backend yuborgan noaniq enum dan tashqari tur (UI: umumiy kartochka) */
+    | 'NOTIFICATION_MISC';
 
 export interface SocketAuthenticatedPayload {
     userId: string;
