@@ -15,7 +15,7 @@ createApp(App)
     .use(pinia)
     .use(Toast, {
         position: POSITION.TOP_RIGHT,
-        timeout: 4000,
+        timeout: 1800,
         pauseOnHover: true,
         closeOnClick: true,
     })
