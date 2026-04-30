@@ -83,6 +83,15 @@ const routes: Array<RouteRecordRaw> = [
                 },
             },
             {
+                path: '/report',
+                name: 'Hisobot',
+                component: () => import('../views/Report.vue'),
+                meta: {
+                    requiresAuth: true,
+                    icon: 'fa-solid fa-chart-bar',
+                },
+            },
+            {
                 path: '/profile',
                 name: 'UserProfile',
                 component: () =>import('../views/UserProfile.vue'),

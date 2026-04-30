@@ -108,6 +108,15 @@
         />
         <h2 class="text-base font-bold text-pb-text sm:text-lg">Barcha vazifalar</h2>
       </div>
+      <div class="flex shrink-0 items-center gap-3 rounded-xl border border-pb-accent/20 bg-pb-accent/5 px-4 py-3">
+        <div class="flex h-10 w-10 items-center justify-center rounded-full bg-pb-accent/10 text-pb-accent">
+          <i class="fa-solid fa-chart-simple text-sm"></i>
+        </div>
+        <div class="flex flex-col">
+          <span class="text-[11px] font-semibold uppercase tracking-wide text-pb-muted">{{ currentMonthLabel }} — natijangiz</span>
+          <span class="text-xl font-bold tabular-nums text-pb-accent">{{ myMonthlyStats }} <span class="text-sm font-medium text-pb-muted">dona</span></span>
+        </div>
+      </div>
       <div
           class="grid shrink-0 grid-cols-1 items-end gap-4 border-b border-pb-border py-3 text-sm sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-5"
       >
@@ -262,10 +271,10 @@
               <div class="flex flex-nowrap items-center justify-end gap-2.5">
                 <CButton
                     type="button"
-                    :text="task.canWork ? 'Bajarish' : 'Kuting'"
+                    :text="(task.remainingAvailable ?? 0) > 0 ? 'Bajarish' : 'Kuting'"
                     size="sm"
                     variant="primary"
-                    :disabled="!task.canWork"
+                    :disabled="(task.remainingAvailable ?? 0) <= 0"
                     @click="activeFormTask(task)"
                 />
               </div>
@@ -314,6 +323,23 @@ const formStatus = ref<OrderStatus | null>(null);
 const formData = ref<string | null | undefined>(null);
 const endData = ref<string | null | undefined>(null);
 const isLoading = ref(false);
+
+const myMonthlyStats = ref<number>(0);
+const now = new Date();
+const currentMonthParam = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+const uzMonths = ["Yanvar","Fevral","Mart","Aprel","May","Iyun","Iyul","Avgust","Sentabr","Oktabr","Noyabr","Dekabr"];
+const currentMonthLabel = `${uzMonths[now.getMonth()]} ${now.getFullYear()}`;
+
+const loadMyMonthlyStats = async () => {
+  try {
+    const { data } = await axiosInstance.get<number>("/api/v1/work-logs/my-monthly", {
+      params: { month: currentMonthParam },
+    });
+    myMonthlyStats.value = Number(data) || 0;
+  } catch {
+    myMonthlyStats.value = 0;
+  }
+};
 
 const taskProgressBaseline = ref("");
 
@@ -470,13 +496,11 @@ const completedTask = async () => {
       return;
     }
 
-    const payload = {
-      processedCount: increment,
-      notes: form.value.notes,
-      workStatus: increment >= remainingTotal ? "COMPLETED" : "STARTED"
-    };
+    const taskId = selectedTask.value?.id || selectedTask.value?.orderId;
+    await axiosInstance.put(`/api/v1/user-tasks/me/${taskId}`, {
 
-    await axiosInstance.put(`/api/v1/user-tasks/me/${selectedTask.value?.orderId}`, payload);
+      processedCount: increment,
+    });
     activeTaskForm.value = false;
     await dataStore.loadGetUserTasks();
     try {
@@ -543,6 +567,7 @@ onMounted(async () => {
     await dataStore.loadGetUserTasks();
     await nextTick();
     await openTaskFromRouteQuery();
+    await loadMyMonthlyStats();
   } catch {
   } finally {
     isLoading.value = false;

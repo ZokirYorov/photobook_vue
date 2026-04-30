@@ -12,6 +12,7 @@ export type OrderFormSnapshotFields = {
   customerName: string;
   receiverName: string;
   employees: string[];
+  employeeResets: Record<string, boolean>;
   pageCount: number | null;
   amount: number | null;
   acceptedDate: string;
@@ -27,7 +28,12 @@ export function snapshotOrderForm(
   hasPendingImageFile: boolean,
   removedOldImage: boolean,
 ): string {
-  const emp = [...(f.employees || [])].map(String).sort().join("\u0001");
+  const emp = [...(f.employees || [])].map(String).sort().join("");
+  const resets = Object.entries(f.employeeResets || {})
+    .filter(([, v]) => v)
+    .map(([k]) => k)
+    .sort()
+    .join("");
   const pageCount =
     f.pageCount === null || f.pageCount === undefined || Number.isNaN(Number(f.pageCount))
       ? null
@@ -44,6 +50,7 @@ export function snapshotOrderForm(
     customerName: normStr(f.customerName),
     receiverName: normStr(f.receiverName),
     employees: emp,
+    resets,
     pageCount,
     amount,
     acceptedDate: normStr(f.acceptedDate),
@@ -91,7 +98,7 @@ export function snapshotUserEmployeeEdit(
   passwordSet: boolean,
   hasPendingAvatarFile: boolean,
 ): string {
-  const roleIds = (f.roles || []).map((r) => String(r.id)).sort().join("\u0001");
+  const roleIds = (f.roles || []).map((r) => String(r.id)).sort().join("");
   return JSON.stringify({
     firstName: normStr(f.firstName),
     lastName: normStr(f.lastName),

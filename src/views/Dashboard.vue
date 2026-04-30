@@ -11,6 +11,20 @@
             Buyurtmalar, jarayonlar va kategoriyalar bo‘yicha tezkor statistika.
           </p>
         </div>
+        <div v-if="isEmployee" class="mt-4 sm:mt-0">
+          <div class="flex items-center gap-4 rounded-2xl border border-pb-border bg-pb-elevated/50 p-4 shadow-sm backdrop-blur-sm transition hover:border-pb-accent/30">
+            <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-pb-accent to-indigo-600 text-white shadow-md">
+              <i class="fa-solid fa-chart-line text-xl"></i>
+            </div>
+            <div>
+              <p class="text-[11px] font-bold uppercase tracking-widest text-pb-muted">Mening natijam (oylik)</p>
+              <div class="flex items-baseline gap-2">
+                <span class="text-2xl font-black tabular-nums text-pb-text">{{ myMonthlyTotal }}</span>
+                <span class="text-sm font-semibold text-pb-muted">dona</span>
+              </div>
+            </div>
+          </div>
+        </div>
       </header>
 
       <section aria-label="Asosiy ko‘rsatkichlar">
@@ -309,11 +323,30 @@
 <script setup lang="ts">
 import {computed, onMounted, ref} from "vue";
 import { useStore } from "@/stores/store";
+import { authService } from "@/service/authService";
 import { useRouter } from "vue-router";
 import axiosInstance from "@/axios";
 
 const dataStore = useStore();
+const auth = authService();
 const router = useRouter();
+
+const myMonthlyTotal = ref<number | string>(0);
+const isEmployee = computed(() => auth.state.roles.includes("ROLE_OPERATOR"));
+
+const loadMyStats = async () => {
+  if (!isEmployee.value) return;
+  try {
+    const now = new Date();
+    const month = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+    const { data } = await axiosInstance.get<number>("/api/v1/work-logs/my-monthly", {
+      params: { month }
+    });
+    myMonthlyTotal.value = data ?? 0;
+  } catch (e) {
+    console.error("Failed to load my stats:", e);
+  }
+};
 
 type DashboardOrderKind = "ALBUM" | "VIGNETTE" | "PICTURE";
 type DashboardStatus = "PENDING" | "IN_PROGRESS" | "PAUSED" | "COMPLETED" | "CANCELLED";
@@ -683,6 +716,7 @@ const getCircleProgress = (percentage: number) => {
 onMounted(async (): Promise<void> => {
   await Promise.all([
     loadAllStats(),
+    loadMyStats(),
     dataStore.loadUsers(),
     dataStore.loadMaterials(),
     dataStore.loadCategory("ALBUM"),

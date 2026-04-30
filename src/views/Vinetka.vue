@@ -190,6 +190,22 @@
             <p v-if="errors.employees" class="text-red-500 text-sm">
               {{errors.employees}}
             </p>
+            <div v-if="isEditing && itemForm.employees.length" class="mt-2 flex flex-col gap-1 rounded-lg border border-pb-border bg-pb-elevated p-2.5">
+              <span class="mb-0.5 text-[11px] font-semibold uppercase tracking-wide text-pb-muted">Qayta boshlash</span>
+              <label
+                  v-for="empId in itemForm.employees"
+                  :key="empId"
+                  class="flex cursor-pointer items-center gap-2 rounded-md px-1.5 py-1 transition-colors hover:bg-pb-surface"
+              >
+                <input
+                    type="checkbox"
+                    :checked="!!employeeResets[empId]"
+                    @change="toggleEmployeeReset(empId)"
+                    class="accent-pb-accent"
+                />
+                <span class="text-sm text-pb-text">{{ getUserName(empId) }}</span>
+              </label>
+            </div>
           </div>
           <AppSelect
               v-model="itemForm.status"
@@ -270,6 +286,11 @@
         />
       </div>
     </div>
+    <OrderWorkHistoryDialog
+        :show="workHistoryShow"
+        :order-id="workHistoryOrderId"
+        @close="workHistoryShow = false"
+    />
     <div class="animate-fade-in flex w-full min-w-0 flex-col gap-3 rounded-xl border border-pb-border bg-pb-surface px-4 py-3 shadow-sm">
       <div class="flex w-full min-w-0 shrink-0 flex-col border-b border-pb-border pb-3">
         <div class="flex items-center gap-2 py-1">
@@ -468,6 +489,13 @@
             <div class="flex flex-nowrap items-center justify-end gap-2.5">
               <CButton
                   type="button"
+                  text="Tarix"
+                  size="sm"
+                  variant="outline-accent"
+                  @click="openWorkHistory(order.id)"
+              />
+              <CButton
+                  type="button"
                   text="Tahrirlash"
                   size="sm"
                   variant="outline-edit"
@@ -551,6 +579,7 @@ import {Order, OrderCreateDto} from "@/typeModules/useModules";
 import { useToast } from "vue-toastification";
 import DeleteConfirm from "@/components/DeleteConfirm.vue";
 import OrderImagePicker from "@/components/OrderImagePicker.vue";
+import OrderWorkHistoryDialog from "@/components/OrderWorkHistoryDialog.vue";
 import { useRoute, useRouter } from "vue-router";
 import {
   snapshotOrderForm,
@@ -582,6 +611,25 @@ const orderedUsers = computed(() => {
 
 const isEditing = ref(false);
 const orderEditBaseline = ref("");
+const workHistoryShow = ref(false);
+const workHistoryOrderId = ref("");
+const employeeResets = ref<Record<string, boolean>>({});
+
+const getUserName = (id: string): string => {
+  const user = allUsers.value.find((u: any) => u.id === id);
+  if (!user) return id.slice(0, 8) + "…";
+  return `${user.lastName} ${user.firstName}`.trim() || user.username;
+};
+
+const toggleEmployeeReset = (id: string) => {
+  employeeResets.value[id] = !employeeResets.value[id];
+};
+
+const openWorkHistory = (id: string) => {
+  workHistoryOrderId.value = id;
+  workHistoryShow.value = true;
+};
+
 const isVisible = ref(false);
 const selectedItem = ref<string | null>(null);
 const showConfirmItem = ref(false);
@@ -839,6 +887,7 @@ const orderSnapshotFields = computed((): OrderFormSnapshotFields => ({
   imageUrl: itemForm.value.imageUrl ?? "",
   notes: itemForm.value.notes ?? "",
   uploadId: itemForm.value.uploadId,
+  employeeResets: employeeResets.value,
 }));
 
 const orderSaveDisabled = computed(
@@ -865,6 +914,7 @@ const handleEmployeeChange = (newValues: string[]) => {
   result = [...result, ...added]
 
   itemForm.value.employees = result
+  removed.forEach(id => { delete employeeResets.value[id]; })
 }
 // const changeFilter = (type: 'search' | 'status', value: string ) => {
 //   if (type === 'search') {
@@ -1028,7 +1078,8 @@ const submitForm = async () => {
       kind: "VIGNETTE",
       employees: itemForm.value.employees.map((id, index) => ({
         employeeId: id,
-        stepOrder: index + 1
+        stepOrder: index + 1,
+        ...(employeeResets.value[id] ? { reset: true } : {})
       }))
     }
 
@@ -1062,6 +1113,7 @@ const editForm = (item: Order) => {
     kind: "VIGNETTE",
     employees: item.employees?.map(e => e.employeeId) || []
   }
+  employeeResets.value = {}
   itemId.value = item.id;
   void nextTick(() => {
     orderEditBaseline.value = snapshotOrderForm(
@@ -1115,6 +1167,7 @@ const resetForm = () => {
     notes: "",
     uploadId: ""
   }
+  employeeResets.value = {}
   isEditing.value = false
   orderEditBaseline.value = ""
 }

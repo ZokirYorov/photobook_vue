@@ -197,6 +197,7 @@ export interface OrderCreateDto {
     employees: {
         employeeId: string;
         stepOrder: number;
+        reset?: boolean;
     }[];
     pageCount: number | null;
     amount: number | null;
@@ -223,6 +224,7 @@ export interface UserForm {
 }
 
 export interface UserTask {
+    id?: string;
     orderId: string;
     kind: OrderKind;
     categoryId: string;
@@ -287,6 +289,33 @@ export interface ExpensesForm {
     date: string;
     paymentMethod: string;
     receipt_image: string;
+}
+
+export interface WorkLog {
+    id: string;
+    orderId: string;
+    employeeId: string;
+    stepOrder: number;
+    delta: number;
+    snapshot: number;
+    workMonth: string;
+    loggedAt: string;
+}
+
+export interface MonthlyWorkReport {
+    employeeId: string;
+    employeeFullName?: string;
+    totalDelta: number;
+}
+
+export interface EmployeeMonthlyOrderSummary {
+    orderId: string;
+    orderName: string;
+    itemType: string;
+    status: OrderStatus | string;
+    acceptedDate: string;
+    lastLoggedAt: string;
+    totalDelta: number;
 }
 
 export interface IForm {
