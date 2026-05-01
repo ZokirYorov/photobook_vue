@@ -75,7 +75,7 @@
         has-close-icon
         no-header
         :show="isVisible"
-        custom-class="w-full max-w-md"
+        custom-class="w-full max-w-md mt-12"
         @close="closeForm"
         body-class="flex max-h-[min(88vh,640px)] flex-col overflow-hidden rounded-xl border border-pb-border !bg-pb-surface p-0 shadow-lg"
     >

@@ -31,6 +31,7 @@
           <tr>
             <th class="px-3 py-3 text-start">№</th>
             <th class="px-3 py-3 text-start">Buyurtma / mahsulot</th>
+            <th class="px-3 py-3 text-center">Bo'lim</th>
             <th class="px-3 py-3 text-center">Sana</th>
             <th class="px-3 py-3 text-center">Miqdori / turi</th>
             <th class="px-3 py-3 text-center">Holati</th>
@@ -54,6 +55,7 @@
               </div>
               <p v-if="order.itemType" class="text-xs text-pb-accent">{{ order.itemType }}</p>
             </td>
+            <td>{{order.category}}</td>
             <td class="px-3 py-2.5 text-center text-pb-muted tabular-nums">
               {{ formatDate(order.lastLoggedAt) }}
             </td>
