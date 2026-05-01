@@ -10,7 +10,14 @@
     <div class="flex min-h-0 flex-1 flex-col">
       <div class="shrink-0 border-b border-pb-border px-4 pb-2 pt-10 sm:pt-6">
         <h2 class="text-base font-semibold text-pb-text">Buyurtma faollik tarixi</h2>
-        <p v-if="orderName" class="mt-0.5 text-sm text-pb-muted">{{ orderName }}</p>
+        <div class="mt-0.5 flex items-center gap-2">
+          <p v-if="orderName" class="text-sm text-pb-muted">{{ orderName }}</p>
+          <span
+              v-if="category"
+              class="shrink-0 rounded px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide"
+              :class="resolveCategoryBadge(category)"
+          >{{ category }}</span>
+        </div>
       </div>
       <div class="min-h-0 flex-1 overflow-auto p-4 sm:p-6">
         <div v-if="isLoading" class="flex items-center justify-center p-8">
@@ -99,6 +106,7 @@ const props = defineProps<{
   show: boolean;
   orderId: string;
   orderName?: string;
+  category?: string;
 }>();
 
 defineEmits<{ close: [] }>();
@@ -128,6 +136,15 @@ const timeline = computed<TimelineItem[]>(() => {
 
   return items.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
 });
+
+const resolveCategoryBadge = (cat: string): string => {
+  const key = cat.toLowerCase();
+  if (key.includes("albom") || key.includes("album")) return "bg-violet-100 text-violet-700";
+  if (key.includes("vinetka")) return "bg-amber-100 text-amber-700";
+  if (key.includes("maktab")) return "bg-sky-100 text-sky-700";
+  if (key.includes("nikoh")) return "bg-pink-100 text-pink-700";
+  return "bg-pb-elevated text-pb-label";
+};
 
 const resolveEmployeeName = (employeeId: string): string => {
   const user = store.state.user.items.find(u => u.id === employeeId);

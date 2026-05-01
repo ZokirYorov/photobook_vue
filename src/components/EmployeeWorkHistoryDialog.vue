@@ -44,7 +44,14 @@
           >
             <td class="px-3 py-2.5 text-pb-muted">{{ idx + 1 }}</td>
             <td class="px-3 py-2.5">
-              <p class="font-medium text-pb-text leading-snug">{{ order.orderName }}</p>
+              <div class="flex items-center gap-1.5">
+                <p class="font-medium text-pb-text leading-snug">{{ order.orderName }}</p>
+                <span
+                    v-if="order.category"
+                    class="shrink-0 rounded px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide"
+                    :class="resolveCategoryBadge(order.category)"
+                >{{ order.category }}</span>
+              </div>
               <p v-if="order.itemType" class="text-xs text-pb-accent">{{ order.itemType }}</p>
             </td>
             <td class="px-3 py-2.5 text-center text-pb-muted tabular-nums">
@@ -138,6 +145,15 @@ const resolveStatusLabel = (status: string): string => {
     default:
       return status;
   }
+};
+
+const resolveCategoryBadge = (category: string): string => {
+  const key = category.toLowerCase();
+  if (key.includes("albom") || key.includes("album")) return "bg-violet-100 text-violet-700";
+  if (key.includes("vinetka")) return "bg-amber-100 text-amber-700";
+  if (key.includes("maktab")) return "bg-sky-100 text-sky-700";
+  if (key.includes("nikoh")) return "bg-pink-100 text-pink-700";
+  return "bg-pb-elevated text-pb-label";
 };
 
 const resolveStatusBadge = (status: string): string => {
