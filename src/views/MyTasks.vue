@@ -109,59 +109,91 @@
         <h2 class="text-base font-bold text-pb-text sm:text-lg">Barcha vazifalar</h2>
       </div>
       <!-- Stats paneli -->
-      <div class="grid grid-cols-2 gap-2 sm:grid-cols-4">
-        <!-- Bu oy -->
-        <div class="col-span-2 sm:col-span-1 flex items-center gap-3 rounded-xl border border-pb-accent/20 bg-pb-accent/5 px-3 py-3">
-          <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-pb-accent/10 text-pb-accent">
-            <i class="fa-solid fa-chart-simple text-sm"></i>
+      <div class="flex flex-col gap-2">
+        <!-- Oy navigatsiyasi -->
+        <div class="flex items-center justify-between gap-2">
+          <button
+            type="button"
+            class="flex h-8 w-8 items-center justify-center rounded-lg border border-pb-border bg-pb-surface text-pb-muted transition hover:bg-pb-app hover:text-pb-text active:scale-95"
+            @click="prevMonth"
+          >
+            <i class="fa-solid fa-chevron-left text-xs"></i>
+          </button>
+          <div class="flex items-center gap-2">
+            <span class="text-sm font-bold text-pb-text">{{ selectedMonthLabel }}</span>
+            <span v-if="isCurrentMonth" class="rounded-full bg-pb-accent/10 px-2 py-0.5 text-[11px] font-semibold text-pb-accent">Hozir</span>
           </div>
-          <div class="min-w-0">
-            <span class="text-[11px] font-semibold uppercase tracking-wide text-pb-muted">{{ currentMonthLabel }}</span>
-            <p class="text-xl font-bold tabular-nums text-pb-accent leading-tight">{{ myMonthlyStats }} <span class="text-sm font-medium text-pb-muted">dona</span></p>
-            <p v-if="myLastMonthlyStats > 0 || myMonthlyStats > 0" class="text-[11px] mt-0.5" :class="monthGrowth >= 0 ? 'text-emerald-600' : 'text-red-500'">
-              <i :class="monthGrowth >= 0 ? 'fa-solid fa-arrow-trend-up' : 'fa-solid fa-arrow-trend-down'"></i>
-              {{ monthGrowth >= 0 ? '+' : '' }}{{ monthGrowth }}% o'tgan oydan
-            </p>
-          </div>
+          <button
+            type="button"
+            class="flex h-8 w-8 items-center justify-center rounded-lg border border-pb-border bg-pb-surface text-pb-muted transition hover:bg-pb-app hover:text-pb-text active:scale-95 disabled:opacity-40 disabled:pointer-events-none"
+            :disabled="isCurrentMonth"
+            @click="nextMonth"
+          >
+            <i class="fa-solid fa-chevron-right text-xs"></i>
+          </button>
         </div>
 
-        <!-- O'tgan oy -->
-        <div class="flex items-center gap-3 rounded-xl border border-pb-border bg-pb-surface px-3 py-3">
-          <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-violet-50 text-violet-500">
-            <i class="fa-solid fa-calendar text-sm"></i>
+        <div class="grid grid-cols-2 gap-2 sm:grid-cols-4">
+          <!-- Tanlangan oy natijasi -->
+          <div class="col-span-2 sm:col-span-1 flex items-center gap-3 rounded-xl border border-pb-accent/20 bg-pb-accent/5 px-3 py-3">
+            <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-pb-accent/10 text-pb-accent">
+              <i v-if="statsLoading" class="fa-solid fa-spinner fa-spin text-sm"></i>
+              <i v-else class="fa-solid fa-chart-simple text-sm"></i>
+            </div>
+            <div class="min-w-0">
+              <span class="text-[11px] font-semibold uppercase tracking-wide text-pb-muted">Natija</span>
+              <p class="text-xl font-bold tabular-nums text-pb-accent leading-tight">
+                {{ statsLoading ? '...' : myMonthlyStats }}
+                <span class="text-sm font-medium text-pb-muted">dona</span>
+              </p>
+              <p v-if="!statsLoading && (myLastMonthlyStats > 0 || myMonthlyStats > 0)" class="text-[11px] mt-0.5" :class="monthGrowth >= 0 ? 'text-emerald-600' : 'text-red-500'">
+                <i :class="monthGrowth >= 0 ? 'fa-solid fa-arrow-trend-up' : 'fa-solid fa-arrow-trend-down'"></i>
+                {{ monthGrowth >= 0 ? '+' : '' }}{{ monthGrowth }}% oldingi oydan
+              </p>
+            </div>
           </div>
-          <div class="min-w-0">
-            <span class="text-[11px] font-semibold uppercase tracking-wide text-pb-muted">O'tgan oy</span>
-            <p class="text-xl font-bold tabular-nums text-pb-text leading-tight">{{ myLastMonthlyStats }} <span class="text-sm font-medium text-pb-muted">dona</span></p>
-          </div>
-        </div>
 
-        <!-- Muddati o'tgan -->
-        <div class="flex items-center gap-3 rounded-xl border px-3 py-3"
-          :class="overdueTasksCount > 0 ? 'border-red-200 bg-red-50' : 'border-pb-border bg-pb-surface'">
-          <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full"
-            :class="overdueTasksCount > 0 ? 'bg-red-100 text-red-500' : 'bg-amber-50 text-amber-500'">
-            <i class="fa-solid fa-clock text-sm"></i>
+          <!-- Oldingi oy -->
+          <div class="flex items-center gap-3 rounded-xl border border-pb-border bg-pb-surface px-3 py-3">
+            <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-violet-50 text-violet-500">
+              <i class="fa-solid fa-calendar text-sm"></i>
+            </div>
+            <div class="min-w-0">
+              <span class="text-[11px] font-semibold uppercase tracking-wide text-pb-muted">Oldingi oy</span>
+              <p class="text-xl font-bold tabular-nums text-pb-text leading-tight">
+                {{ statsLoading ? '...' : myLastMonthlyStats }}
+                <span class="text-sm font-medium text-pb-muted">dona</span>
+              </p>
+            </div>
           </div>
-          <div class="min-w-0">
-            <span class="text-[11px] font-semibold uppercase tracking-wide text-pb-muted">Muddati o'tgan</span>
-            <p class="text-xl font-bold tabular-nums leading-tight" :class="overdueTasksCount > 0 ? 'text-red-600' : 'text-pb-text'">
-              {{ overdueTasksCount }} <span class="text-sm font-medium text-pb-muted">ta</span>
-            </p>
-            <p v-if="dueTodayTasksCount > 0" class="text-[11px] text-amber-600 mt-0.5">
-              <i class="fa-solid fa-triangle-exclamation"></i> Bugun: {{ dueTodayTasksCount }} ta
-            </p>
-          </div>
-        </div>
 
-        <!-- Faol vazifalar -->
-        <div class="flex items-center gap-3 rounded-xl border border-pb-border bg-pb-surface px-3 py-3">
-          <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-emerald-50 text-emerald-600">
-            <i class="fa-solid fa-list-check text-sm"></i>
+          <!-- Muddati o'tgan (faqat joriy oyda) -->
+          <div class="flex items-center gap-3 rounded-xl border px-3 py-3"
+            :class="overdueTasksCount > 0 ? 'border-red-200 bg-red-50' : 'border-pb-border bg-pb-surface'">
+            <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full"
+              :class="overdueTasksCount > 0 ? 'bg-red-100 text-red-500' : 'bg-amber-50 text-amber-500'">
+              <i class="fa-solid fa-clock text-sm"></i>
+            </div>
+            <div class="min-w-0">
+              <span class="text-[11px] font-semibold uppercase tracking-wide text-pb-muted">Muddati o'tgan</span>
+              <p class="text-xl font-bold tabular-nums leading-tight" :class="overdueTasksCount > 0 ? 'text-red-600' : 'text-pb-text'">
+                {{ overdueTasksCount }} <span class="text-sm font-medium text-pb-muted">ta</span>
+              </p>
+              <p v-if="dueTodayTasksCount > 0" class="text-[11px] text-amber-600 mt-0.5">
+                <i class="fa-solid fa-triangle-exclamation"></i> Bugun: {{ dueTodayTasksCount }} ta
+              </p>
+            </div>
           </div>
-          <div class="min-w-0">
-            <span class="text-[11px] font-semibold uppercase tracking-wide text-pb-muted">Faol vazifalar</span>
-            <p class="text-xl font-bold tabular-nums text-pb-text leading-tight">{{ activeTasksCount }} <span class="text-sm font-medium text-pb-muted">ta</span></p>
+
+          <!-- Faol vazifalar -->
+          <div class="flex items-center gap-3 rounded-xl border border-pb-border bg-pb-surface px-3 py-3">
+            <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-emerald-50 text-emerald-600">
+              <i class="fa-solid fa-list-check text-sm"></i>
+            </div>
+            <div class="min-w-0">
+              <span class="text-[11px] font-semibold uppercase tracking-wide text-pb-muted">Faol vazifalar</span>
+              <p class="text-xl font-bold tabular-nums text-pb-text leading-tight">{{ activeTasksCount }} <span class="text-sm font-medium text-pb-muted">ta</span></p>
+            </div>
           </div>
         </div>
       </div>
@@ -375,13 +407,32 @@ const isLoading = ref(false);
 
 const myMonthlyStats = ref<number>(0);
 const myLastMonthlyStats = ref<number>(0);
+const statsLoading = ref(false);
+
 const now = new Date();
-const currentMonthParam = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
-const prevMonthDate = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-const prevMonthParam = `${prevMonthDate.getFullYear()}-${String(prevMonthDate.getMonth() + 1).padStart(2, "0")}`;
 const uzMonths = ["Yanvar","Fevral","Mart","Aprel","May","Iyun","Iyul","Avgust","Sentabr","Oktabr","Noyabr","Dekabr"];
-const currentMonthLabel = `${uzMonths[now.getMonth()]} ${now.getFullYear()}`;
 const todayStr = now.toISOString().slice(0, 10);
+
+// Tanlangan oy (yil va oy raqami)
+const selectedYear = ref(now.getFullYear());
+const selectedMonth = ref(now.getMonth()); // 0-11
+
+const toParam = (year: number, month: number) =>
+  `${year}-${String(month + 1).padStart(2, "0")}`;
+
+const selectedMonthParam = computed(() => toParam(selectedYear.value, selectedMonth.value));
+const selectedMonthLabel = computed(() => `${uzMonths[selectedMonth.value]} ${selectedYear.value}`);
+const isCurrentMonth = computed(() =>
+  selectedYear.value === now.getFullYear() && selectedMonth.value === now.getMonth()
+);
+
+const prevMonthParam = computed(() => {
+  const d = new Date(selectedYear.value, selectedMonth.value - 1, 1);
+  return toParam(d.getFullYear(), d.getMonth());
+});
+
+// Deprecated - kept for compatibility
+const currentMonthLabel = computed(() => selectedMonthLabel.value);
 
 const monthGrowth = computed(() => {
   if (!myLastMonthlyStats.value) return myMonthlyStats.value > 0 ? 100 : 0;
@@ -393,18 +444,36 @@ const activeTasksCount = computed(() => allTasks.value.filter(t => t.status === 
 const overdueTasksCount = computed(() => allTasks.value.filter(t => t.deadline && t.deadline.slice(0, 10) < todayStr && t.status !== 'COMPLETED').length);
 const dueTodayTasksCount = computed(() => allTasks.value.filter(t => t.deadline && t.deadline.slice(0, 10) === todayStr && t.status !== 'COMPLETED').length);
 
+const prevMonth = () => {
+  const d = new Date(selectedYear.value, selectedMonth.value - 1, 1);
+  selectedYear.value = d.getFullYear();
+  selectedMonth.value = d.getMonth();
+};
+
+const nextMonth = () => {
+  if (isCurrentMonth.value) return;
+  const d = new Date(selectedYear.value, selectedMonth.value + 1, 1);
+  selectedYear.value = d.getFullYear();
+  selectedMonth.value = d.getMonth();
+};
+
 const loadMyMonthlyStats = async () => {
+  statsLoading.value = true;
   try {
     const [cur, prev] = await Promise.allSettled([
-      axiosInstance.get<number>("/api/v1/work-logs/my-monthly", { params: { month: currentMonthParam } }),
-      axiosInstance.get<number>("/api/v1/work-logs/my-monthly", { params: { month: prevMonthParam } }),
+      axiosInstance.get<number>("/api/v1/work-logs/my-monthly", { params: { month: selectedMonthParam.value } }),
+      axiosInstance.get<number>("/api/v1/work-logs/my-monthly", { params: { month: prevMonthParam.value } }),
     ]);
     if (cur.status === "fulfilled") myMonthlyStats.value = Number(cur.value.data) || 0;
     if (prev.status === "fulfilled") myLastMonthlyStats.value = Number(prev.value.data) || 0;
   } catch {
     myMonthlyStats.value = 0;
+  } finally {
+    statsLoading.value = false;
   }
 };
+
+watch([selectedYear, selectedMonth], loadMyMonthlyStats);
 
 const taskProgressBaseline = ref("");
 
