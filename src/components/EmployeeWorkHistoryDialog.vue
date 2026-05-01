@@ -31,7 +31,7 @@
           <tr>
             <th class="px-3 py-3 text-start">№</th>
             <th class="px-3 py-3 text-start">Buyurtma / mahsulot</th>
-            <th class="px-3 py-3 text-center">Bo'lim</th>
+            <th class="px-3 py-3 text-center">Kategoriya</th>
             <th class="px-3 py-3 text-center">Sana</th>
             <th class="px-3 py-3 text-center">Miqdori / turi</th>
             <th class="px-3 py-3 text-center">Holati</th>
@@ -45,15 +45,16 @@
           >
             <td class="px-3 py-2.5 text-pb-muted">{{ idx + 1 }}</td>
             <td class="px-3 py-2.5">
-              <div class="flex items-center gap-1.5">
-                <p class="font-medium text-pb-text leading-snug">{{ order.orderName }}</p>
-                <span
-                    v-if="order.category"
-                    class="shrink-0 rounded px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide"
-                    :class="resolveCategoryBadge(order.category)"
-                >{{ order.category }}</span>
-              </div>
+              <p class="font-medium text-pb-text leading-snug">{{ order.orderName }}</p>
               <p v-if="order.itemType" class="text-xs text-pb-accent">{{ order.itemType }}</p>
+            </td>
+            <td class="px-3 py-2.5 text-center">
+              <span
+                  v-if="order.category"
+                  class="rounded px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide"
+                  :class="resolveCategoryBadge(order.category)"
+              >{{ order.category }}</span>
+              <span v-else class="text-pb-muted">—</span>
             </td>
             <td>{{order.category}}</td>
             <td class="px-3 py-2.5 text-center text-pb-muted tabular-nums">
@@ -74,7 +75,7 @@
           </tbody>
           <tfoot class="sticky bottom-0 border-t-2 border-pb-border bg-pb-elevated">
           <tr>
-            <td colspan="3" class="px-3 py-2.5 text-sm font-semibold text-pb-text">
+            <td colspan="4" class="px-3 py-2.5 text-sm font-semibold text-pb-text">
               Jami: <span class="text-gray-500">{{ orders.length }} ta buyurtma</span>
             </td>
             <td class="px-3 py-2.5 text-center font-bold text-pb-accent tabular-nums">
