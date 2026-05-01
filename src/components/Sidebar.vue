@@ -99,6 +99,7 @@ import { authService } from "@/service/authService";
 import { useRouter } from "vue-router";
 import CButton from "@/components/CButton.vue";
 import CDialog from "@/components/CDialog.vue";
+import { useIsDesktop } from "@/composables/useBreakpoint";
 
 const router = useRouter();
 const authStore = authService();
@@ -150,7 +151,7 @@ const mainMenuItems: ComputedRef = computed(() => {
   return routes;
 })
 
-const isDesktop = computed(() => window.innerWidth > 768);
+const isDesktop = useIsDesktop();
 
 const backToLogin = () => {
   isExit.value = true;

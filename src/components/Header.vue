@@ -27,7 +27,7 @@
             :to="route?.path"
           active-class="bg-white/15 text-white font-medium"
           class="p-2 gap-1 text-md flex max-lg:p-1 items-center text-center rounded-md text-white/90 hover:bg-white/10 hover:text-white transition duration-200"
-            :class="index === mainRoutes.length - 1 ? 'hidden' : 'of-hidden'"
+            :class="index === mainRoutes.length - 1 ? 'hidden' : ''"
         >
           <i class="w-4 text-sm h-3 flex" v-if="route.meta?.icon" :class="route.meta?.icon"></i>
           <span class="">{{ route.name }}</span>
@@ -156,6 +156,7 @@ import CDialog from "@/components/CDialog.vue";
 import { authService } from "@/service/authService";
 import NotificationPanel from "@/components/notifications/NotificationPanel.vue";
 import { useNotifications } from "@/composables/useNotifications";
+import { useIsDesktop } from "@/composables/useBreakpoint";
 
 type HeaderMenuRoute = {
   path: string;
@@ -252,7 +253,7 @@ const userAvatar = computed(() => {
 const openToProfile = () => {
   router.push("/profile");
 }
-const isDesktop = computed(() => window.innerWidth > 768);
+const isDesktop = useIsDesktop();
 const {
   activeTab,
   notifications,
