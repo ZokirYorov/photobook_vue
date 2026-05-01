@@ -637,6 +637,8 @@ const completedTask = async () => {
     });
     activeTaskForm.value = false;
     await dataStore.loadGetUserTasks();
+
+    await loadMyMonthlyStats()
     try {
       await dataStore.refreshUnreadNotificationsCount();
     } catch {
