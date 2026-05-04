@@ -95,7 +95,8 @@
         <button
             v-if="!paging.last"
             type="button"
-            class="notify-load-more"
+            title="Bildirishnomalar ro'yxati"
+            class="notify-load-more cursor-pointer"
             :disabled="loading"
             @click="$emit('load-more')"
         >
@@ -195,7 +196,7 @@ watch(
   top: calc(100% + 10px);
   right: 0;
   width: min(420px, 90vw);
-  max-height: 70vh;
+  max-height: 80vh;
   overflow: hidden;
   border-radius: 18px;
   background: var(--color-pb-surface);
@@ -211,7 +212,7 @@ watch(
   left: 50%;
   transform: translateX(-50%);
   width: min(95vw, 440px);
-  max-height: calc(70vh - env(safe-area-inset-top, 0px));
+  max-height: calc(88vh - env(safe-area-inset-top, 0px));
   border-radius: 16px;
 }
 

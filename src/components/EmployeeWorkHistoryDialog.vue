@@ -3,7 +3,7 @@
       :show="show"
       has-close-icon
       no-header
-      custom-class="w-full max-w-2xl"
+      custom-class="w-full max-w-2xl mt-12"
       @close="$emit('close')"
       body-class="flex max-h-[min(88vh,680px)] flex-col overflow-hidden rounded-xl border border-pb-border !bg-pb-surface p-0 shadow-lg"
   >
@@ -30,10 +30,10 @@
           <thead class="sticky top-0 bg-pb-elevated text-xs font-semibold uppercase tracking-wide text-pb-label">
           <tr>
             <th class="px-3 py-3 text-start">№</th>
-            <th class="px-3 py-3 text-start">Buyurtma / mahsulot</th>
+            <th class="px-3 py-3 text-start">Buyurtma</th>
             <th class="px-3 py-3 text-center">Kategoriya</th>
             <th class="px-3 py-3 text-center">Sana</th>
-            <th class="px-3 py-3 text-center">Miqdori / turi</th>
+            <th class="px-3 py-3 text-center">Miqdori</th>
             <th class="px-3 py-3 text-center">Holati</th>
           </tr>
           </thead>
@@ -46,15 +46,15 @@
             <td class="px-3 py-2.5 text-pb-muted">{{ idx + 1 }}</td>
             <td class="px-3 py-2.5">
               <p class="font-medium text-pb-text leading-snug">{{ order.orderName }}</p>
+              <span
+                  v-if="order.category"
+                  class="rounded font-semibold uppercase tracking-wide"
+                  :class="order.category ? 'font-mono text-blue-600' : ''"
+              >{{ order.category }}</span>
               <p v-if="order.itemType" class="text-xs text-pb-accent">{{ order.itemType }}</p>
             </td>
             <td class="px-3 py-2.5 text-center">
-              <span
-                  v-if="order.category"
-                  class="rounded px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide"
-                  :class="resolveCategoryBadge(order.category)"
-              >{{ order.category }}</span>
-              <span v-else class="text-pb-muted">—</span>
+              Vinetka / Albom
             </td>
             <td class="px-3 py-2.5 text-center text-pb-muted tabular-nums">
               {{ formatDate(order.lastLoggedAt) }}
@@ -147,15 +147,6 @@ const resolveStatusLabel = (status: string): string => {
     default:
       return status;
   }
-};
-
-const resolveCategoryBadge = (category: string): string => {
-  const key = category.toLowerCase();
-  if (key.includes("albom") || key.includes("album")) return "bg-violet-100 text-violet-700";
-  if (key.includes("vinetka")) return "bg-amber-100 text-amber-700";
-  if (key.includes("maktab")) return "bg-sky-100 text-sky-700";
-  if (key.includes("nikoh")) return "bg-pink-100 text-pink-700";
-  return "bg-pb-elevated text-pb-label";
 };
 
 const resolveStatusBadge = (status: string): string => {

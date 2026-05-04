@@ -189,7 +189,7 @@ import { snapshotProductCategory } from "@/utils/updateFormDirty";
 
 
 const dataStore = useStore();
-const alCategories = computed(() => dataStore.state.alCategory);
+const alCategories = computed(() => dataStore.state.allCategory);
 
 const showModal = ref(false);
 const isEditing = ref(false);

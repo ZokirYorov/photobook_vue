@@ -93,7 +93,7 @@
           <div class="flex flex-col w-full">
             <AppSelect
                 v-model="form.categoryId"
-                :options="allCategory"
+                :options="categoryOptions"
                 disabledValue="Tanlang"
                 text-field="text"
                 value-field="value"
@@ -139,7 +139,7 @@
             <div class="flex flex-col w-full">
               <AppInput
                   type="text"
-                  placeholder="Nomini kiriting"
+                  placeholder="Masalan: Maktab"
                   label="Nomi"
                   class="w-full"
                   v-model="form.orderName"
@@ -152,7 +152,7 @@
             <div class="flex flex-col w-full">
               <AppInput
                   type="text"
-                  placeholder="Turini kiriting"
+                  placeholder="Masalan: Qora koja"
                   label="Turi"
                   class="w-full"
                   v-model="form.itemType"
@@ -306,6 +306,8 @@
     <OrderWorkHistoryDialog
         :show="workHistoryShow"
         :order-id="workHistoryOrderId"
+        :statusColor="statusColor"
+        :statusLabel="statusLabel"
         category="Albom"
         @close="workHistoryShow = false"
     />
@@ -560,7 +562,7 @@
               class="flex justify-center items-center px-3 py-1 h-11 w-11 rounded-3xl select-none"
               :class="{
                 'bg-pb-accent font-bold text-white': pageItem === page,
-                'cursor-pointer hover:bg-pb-elevated': pageItem !== '...' && pageItem !== page,
+                'cursor-pointer hover:bg-blue-100': pageItem !== '...' && pageItem !== page,
                 'cursor-default text-lg text-pb-muted': pageItem === '...',
               }"
               @click="pageItem !== '...' && changePage(pageItem)"
@@ -610,7 +612,14 @@ const Toast = useToast();
 const dataStore = useStore();
 
 const allUsers = computed(() => dataStore.state.user.items);
-const allCategory = computed(() => dataStore.state.alCategory)
+const allCategory = computed(() => dataStore.state.allCategory)
+
+const categoryOptions = computed(() => {
+  return allCategory.value.map((cat: any) => ({
+    value: cat.id,
+    text: `${cat.name} (${cat.defaultPages || 0} bet)`
+  }))
+})
 
 const orderedUsers = computed(() => {
   const selected = form.value.employees
@@ -1138,6 +1147,15 @@ const deleteItem = async (id: string | null) => {
   showConfirmItem.value = true;
 }
 
+const getToday = () => {
+  const d = new Date()
+  const year = d.getFullYear()
+  const month = String(d.getMonth() + 1).padStart(2, '0')
+  const day = String(d.getDate()).padStart(2, '0')
+
+  return `${year}-${month}-${day}`
+}
+
 const resetForm = () => {
   if (avatarPreview.value.startsWith("blob:")) {
     URL.revokeObjectURL(avatarPreview.value)
@@ -1158,7 +1176,7 @@ const resetForm = () => {
     employees: [],
     pageCount: 0,
     amount: 0,
-    acceptedDate: "",
+    acceptedDate: getToday(),
     deadline: "",
     status: "PENDING",
     imageUrl: "",

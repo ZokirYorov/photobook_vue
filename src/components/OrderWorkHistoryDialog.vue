@@ -48,9 +48,19 @@
               <div class="mt-1 text-sm">
                 <template v-if="item.type === 'STATUS'">
                   <div class="flex items-center gap-2">
-                    <span class="font-bold text-pb-text">{{ item.fromStatus }}</span>
+                    <span
+                        class="font-bold rounded-md px-2 py-1"
+                        :class="statusColor[item.fromStatus]"
+                    >
+                      {{ statusLabel[item.fromStatus] }}
+                    </span>
+                    dan
                     <i class="fa-solid fa-arrow-right text-[10px] text-pb-muted"></i>
-                    <span class="font-bold text-pb-accent">{{ item.toStatus }}</span>
+                    <span class="font-bold rounded-md px-2 py-1"
+                          :class="statusColor[item.toStatus]"
+                    >
+                      {{ statusLabel[item.toStatus] }}
+                    </span> ga
                   </div>
                 </template>
                 <template v-else>
@@ -107,6 +117,8 @@ const props = defineProps<{
   orderId: string;
   orderName?: string;
   category?: string;
+  statusColor: Record<string, string>;
+  statusLabel: Record<string, string>;
 }>();
 
 defineEmits<{ close: [] }>();

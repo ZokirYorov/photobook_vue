@@ -108,9 +108,7 @@
         />
         <h2 class="text-base font-bold text-pb-text sm:text-lg">Barcha vazifalar</h2>
       </div>
-      <!-- Stats paneli -->
       <div class="flex flex-col gap-2">
-        <!-- Oy navigatsiyasi -->
         <div class="flex items-center justify-between gap-2">
           <button
             type="button"
@@ -166,10 +164,9 @@
               </p>
             </div>
           </div>
-
-          <!-- Muddati o'tgan (faqat joriy oyda) -->
           <div class="flex items-center gap-3 rounded-xl border px-3 py-3"
-            :class="overdueTasksCount > 0 ? 'border-red-200 bg-red-50' : 'border-pb-border bg-pb-surface'">
+            :class="overdueTasksCount > 0 ? 'border-red-200 bg-red-50' : 'border-pb-border bg-pb-surface'"
+          >
             <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full"
               :class="overdueTasksCount > 0 ? 'bg-red-100 text-red-500' : 'bg-amber-50 text-amber-500'">
               <i class="fa-solid fa-clock text-sm"></i>
@@ -185,7 +182,6 @@
             </div>
           </div>
 
-          <!-- Faol vazifalar -->
           <div class="flex items-center gap-3 rounded-xl border border-pb-border bg-pb-surface px-3 py-3">
             <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-emerald-50 text-emerald-600">
               <i class="fa-solid fa-list-check text-sm"></i>
@@ -355,7 +351,7 @@
                     :text="(task.remainingAvailable ?? 0) > 0 ? 'Bajarish' : 'Kuting'"
                     size="sm"
                     variant="primary"
-                    :disabled="(task.remainingAvailable ?? 0) <= 0"
+                    :disabled=" !canUserWork(task)"
                     @click="activeFormTask(task)"
                 />
               </div>
@@ -413,9 +409,8 @@ const now = new Date();
 const uzMonths = ["Yanvar","Fevral","Mart","Aprel","May","Iyun","Iyul","Avgust","Sentabr","Oktabr","Noyabr","Dekabr"];
 const todayStr = now.toISOString().slice(0, 10);
 
-// Tanlangan oy (yil va oy raqami)
 const selectedYear = ref(now.getFullYear());
-const selectedMonth = ref(now.getMonth()); // 0-11
+const selectedMonth = ref(now.getMonth());
 
 const toParam = (year: number, month: number) =>
   `${year}-${String(month + 1).padStart(2, "0")}`;
@@ -431,7 +426,6 @@ const prevMonthParam = computed(() => {
   return toParam(d.getFullYear(), d.getMonth());
 });
 
-// Deprecated - kept for compatibility
 const currentMonthLabel = computed(() => selectedMonthLabel.value);
 
 const monthGrowth = computed(() => {
@@ -541,6 +535,10 @@ const statusLabel: Record<string, string> = {
   IN_PROGRESS: "Jarayonda",
   PAUSED:      "To'xtatilgan",
   COMPLETED:   "Bajarilgan",
+};
+
+const canUserWork = (task: UserTask) => {
+  return task.status === 'IN_PROGRESS' && (task.remainingAvailable ?? 0) > 0;
 };
 
 const getTaskProcessedCount = (task: any) => {

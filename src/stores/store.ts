@@ -16,7 +16,6 @@ import { localizeOrderStatusTokens } from "@/utils/localizeOrderStatusTokens";
 
 const NOTIFICATION_LIMIT = 100;
 const REALTIME_NOTIFICATION_CLOCK_SKEW_MS = 5000;
-/** Bir nechta socket-xabar ketma-ket kelsa, vazifa/buyurtma ro'yxatini bir marta yangilash */
 const SOCKET_LIST_REFRESH_DEBOUNCE_MS = 400;
 const ORDER_FETCH_SIZE = 100;
 const DEFAULT_ORDER_SORT = "updatedAt,desc";
@@ -26,12 +25,10 @@ const orderStateKeyByKind: Record<OrderKind, "albums" | "vignettes" | "pictures"
     PICTURE: "pictures",
 };
 
-/** In-memory only; `markNotificationRead` API ga yuborilmaydi */
 const LOCAL_NOTIFICATION_PREFIX = "local:";
 
 const ORDER_STATUSES: OrderStatus[] = ["PENDING", "IN_PROGRESS", "PAUSED", "COMPLETED"];
 
-/** POST /orders/paging `status` — faqat enum; noto'g'ri qiymat 400 berishi mumkin */
 const ORDER_PAGING_STATUS = new Set<string>([
     "PENDING",
     "IN_PROGRESS",
@@ -43,7 +40,6 @@ const ORDER_PAGING_STATUS = new Set<string>([
 const parseOrderStatus = (value?: string): OrderStatus =>
     (value && ORDER_STATUSES.includes(value as OrderStatus) ? value : "IN_PROGRESS") as OrderStatus;
 
-/** REST/socket dan kelgan `type` qiymatini tanish */
 const NOTIFICATION_PARSE_ORDER: readonly NotificationType[] = [
     "ORDER_ASSIGNED",
     "TASK_ACTIVATED",
@@ -127,7 +123,7 @@ export const useStore = defineStore('item', () => {
             last: true,
         },
         items: [] as IItems[],
-        alCategory: [] as AllCategory[],
+        allCategory: [] as AllCategory[],
         vignetteCategory: [] as AllCategory[],
         photoCategory: [] as AllCategory[],
         expenses: [] as ExpensesForm[],
@@ -727,7 +723,7 @@ export const useStore = defineStore('item', () => {
         );
 
         if (kind === "ALBUM") {
-            state.value.alCategory = filtered;
+            state.value.allCategory = filtered;
         }
 
         if (kind === "VIGNETTE") {

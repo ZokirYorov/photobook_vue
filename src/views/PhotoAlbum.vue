@@ -95,7 +95,7 @@
           <div class="flex flex-col">
             <AppSelect
                 v-model="itemForm.categoryId"
-                :options="photoCategory"
+                :options="categoryOptions"
                 disabledValue="Tanlang"
                 text-field="text"
                 value-field="value"
@@ -288,6 +288,8 @@
     <OrderWorkHistoryDialog
         :show="workHistoryShow"
         :order-id="workHistoryOrderId"
+        :statusColor="statusColor"
+        :statusLabel="statusLabel"
         category="Rasmli Albom"
         @close="workHistoryShow = false"
     />
@@ -376,27 +378,22 @@
         <tbody v-if="isLoading">
         <tr v-for="i in 8" :key="i" class="border-t border-pb-border">
           <td class="p-2"><div class="h-4 w-6 animate-pulse rounded bg-pb-border"></div></td>
-
           <td class="space-y-2 p-2">
             <div class="h-4 w-32 animate-pulse rounded bg-pb-border"></div>
             <div class="h-3 w-24 animate-pulse rounded bg-pb-border"></div>
           </td>
-
           <td class="p-2">
             <div class="h-10 w-14 animate-pulse rounded-lg bg-pb-border"></div>
           </td>
-
           <td class="p-2"><div class="h-4 w-20 animate-pulse rounded bg-pb-border"></div></td>
           <td class="p-2"><div class="h-4 w-24 animate-pulse rounded bg-pb-border"></div></td>
           <td class="p-2"><div class="h-4 w-24 animate-pulse rounded bg-pb-border"></div></td>
-
           <td class="p-2">
             <div class="h-2 w-full animate-pulse rounded-full bg-pb-border"></div>
             <div class="mt-2 h-3 w-16 animate-pulse rounded bg-pb-border"></div>
           </td>
           <td class="p-2"><div class="h-4 w-20 animate-pulse rounded bg-pb-border"></div></td>
           <td class="p-2"><div class="h-4 w-20 animate-pulse rounded bg-pb-border"></div></td>
-
           <td class="p-2">
             <div class="h-6 w-20 animate-pulse rounded-full bg-pb-border"></div>
           </td>
@@ -544,7 +541,7 @@
             class="flex h-11 w-11 select-none items-center justify-center rounded-3xl px-3 py-1"
             :class="{
               'bg-pb-accent font-bold text-white': pageItem === page,
-              'cursor-pointer hover:bg-pb-elevated': pageItem !== '...' && pageItem !== page,
+              'cursor-pointer hover:bg-blue-100': pageItem !== '...' && pageItem !== page,
               'cursor-default text-lg text-pb-muted': pageItem === '...',
             }"
             @click="pageItem !== '...' && changePage(pageItem)"
@@ -565,9 +562,7 @@
       </div>
     </div>
   </div>
-
 </template>
-
 
 <script setup lang="ts">
 import CButton from "@/components/CButton.vue";
@@ -594,6 +589,13 @@ const dataStore = useStore();
 
 const allUsers: ComputedRef = computed(() => dataStore.state.user.items);
 const photoCategory: ComputedRef = computed(() => dataStore.state.photoCategory);
+
+const categoryOptions = computed(() => {
+  return photoCategory.value.map((cat: any) => ({
+    value: cat.id,
+    text: `${cat.name} (${cat.defaultPages || 0} bet)`
+  }))
+})
 
 const orderedUsers = computed(() => {
   const selected = itemForm.value.employees
@@ -983,28 +985,6 @@ const pageProcessed = computed(() => {
   return dataStore.state.paging.PICTURE.totalElements
 })
 
-const getCategoryCount = (value: string) => {
-  return filteredPictures.value
-      .filter(item => item.categoryName === value)
-      .reduce((total, item) => total + (item.amount || 0), 0)
-}
-
-const getCount = (value: string) => {
-  return filteredPictures.value
-      .filter(item => item.categoryName === value)
-      .reduce((total, item) => total + (getProcessedCount(item) || 0), 0)
-}
-
-const getRemaining = (value: string) => {
-  return filteredPictures.value
-      .filter(item => item.categoryName === value)
-      .reduce((total, item) => {
-        const totalNum = item.amount || 0
-        const processed = getProcessedCount(item) || 0
-        return total + (totalNum - processed)
-      }, 0)
-}
-
 const itemStatus = ref( [
   { value: 'PENDING', text: 'Kutilmoqda' },
   { value: 'IN_PROGRESS', text: 'Jarayonda' },
@@ -1072,7 +1052,6 @@ const submitForm = async () => {
   }
 
   try {
-
     const payload: OrderCreateDto = {
       ...itemForm.value,
       kind: "PICTURE",
@@ -1141,6 +1120,15 @@ const deleteItem = async (id: string | null) => {
   showConfirmItem.value = true;
 }
 
+const getToday = () => {
+  const d = new Date()
+  const year = d.getFullYear()
+  const month = String(d.getMonth() + 1).padStart(2, '0')
+  const day = String(d.getDate()).padStart(2, '0')
+
+  return `${year}-${month}-${day}`
+}
+
 const resetForm = () => {
   if (previewUrl.value?.startsWith("blob:")) {
     URL.revokeObjectURL(previewUrl.value)
@@ -1160,7 +1148,7 @@ const resetForm = () => {
     employees: [],
     pageCount: 0,
     amount: 0,
-    acceptedDate: "",
+    acceptedDate: getToday(),
     deadline: "",
     status: "PENDING",
     imageUrl: "",
@@ -1211,7 +1199,6 @@ onMounted(async () => {
       linear-gradient(180deg, rgb(248 250 252 / 0.9) 0%, var(--color-pb-app) 36%, var(--color-pb-app) 100%),
       radial-gradient(ellipse 65% 40% at 50% -8%, rgb(37 99 235 / 0.07), transparent 52%);
 }
-
 .animate-fade-in {
   animation: fadeIn 0.4s ease-in-out;
 }

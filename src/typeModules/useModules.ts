@@ -30,7 +30,6 @@ export type NotificationType =
     | 'ADMIN_TASK_STEP_COMPLETED'
     | 'ADMIN_TASK_HANDOFF'
     | 'ADMIN_ORDER_WORK_COMPLETED'
-    /** Backend yuborgan noaniq enum dan tashqari tur (UI: umumiy kartochka) */
     | 'NOTIFICATION_MISC';
 
 export interface SocketAuthenticatedPayload {

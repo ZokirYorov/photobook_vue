@@ -95,7 +95,7 @@
           <div class="flex flex-col w-full">
             <AppSelect
                 v-model="itemForm.categoryId"
-                :options="vignetteCategory"
+                :options="categoryOptions"
                 disabledValue="Tanlang"
                 text-field="text"
                 value-field="value"
@@ -289,6 +289,8 @@
     <OrderWorkHistoryDialog
         :show="workHistoryShow"
         :order-id="workHistoryOrderId"
+        :statusColor="statusColor"
+        :statusLabel="statusLabel"
         category="Vinetka"
         @close="workHistoryShow = false"
     />
@@ -547,7 +549,7 @@
             class="flex h-11 w-11 select-none items-center justify-center rounded-3xl px-3 py-1"
             :class="{
               'bg-pb-accent font-bold text-white': pageItem === page,
-              'cursor-pointer hover:bg-pb-elevated': pageItem !== '...' && pageItem !== page,
+              'cursor-pointer hover:bg-blue-100': pageItem !== '...' && pageItem !== page,
               'cursor-default text-lg text-pb-muted': pageItem === '...',
             }"
             @click="pageItem !== '...' && changePage(pageItem)"
@@ -595,6 +597,13 @@ const dataStore = useStore();
 
 const allUsers: ComputedRef = computed(() => dataStore.state.user.items);
 const vignetteCategory: ComputedRef = computed(() => dataStore.state.vignetteCategory)
+
+const categoryOptions = computed(() => {
+  return vignetteCategory.value.map((cat: any) => ({
+    value: cat.id,
+    text: `${cat.name} (${cat.defaultPages || 0} bet)`
+  }))
+})
 
 const orderedUsers = computed(() => {
   const selected = itemForm.value.employees
@@ -1143,6 +1152,15 @@ const deleteItem = async (id: string | null) => {
   showConfirmItem.value = true;
 }
 
+const getToday = () => {
+  const d = new Date()
+  const year = d.getFullYear()
+  const month = String(d.getMonth() + 1).padStart(2, '0')
+  const day = String(d.getDate()).padStart(2, '0')
+
+  return `${year}-${month}-${day}`
+}
+
 const resetForm = () => {
   if (previewUrl.value?.startsWith("blob:")) {
     URL.revokeObjectURL(previewUrl.value)
@@ -1162,7 +1180,7 @@ const resetForm = () => {
     employees: [],
     pageCount: 0,
     amount: 0,
-    acceptedDate: "",
+    acceptedDate: getToday(),
     deadline: "",
     status: "PENDING",
     imageUrl: "",

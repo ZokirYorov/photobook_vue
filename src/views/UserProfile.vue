@@ -702,14 +702,13 @@ onUnmounted(() => {
       280% 280%,
       260% 260%;
   background-position:
-      0% 0%,
+      0 0,
       48% 42%,
       52% 58%,
       62% 38%;
   animation: profile-bg-pan 11s ease-in-out infinite;
 }
 
-/* Mobil: ota layout skrolli ishlashi uchun; desktopda overflow:hidden + blur fon */
 @media (max-width: 1023px) {
   .profile-page {
     overflow-x: hidden;
@@ -797,28 +796,28 @@ onUnmounted(() => {
   0%,
   100% {
     background-position:
-        0% 0%,
+        0 0,
         18% 28%,
         82% 72%,
         75% 22%;
   }
   25% {
     background-position:
-        0% 0%,
+        0 0,
         78% 22%,
         24% 78%,
         28% 68%;
   }
   50% {
     background-position:
-        0% 0%,
+        0 0,
         32% 72%,
         68% 28%,
         82% 48%;
   }
   75% {
     background-position:
-        0% 0%,
+        0 0,
         65% 55%,
         38% 42%,
         40% 30%;
@@ -896,7 +895,7 @@ onUnmounted(() => {
   .profile-page {
     animation: none;
     background-size: 100% 100%, 100% 100%, 100% 100%, 100% 100%;
-    background-position: 0% 0%, 50% 45%, 50% 55%, 50% 50%;
+    background-position: 0 0, 50% 45%, 50% 55%, 50% 50%;
   }
 
   .profile-bg-sheen {

@@ -563,7 +563,7 @@ const getOrderBreakdown = async (type: "ALBUM" | "VIGNETTE" | "PICTURE") => {
 
 const allUsers = computed(() => dataStore.state.user?.items?.length || 0)
 const allMaterialCount = computed(() => dataStore.state.items?.length || 0)
-const albumCategories = computed(() => dataStore.state.alCategory?.length || 0)
+const albumCategories = computed(() => dataStore.state.allCategory?.length || 0)
 const vignetteCategories = computed(() => dataStore.state.vignetteCategory?.length || 0)
 const photosCategories = computed(() => dataStore.state.photoCategory?.length || 0)
 
