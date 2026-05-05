@@ -14,6 +14,19 @@
       />
     </div>
 
+    <CDialog
+        :show="showConfirmItem"
+        custom-class="w-full max-w-sm"
+        @close="showConfirmItem = false"
+        body-class="rounded-xl border border-pb-border !bg-pb-surface p-5 text-center shadow-lg"
+    >
+      <DeleteConfirm
+          v-model:show="showConfirmItem"
+          @confirm="deleteConfirmItem"
+          title="Ushbu kategoriyani o'chirmoqchimisiz?"
+      />
+    </CDialog>
+
     <div
         class="animate-fade-in flex w-full min-w-0 flex-col gap-4 rounded-xl border border-pb-border bg-pb-surface p-4 shadow-sm"
     >
@@ -164,6 +177,7 @@
 import {ref, computed, onMounted, watch, nextTick} from 'vue';
 import CButton from "@/components/CButton.vue";
 import CDialog from "@/components/CDialog.vue";
+import DeleteConfirm from "@/components/DeleteConfirm.vue";
 import { useStore } from "@/stores/store";
 import AppInput from "@/components/ui/AppInput.vue";
 import { AllCategory } from "@/typeModules/useModules";
@@ -178,6 +192,7 @@ const dataStore = useStore();
 const photoCategories = computed(() => dataStore.state.photoCategory);
 
 const showModal = ref(false);
+const showConfirmItem = ref(false);
 const isEditing = ref(false);
 const categoryEditBaseline = ref("");
 const isLoading = ref(false);
@@ -306,14 +321,18 @@ const editItem = (item: AllCategory) => {
   });
 }
 
-const deleteItem = async (item: AllCategory) => {
+const deleteConfirmItem = async () => {
   try {
-    await dataStore.deleteCategory(item.id, item.kind);
-    await dataStore.loadCategory(item.kind)
+    await dataStore.deleteCategory(form.value.id, form.value.kind);
+    showConfirmItem.value = false;
+    await dataStore.loadCategory(form.value.kind);
+  } catch {
   }
-  catch {
-  }
+};
 
+const deleteItem = (item: AllCategory) => {
+  form.value = { ...item };
+  showConfirmItem.value = true;
 };
 
 onMounted(async () => {

@@ -135,25 +135,28 @@
       <div class="flex flex-col gap-2">
 
         <div class="grid grid-cols-2 gap-2 sm:grid-cols-4">
-          <!-- Tanlangan oy natijasi -->
+          <!-- Natija -->
           <div class="col-span-2 sm:col-span-1 flex items-center gap-3 rounded-xl border border-pb-accent/20 bg-pb-accent/5 px-3 py-3">
             <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-pb-accent/10 text-pb-accent">
-              <i v-if="statsLoading" class="fa-solid fa-spinner fa-spin text-sm"></i>
-              <i v-else class="fa-solid fa-chart-simple text-sm"></i>
+              <i class="fa-solid fa-chart-simple text-sm"></i>
             </div>
-            <div class="min-w-0">
+            <div class="min-w-0 flex-1">
               <span class="text-[11px] font-semibold uppercase tracking-wide text-pb-muted">Natija</span>
-              <p class="text-xl font-bold tabular-nums text-pb-accent leading-tight">
-                {{ statsLoading ? '...' : myMonthlyStats }}
-                <span class="text-sm font-medium text-pb-muted">dona</span>
-              </p>
-              <p v-if="!statsLoading && (myLastMonthlyStats > 0 || myMonthlyStats > 0)" class="text-[11px] mt-0.5" :class="monthGrowth >= 0 ? 'text-emerald-600' : 'text-red-500'">
-                <i :class="monthGrowth >= 0 ? 'fa-solid fa-arrow-trend-up' : 'fa-solid fa-arrow-trend-down'"></i>
-                {{ monthGrowth >= 0 ? '+' : '' }}{{ monthGrowth }}% oldingi oydan
-              </p>
+              <template v-if="statsLoading">
+                <div class="mt-1 h-6 w-20 animate-pulse rounded bg-pb-accent/20"></div>
+                <div class="mt-1 h-3 w-28 animate-pulse rounded bg-pb-accent/10"></div>
+              </template>
+              <template v-else>
+                <p class="text-xl font-bold tabular-nums text-pb-accent leading-tight">
+                  {{ myMonthlyStats }}<span class="text-sm font-medium text-pb-muted"> dona</span>
+                </p>
+                <p v-if="myLastMonthlyStats > 0 || myMonthlyStats > 0" class="text-[11px] mt-0.5" :class="monthGrowth >= 0 ? 'text-emerald-600' : 'text-red-500'">
+                  <i :class="monthGrowth >= 0 ? 'fa-solid fa-arrow-trend-up' : 'fa-solid fa-arrow-trend-down'"></i>
+                  {{ monthGrowth >= 0 ? '+' : '' }}{{ monthGrowth }}% oldingi oydan
+                </p>
+              </template>
             </div>
           </div>
-
 
           <!-- Oldingi oydan qolgan -->
           <div class="flex items-center gap-3 rounded-xl border px-3 py-3"
@@ -162,23 +165,27 @@
             <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full"
               :class="prevMonthUnfinishedCount > 0 ? 'bg-orange-100 text-orange-500' : 'bg-violet-50 text-violet-400'"
             >
-              <i v-if="prevMonthUnfinishedLoading" class="fa-solid fa-spinner fa-spin text-sm"></i>
-              <i v-else class="fa-solid fa-calendar-xmark text-sm"></i>
+              <i class="fa-solid fa-calendar-xmark text-sm"></i>
             </div>
-            <div class="min-w-0">
+            <div class="min-w-0 flex-1">
               <span class="text-[11px] font-semibold uppercase tracking-wide text-pb-muted">Oldingi oydan</span>
-              <p class="text-xl font-bold tabular-nums leading-tight"
-                :class="prevMonthUnfinishedCount > 0 ? 'text-orange-600' : 'text-pb-text'"
-              >
-                {{ prevMonthUnfinishedLoading ? '...' : prevMonthUnfinishedCount }}
-                <span class="text-sm font-medium text-pb-muted">ta</span>
-              </p>
-              <p class="text-[11px] text-pb-muted mt-0.5">
-                {{ prevMonthUnfinishedCount > 0 ? 'tugallanmagan' : 'hammasi bajarilgan' }}
-              </p>
+              <template v-if="prevMonthUnfinishedLoading">
+                <div class="mt-1 h-6 w-16 animate-pulse rounded bg-pb-border"></div>
+                <div class="mt-1 h-3 w-24 animate-pulse rounded bg-pb-border"></div>
+              </template>
+              <template v-else>
+                <p class="text-xl font-bold tabular-nums leading-tight"
+                  :class="prevMonthUnfinishedCount > 0 ? 'text-orange-600' : 'text-pb-text'">
+                  {{ prevMonthUnfinishedCount }}<span class="text-sm font-medium text-pb-muted"> ta</span>
+                </p>
+                <p class="text-[11px] text-pb-muted mt-0.5">
+                  {{ prevMonthUnfinishedCount > 0 ? 'tugallanmagan' : 'hammasi bajarilgan' }}
+                </p>
+              </template>
             </div>
           </div>
 
+          <!-- Muddati o'tgan -->
           <div class="flex items-center gap-3 rounded-xl border px-3 py-3"
             :class="overdueTasksCount > 0 ? 'border-red-200 bg-red-50' : 'border-pb-border bg-pb-surface'"
           >
@@ -186,24 +193,37 @@
               :class="overdueTasksCount > 0 ? 'bg-red-100 text-red-500' : 'bg-amber-50 text-amber-500'">
               <i class="fa-solid fa-clock text-sm"></i>
             </div>
-            <div class="min-w-0">
+            <div class="min-w-0 flex-1">
               <span class="text-[11px] font-semibold uppercase tracking-wide text-pb-muted">Muddati o'tgan</span>
-              <p class="text-xl font-bold tabular-nums leading-tight" :class="overdueTasksCount > 0 ? 'text-red-600' : 'text-pb-text'">
-                {{ overdueTasksCount }} <span class="text-sm font-medium text-pb-muted">ta</span>
-              </p>
-              <p v-if="dueTodayTasksCount > 0" class="text-[11px] text-amber-600 mt-0.5">
-                <i class="fa-solid fa-triangle-exclamation"></i> Bugun: {{ dueTodayTasksCount }} ta
-              </p>
+              <template v-if="isLoading">
+                <div class="mt-1 h-6 w-12 animate-pulse rounded bg-pb-border"></div>
+              </template>
+              <template v-else>
+                <p class="text-xl font-bold tabular-nums leading-tight" :class="overdueTasksCount > 0 ? 'text-red-600' : 'text-pb-text'">
+                  {{ overdueTasksCount }}<span class="text-sm font-medium text-pb-muted"> ta</span>
+                </p>
+                <p v-if="dueTodayTasksCount > 0" class="text-[11px] text-amber-600 mt-0.5">
+                  <i class="fa-solid fa-triangle-exclamation"></i> Bugun: {{ dueTodayTasksCount }} ta
+                </p>
+              </template>
             </div>
           </div>
 
+          <!-- Faol vazifalar -->
           <div class="flex items-center gap-3 rounded-xl border border-pb-border bg-pb-surface px-3 py-3">
             <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-emerald-50 text-emerald-600">
               <i class="fa-solid fa-list-check text-sm"></i>
             </div>
-            <div class="min-w-0">
+            <div class="min-w-0 flex-1">
               <span class="text-[11px] font-semibold uppercase tracking-wide text-pb-muted">Faol vazifalar</span>
-              <p class="text-xl font-bold tabular-nums text-pb-text leading-tight">{{ activeTasksCount }} <span class="text-sm font-medium text-pb-muted">ta</span></p>
+              <template v-if="isLoading">
+                <div class="mt-1 h-6 w-12 animate-pulse rounded bg-pb-border"></div>
+              </template>
+              <template v-else>
+                <p class="text-xl font-bold tabular-nums text-pb-text leading-tight">
+                  {{ activeTasksCount }}<span class="text-sm font-medium text-pb-muted"> ta</span>
+                </p>
+              </template>
             </div>
           </div>
         </div>
@@ -214,8 +234,23 @@
         <p class="mb-2 text-[11px] font-semibold uppercase tracking-wide text-pb-muted">
           Kategoriya bo'yicha bajarilgan
         </p>
-        <div v-if="categoryStatsLoading" class="text-sm text-pb-muted">
-          <i class="fa-solid fa-spinner fa-spin mr-1"></i> Yuklanmoqda...
+        <div v-if="categoryStatsLoading" class="flex flex-wrap gap-2">
+          <div v-for="i in 4" :key="i" class="min-w-[160px] rounded-xl border border-pb-border bg-pb-surface px-3 py-3 flex flex-col gap-3">
+            <div class="flex items-start gap-2">
+              <div class="h-7 w-7 shrink-0 animate-pulse rounded-lg bg-pb-border"></div>
+              <div class="flex flex-col gap-1.5 flex-1">
+                <div class="h-3 w-20 animate-pulse rounded bg-pb-border"></div>
+                <div class="h-3 w-14 animate-pulse rounded bg-pb-border"></div>
+              </div>
+            </div>
+            <div class="flex items-end justify-between gap-2">
+              <div class="flex flex-col gap-1">
+                <div class="h-5 w-24 animate-pulse rounded bg-pb-border"></div>
+                <div class="h-3 w-16 animate-pulse rounded bg-pb-border"></div>
+              </div>
+              <div class="h-7 w-10 animate-pulse rounded bg-pb-border"></div>
+            </div>
+          </div>
         </div>
         <div v-else-if="categoryGroups.length === 0" class="text-sm text-pb-muted">
           Bajarilgan vazifalar mavjud emas
@@ -604,22 +639,32 @@ const loadPrevMonthUnfinished = async () => {
   }
 };
 
-const reloadTasksByMonth = () => {
-  dataStore.loadGetUserTasks({
-    search: formFilter.value || '',
-    statuses: formStatus.value ? [formStatus.value] : [],
-    acceptedDateFrom: monthAcceptedDateFrom.value,
-    acceptedDateTo: monthAcceptedDateTo.value,
-    deadlineFrom: formData.value || undefined,
-    deadlineTo: endData.value || undefined,
-  });
+const currentFilters = () => ({
+  search: formFilter.value || '',
+  statuses: formStatus.value ? [formStatus.value] : [],
+  acceptedDateFrom: monthAcceptedDateFrom.value,
+  acceptedDateTo: monthAcceptedDateTo.value,
+  deadlineFrom: formData.value || undefined,
+  deadlineTo: endData.value || undefined,
+});
+
+let taskLoadVersion = 0;
+
+const reloadTasksByMonth = async () => {
+  const version = ++taskLoadVersion;
+  isLoading.value = true;
+  try {
+    await dataStore.loadGetUserTasks(currentFilters());
+  } finally {
+    if (version === taskLoadVersion) isLoading.value = false;
+  }
 };
 
 watch([selectedYear, selectedMonth], () => {
-  loadMyMonthlyStats();
-  reloadTasksByMonth();
-  loadCategoryStats();
-  loadPrevMonthUnfinished();
+  void reloadTasksByMonth();
+  void loadMyMonthlyStats();
+  void loadCategoryStats();
+  void loadPrevMonthUnfinished();
 });
 
 const formatWorkMonth = (workMonth: string) => {
@@ -654,17 +699,21 @@ const taskSaveAllowed = computed(() => {
   return inc > 0 && inc <= max;
 });
 
-const closeFilter = () => {
+const closeFilter = async () => {
   formStatus.value = null;
   formFilter.value = '';
   formData.value = null;
   endData.value = null;
-
-  dataStore.loadGetUserTasks({
-    acceptedDateFrom: monthAcceptedDateFrom.value,
-    acceptedDateTo: monthAcceptedDateTo.value,
-  });
-}
+  isLoading.value = true;
+  try {
+    await dataStore.loadGetUserTasks({
+      acceptedDateFrom: monthAcceptedDateFrom.value,
+      acceptedDateTo: monthAcceptedDateTo.value,
+    });
+  } finally {
+    isLoading.value = false;
+  }
+};
 
 const openPreview = (url: string) => {
   previewImage.value = url;
@@ -811,13 +860,12 @@ const completedTask = async () => {
       workStatus: nextRemainingAvailable <= 0 ? "COMPLETED" : "STARTED",
     });
     activeTaskForm.value = false;
-    await dataStore.loadGetUserTasks({
-      acceptedDateFrom: monthAcceptedDateFrom.value,
-      acceptedDateTo: monthAcceptedDateTo.value,
-    });
-
-    await loadMyMonthlyStats();
-    await loadCategoryStats()
+    await Promise.all([
+      dataStore.loadGetUserTasks(currentFilters()),
+      loadMyMonthlyStats(),
+      loadCategoryStats(),
+      loadPrevMonthUnfinished(),
+    ]);
     try {
       await dataStore.refreshUnreadNotificationsCount();
     } catch {
@@ -830,10 +878,7 @@ const completedTask = async () => {
       e?.response?.data?.message ||
       "Xatolik yuz berdi";
     Toast.error(msg);
-    await dataStore.loadGetUserTasks({
-      acceptedDateFrom: monthAcceptedDateFrom.value,
-      acceptedDateTo: monthAcceptedDateTo.value,
-    });
+    await dataStore.loadGetUserTasks(currentFilters());
   } finally {
     isLoading.value = false;
   }
@@ -890,15 +935,14 @@ watch(
 onMounted(async () => {
   isLoading.value = true;
   try {
-    await dataStore.loadGetUserTasks({
-      acceptedDateFrom: monthAcceptedDateFrom.value,
-      acceptedDateTo: monthAcceptedDateTo.value,
-    });
+    await dataStore.loadGetUserTasks(currentFilters());
     await nextTick();
     await openTaskFromRouteQuery();
-    await loadMyMonthlyStats();
-    await loadCategoryStats();
-    void loadPrevMonthUnfinished();
+    void Promise.all([
+      loadMyMonthlyStats(),
+      loadCategoryStats(),
+      loadPrevMonthUnfinished(),
+    ]);
   } catch {
   } finally {
     isLoading.value = false;
