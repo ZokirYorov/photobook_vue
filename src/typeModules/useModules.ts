@@ -251,11 +251,20 @@ export interface UserTask {
     orderNotes?: string | null;
 }
 
-export interface CategoryStats {
+export interface CategoryMonthlyStats {
     categoryId: string;
     categoryName: string;
+    workMonth: string;
     orderCount: number;
     totalProcessed: number;
+}
+
+export interface CategoryGroup {
+    categoryId: string;
+    categoryName: string;
+    totalOrderCount: number;
+    totalProcessed: number;
+    months: CategoryMonthlyStats[];
 }
 
 export interface Role {
@@ -273,6 +282,8 @@ export interface IPaging {
     sort?: string[];
     search: string;
     statuses: OrderStatus[];
+    acceptedDateFrom?: string;
+    acceptedDateTo?: string;
     deadlineFrom: string;
     deadlineTo: string;
 }

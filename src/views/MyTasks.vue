@@ -205,28 +205,28 @@
         <div v-if="categoryStatsLoading" class="text-sm text-pb-muted">
           <i class="fa-solid fa-spinner fa-spin mr-1"></i> Yuklanmoqda...
         </div>
-        <div v-else-if="categoryStats.length === 0" class="text-sm text-pb-muted">
+        <div v-else-if="categoryGroups.length === 0" class="text-sm text-pb-muted">
           Bajarilgan vazifalar mavjud emas
         </div>
         <div v-else class="flex flex-wrap gap-2">
           <div
-            v-for="stat in categoryStats"
-            :key="stat.categoryId"
-            class="flex min-w-[160px] items-center gap-3 rounded-xl border border-pb-border bg-pb-surface px-3 py-3"
+            v-for="group in categoryGroups"
+            :key="group.categoryId"
+            class="min-w-[180px] rounded-xl border border-pb-border bg-pb-surface px-3 py-3"
           >
-            <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-blue-50 text-blue-500">
-              <i class="fa-solid fa-tag text-sm"></i>
-            </div>
-            <div class="min-w-0">
-              <span class="block truncate text-[11px] font-semibold uppercase tracking-wide text-pb-muted">
-                {{ stat.categoryName }}
+            <div class="flex items-center gap-2 mb-2">
+              <div class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-blue-50 text-blue-500">
+                <i class="fa-solid fa-tag text-xs"></i>
+              </div>
+              <span class="text-[11px] font-semibold uppercase tracking-wide text-pb-muted truncate">
+                {{ group.categoryName }}
               </span>
-              <p class="text-xl font-bold tabular-nums text-pb-text leading-tight">
-                {{ stat.orderCount }}
-                <span class="text-sm font-medium text-pb-muted">ta order</span>
-              </p>
-              <p class="text-[11px] text-pb-muted">{{ stat.totalProcessed }} dona</p>
             </div>
+            <p class="text-lg font-bold tabular-nums text-pb-text leading-tight">
+              {{ group.totalOrderCount }}
+              <span class="text-sm font-medium text-pb-muted">ta order</span>
+            </p>
+            <p class="text-[12px] font-semibold text-pb-accent">{{ group.totalProcessed }} dona</p>
           </div>
         </div>
       </div>
@@ -416,7 +416,7 @@
 import { useStore } from "@/stores/store";
 import CButton from "@/components/CButton.vue";
 import {computed, nextTick, onMounted, ref, watch} from "vue";
-import {CategoryStats, OrderStatus, UserTask, WorkStatus} from "@/typeModules/useModules";
+import {CategoryGroup, CategoryMonthlyStats, OrderStatus, UserTask, WorkStatus} from "@/typeModules/useModules";
 import axiosInstance from "@/axios";
 import CDialog from "@/components/CDialog.vue";
 import { useToast } from "vue-toastification";
@@ -443,8 +443,28 @@ const myMonthlyStats = ref<number>(0);
 const myLastMonthlyStats = ref<number>(0);
 const statsLoading = ref(false);
 
-const categoryStats = ref<CategoryStats[]>([]);
+const categoryStats = ref<CategoryMonthlyStats[]>([]);
 const categoryStatsLoading = ref(false);
+
+const categoryGroups = computed<CategoryGroup[]>(() => {
+  const map = new Map<string, CategoryGroup>();
+  for (const item of categoryStats.value.filter(i => i.workMonth === selectedMonthParam.value)) {
+    if (!map.has(item.categoryId)) {
+      map.set(item.categoryId, {
+        categoryId: item.categoryId,
+        categoryName: item.categoryName,
+        totalOrderCount: 0,
+        totalProcessed: 0,
+        months: []
+      });
+    }
+    const group = map.get(item.categoryId)!;
+    group.totalOrderCount += Number(item.orderCount);
+    group.totalProcessed += Number(item.totalProcessed);
+    group.months.push(item);
+  }
+  return Array.from(map.values()).sort((a, b) => b.totalProcessed - a.totalProcessed);
+});
 
 const now = new Date();
 const uzMonths = ["Yanvar","Fevral","Mart","Aprel","May","Iyun","Iyul","Avgust","Sentabr","Oktabr","Noyabr","Dekabr"];
@@ -510,12 +530,38 @@ const loadMyMonthlyStats = async () => {
   }
 };
 
-watch([selectedYear, selectedMonth], loadMyMonthlyStats);
+const monthAcceptedDateFrom = computed(() => {
+  const m = String(selectedMonth.value + 1).padStart(2, '0');
+  return `${selectedYear.value}-${m}-01`;
+});
+
+const monthAcceptedDateTo = computed(() => {
+  const lastDay = new Date(selectedYear.value, selectedMonth.value + 1, 0).getDate();
+  const m = String(selectedMonth.value + 1).padStart(2, '0');
+  return `${selectedYear.value}-${m}-${String(lastDay).padStart(2, '0')}`;
+});
+
+const reloadTasksByMonth = () => {
+  dataStore.loadGetUserTasks({
+    acceptedDateFrom: monthAcceptedDateFrom.value,
+    acceptedDateTo: monthAcceptedDateTo.value,
+  });
+};
+
+watch([selectedYear, selectedMonth], () => {
+  loadMyMonthlyStats();
+  reloadTasksByMonth();
+});
+
+const formatWorkMonth = (workMonth: string) => {
+  const [year, month] = workMonth.split('-');
+  return `${uzMonths[parseInt(month) - 1]} ${year}`;
+};
 
 const loadCategoryStats = async () => {
   categoryStatsLoading.value = true;
   try {
-    const res = await axiosInstance.get<CategoryStats[]>('/api/v1/user-tasks/me/stats/by-category');
+    const res = await axiosInstance.get<CategoryMonthlyStats[]>('/api/v1/user-tasks/me/stats/by-category');
     categoryStats.value = res.data;
   } catch {
     categoryStats.value = [];
@@ -543,7 +589,10 @@ const closeFilter = () => {
   formData.value = null;
   endData.value = null;
 
-  dataStore.loadGetUserTasks();
+  dataStore.loadGetUserTasks({
+    acceptedDateFrom: monthAcceptedDateFrom.value,
+    acceptedDateTo: monthAcceptedDateTo.value,
+  });
 }
 
 const openPreview = (url: string) => {
@@ -691,9 +740,13 @@ const completedTask = async () => {
       workStatus: nextRemainingAvailable <= 0 ? "COMPLETED" : "STARTED",
     });
     activeTaskForm.value = false;
-    await dataStore.loadGetUserTasks();
+    await dataStore.loadGetUserTasks({
+      acceptedDateFrom: monthAcceptedDateFrom.value,
+      acceptedDateTo: monthAcceptedDateTo.value,
+    });
 
     await loadMyMonthlyStats();
+    loadCategoryStats();
     try {
       await dataStore.refreshUnreadNotificationsCount();
     } catch {
@@ -706,7 +759,10 @@ const completedTask = async () => {
       e?.response?.data?.message ||
       "Xatolik yuz berdi";
     Toast.error(msg);
-    await dataStore.loadGetUserTasks();
+    await dataStore.loadGetUserTasks({
+      acceptedDateFrom: monthAcceptedDateFrom.value,
+      acceptedDateTo: monthAcceptedDateTo.value,
+    });
   } finally {
     isLoading.value = false;
   }
@@ -721,6 +777,8 @@ watch(
           await dataStore.loadGetUserTasks({
             search: formFilter.value || '',
             statuses: formStatus.value ? [formStatus.value] : [],
+            acceptedDateFrom: monthAcceptedDateFrom.value,
+            acceptedDateTo: monthAcceptedDateTo.value,
             deadlineFrom: formData.value || undefined,
             deadlineTo: endData.value || undefined,
             page: 0,
@@ -761,7 +819,10 @@ watch(
 onMounted(async () => {
   isLoading.value = true;
   try {
-    await dataStore.loadGetUserTasks();
+    await dataStore.loadGetUserTasks({
+      acceptedDateFrom: monthAcceptedDateFrom.value,
+      acceptedDateTo: monthAcceptedDateTo.value,
+    });
     await nextTick();
     await openTaskFromRouteQuery();
     await loadMyMonthlyStats();
