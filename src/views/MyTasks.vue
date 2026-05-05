@@ -305,6 +305,7 @@
         />
         <AppInput
             v-model="formFilter"
+            type="search"
             label="Qidirish"
             placeholder="Qidirish ..."
         />
