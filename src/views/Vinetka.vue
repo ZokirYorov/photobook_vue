@@ -159,20 +159,20 @@
                 label="Mijoz ismi"
             />
           </div>
-          <div class="flex flex-col w-full">
-            <AppSelect
-                :options="oderReceiver"
-                v-model="itemForm.receiverName"
-                disabledValue="Tanlang"
-                text-field="text"
-                value-field="value"
-                label="Qabul qiluvchi"
-                @change="clearError('receiverName')"
-            />
-            <p v-if="errors.receiverName" class="text-red-500 text-sm">
-              {{errors.receiverName}}
-            </p>
-          </div>
+<!--          <div class="flex flex-col w-full">-->
+<!--            <AppSelect-->
+<!--                :options="oderReceiver"-->
+<!--                v-model="itemForm.receiverName"-->
+<!--                disabledValue="Tanlang"-->
+<!--                text-field="text"-->
+<!--                value-field="value"-->
+<!--                label="Qabul qiluvchi"-->
+<!--                @change="clearError('receiverName')"-->
+<!--            />-->
+<!--            <p v-if="errors.receiverName" class="text-red-500 text-sm">-->
+<!--              {{errors.receiverName}}-->
+<!--            </p>-->
+<!--          </div>-->
           <div class="flex flex-col w-full">
             <AppSelect
                 :model-value="itemForm.employees"
@@ -580,6 +580,7 @@ import CDialog from "@/components/CDialog.vue";
 import AppInput from "@/components/ui/AppInput.vue";
 import AppSelect from "@/components/ui/AppSelect.vue";
 import {useStore} from "@/stores/store";
+import { authService } from "@/service/authService";
 import {Order, OrderCreateDto} from "@/typeModules/useModules";
 import { useToast } from "vue-toastification";
 import DeleteConfirm from "@/components/DeleteConfirm.vue";
@@ -595,6 +596,7 @@ const router = useRouter();
 const route = useRoute();
 const Toast = useToast();
 const dataStore = useStore();
+const authStore = authService();
 
 const allUsers: ComputedRef = computed(() => dataStore.state.user.items);
 const vignetteCategory: ComputedRef = computed(() => dataStore.state.vignetteCategory)
@@ -947,6 +949,17 @@ const totalPages = computed(() => dataStore.state.paging.VIGNETTE.totalPages)
 const pageSize = computed(() => dataStore.state.paging.VIGNETTE.pageSize)
 const rowNumber = (index: number) => currentPage.value * pageSize.value + index + 1
 
+const searchName = computed(() => {
+  const roles = authStore.state.roles || [];
+  if (roles.includes("ROLE_ADMIN")) {
+    return "ADMIN";
+  }
+  if (roles.includes("ROLE_MANAGER")) {
+    return "MENEGER";
+  }
+  return "";
+})
+
 const orderFilters = computed(() => ({
   status: formStatus.value || undefined,
   acceptedDate: formData.value || undefined,
@@ -1070,7 +1083,7 @@ const validateForm = () => {
   if (!f.categoryId) errors.value.categoryId = "Kategoriya tanlanishi shart"
   if (!f.amount) errors.value.amount = "Buyurtma soni kiritilmadi"
   if (!f.pageCount) errors.value.pageCount = "Betlar soni kiritilmadi"
-  if (!f.receiverName) errors.value.receiverName = "Qabul qiluvchi tanlanmadi"
+  // if (!f.receiverName) errors.value.receiverName = "Qabul qiluvchi tanlanmadi"
   if (!f.status) errors.value.status = "Status tanlanmadi"
   if (!f.acceptedDate) errors.value.acceptedDate = "Sana kiritilmadi"
   if (!f.deadline) errors.value.deadline = "Muddat kiritilmadi"
@@ -1088,6 +1101,10 @@ const submitForm = async () => {
   }
 
   try {
+
+    if (searchName) {
+      itemForm.value.receiverName = searchName.value || 'ADMIN'
+    }
 
     const payload: OrderCreateDto = {
       ...itemForm.value,

@@ -110,9 +110,9 @@
             :show="isExit"
             custom-class="w-full max-w-sm"
             @close="isExit = false"
-            body-class="!bg-pb-surface rounded-xl border border-pb-border p-4 text-center shadow-lg"
+            body-class="!bg-pb-surface rounded-xl p-4 text-center shadow-lg"
         >
-          <div class="flex flex-col gap-3">
+          <div class="flex flex-col gap-3 mb-4">
             <h2 class="text-base font-semibold text-pb-text">Chiqishni tasdiqlaysizmi?</h2>
             <div class="flex flex-col-reverse gap-2 sm:flex-row sm:justify-center">
               <CButton
@@ -209,8 +209,14 @@ const searchName = computed(() => {
 const mainRoutes = computed((): HeaderMenuRoute[] => {
   const routes = props.routes;
 
-  if (isAdmin.value || isManager.value) {
+  if (isAdmin.value) {
     return routes;
+  }
+
+  const HIDDEN_FOR_MANAGER = ["/users"];
+
+  if (isManager.value) {
+    return routes.filter(r => !HIDDEN_FOR_MANAGER.includes(r.path));
   }
 
   if (isOperator.value) {
