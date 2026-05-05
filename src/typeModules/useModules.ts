@@ -314,7 +314,6 @@ export interface EmployeeMonthlyOrderSummary {
     orderKind?: OrderKind;
     category: string;
     itemType: string;
-    kind: OrderKind;
     status: OrderStatus | string;
     acceptedDate: string;
     lastLoggedAt: string;
