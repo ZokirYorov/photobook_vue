@@ -280,7 +280,7 @@
               <div>
                 <p class="text-base font-bold tabular-nums text-pb-text leading-tight">
                   {{ group.totalOrderCount }}
-                  <span class="text-sm font-medium text-pb-muted">ta order</span>
+                  <span class="text-sm font-medium text-pb-muted">ta buyurtma</span>
                 </p>
                 <p class="text-[12px] font-semibold text-pb-accent">{{ group.totalProcessed }} dona</p>
               </div>
