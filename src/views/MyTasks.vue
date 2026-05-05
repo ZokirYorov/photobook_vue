@@ -193,6 +193,41 @@
           </div>
         </div>
       </div>
+
+      <!-- Kategoriya bo'yicha bajarilgan -->
+      <div class="border-b border-pb-border py-3">
+        <p class="mb-2 text-[11px] font-semibold uppercase tracking-wide text-pb-muted">
+          Kategoriya bo'yicha bajarilgan
+        </p>
+        <div v-if="categoryStatsLoading" class="text-sm text-pb-muted">
+          <i class="fa-solid fa-spinner fa-spin mr-1"></i> Yuklanmoqda...
+        </div>
+        <div v-else-if="categoryStats.length === 0" class="text-sm text-pb-muted">
+          Bajarilgan vazifalar mavjud emas
+        </div>
+        <div v-else class="flex flex-wrap gap-2">
+          <div
+            v-for="stat in categoryStats"
+            :key="stat.categoryId"
+            class="flex min-w-[160px] items-center gap-3 rounded-xl border border-pb-border bg-pb-surface px-3 py-3"
+          >
+            <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-blue-50 text-blue-500">
+              <i class="fa-solid fa-tag text-sm"></i>
+            </div>
+            <div class="min-w-0">
+              <span class="block truncate text-[11px] font-semibold uppercase tracking-wide text-pb-muted">
+                {{ stat.categoryName }}
+              </span>
+              <p class="text-xl font-bold tabular-nums text-pb-text leading-tight">
+                {{ stat.orderCount }}
+                <span class="text-sm font-medium text-pb-muted">ta order</span>
+              </p>
+              <p class="text-[11px] text-pb-muted">{{ stat.totalProcessed }} dona</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div
           class="grid shrink-0 grid-cols-1 items-end gap-4 border-b border-pb-border py-3 text-sm sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-5"
       >
@@ -378,7 +413,7 @@
 import { useStore } from "@/stores/store";
 import CButton from "@/components/CButton.vue";
 import {computed, nextTick, onMounted, ref, watch} from "vue";
-import {OrderStatus, UserTask, WorkStatus} from "@/typeModules/useModules";
+import {CategoryStats, OrderStatus, UserTask, WorkStatus} from "@/typeModules/useModules";
 import axiosInstance from "@/axios";
 import CDialog from "@/components/CDialog.vue";
 import { useToast } from "vue-toastification";
@@ -404,6 +439,9 @@ const isLoading = ref(false);
 const myMonthlyStats = ref<number>(0);
 const myLastMonthlyStats = ref<number>(0);
 const statsLoading = ref(false);
+
+const categoryStats = ref<CategoryStats[]>([]);
+const categoryStatsLoading = ref(false);
 
 const now = new Date();
 const uzMonths = ["Yanvar","Fevral","Mart","Aprel","May","Iyun","Iyul","Avgust","Sentabr","Oktabr","Noyabr","Dekabr"];
@@ -470,6 +508,18 @@ const loadMyMonthlyStats = async () => {
 };
 
 watch([selectedYear, selectedMonth], loadMyMonthlyStats);
+
+const loadCategoryStats = async () => {
+  categoryStatsLoading.value = true;
+  try {
+    const res = await axiosInstance.get<CategoryStats[]>('/api/v1/user-tasks/me/stats/by-category');
+    categoryStats.value = res.data;
+  } catch {
+    categoryStats.value = [];
+  } finally {
+    categoryStatsLoading.value = false;
+  }
+};
 
 const taskProgressBaseline = ref("");
 
@@ -712,6 +762,7 @@ onMounted(async () => {
     await nextTick();
     await openTaskFromRouteQuery();
     await loadMyMonthlyStats();
+    loadCategoryStats();
   } catch {
   } finally {
     isLoading.value = false;

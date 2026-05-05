@@ -251,6 +251,13 @@ export interface UserTask {
     orderNotes?: string | null;
 }
 
+export interface CategoryStats {
+    categoryId: string;
+    categoryName: string;
+    orderCount: number;
+    totalProcessed: number;
+}
+
 export interface Role {
     id: string;
     createdAt: string;
