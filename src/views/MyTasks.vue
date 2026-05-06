@@ -169,17 +169,16 @@
             </div>
             <div class="min-w-0 flex-1">
               <span class="text-[11px] font-semibold uppercase tracking-wide text-pb-muted">Oldingi oydan</span>
-              <template v-if="prevMonthUnfinishedLoading">
+              <template v-if="prevMonthUnfinishedLoading || statsLoading">
                 <div class="mt-1 h-6 w-16 animate-pulse rounded bg-pb-border"></div>
                 <div class="mt-1 h-3 w-24 animate-pulse rounded bg-pb-border"></div>
               </template>
               <template v-else>
-                <p class="text-xl font-bold tabular-nums leading-tight"
-                  :class="prevMonthUnfinishedCount > 0 ? 'text-orange-600' : 'text-pb-text'">
-                  {{ prevMonthUnfinishedCount }}<span class="text-sm font-medium text-pb-muted"> ta</span>
+                <p class="text-xl font-bold tabular-nums leading-tight text-pb-text">
+                  {{ myLastMonthlyStats }}<span class="text-sm font-medium text-pb-muted"> dona</span>
                 </p>
                 <p class="text-[11px] text-pb-muted mt-0.5">
-                  {{ prevMonthUnfinishedCount > 0 ? 'tugallanmagan' : 'hammasi bajarilgan' }}
+                  {{ prevMonthUnfinishedCount > 0 ? `${prevMonthUnfinishedCount} ta tugallanmagan` : 'hammasi bajarilgan' }}
                 </p>
               </template>
             </div>
