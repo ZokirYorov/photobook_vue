@@ -54,6 +54,7 @@
               @click="isNotificationsOpen = false"
           ></div>
           <NotificationPanel
+              @close="closeNotifications"
               v-if="isNotificationsOpen"
               :notifications="notifications"
               :paging="notificationsPaging"
@@ -177,6 +178,10 @@ const props = withDefaults(
     isMenuOpen: false,
   },
 );
+
+const closeNotifications = () => {
+  isNotificationsOpen.value = false;
+}
 
 const isExit = ref(false);
 
