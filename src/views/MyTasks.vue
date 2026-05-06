@@ -96,7 +96,6 @@
           />
         </div>
       </div>
-
       <div class="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 items-center justify-between gap-2 py-4">
         <div class="flex shrink-0 items-center gap-2">
           <CButton
@@ -133,9 +132,7 @@
         </div>
       </div>
       <div class="flex flex-col gap-2">
-
         <div class="grid grid-cols-2 gap-2 sm:grid-cols-4">
-          <!-- Natija -->
           <div class="col-span-2 sm:col-span-1 flex items-center gap-3 rounded-xl border border-pb-accent/20 bg-pb-accent/5 px-3 py-3">
             <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-pb-accent/10 text-pb-accent">
               <i class="fa-solid fa-chart-simple text-sm"></i>
@@ -157,8 +154,6 @@
               </template>
             </div>
           </div>
-
-          <!-- Oldingi oydan qolgan -->
           <div class="flex items-center gap-3 rounded-xl border px-3 py-3"
             :class="prevMonthUnfinishedCount > 0 ? 'border-orange-200 bg-orange-50' : 'border-pb-border bg-pb-surface'"
           >
@@ -183,8 +178,6 @@
               </template>
             </div>
           </div>
-
-          <!-- Muddati o'tgan -->
           <div class="flex items-center gap-3 rounded-xl border px-3 py-3"
             :class="overdueTasksCount > 0 ? 'border-red-200 bg-red-50' : 'border-pb-border bg-pb-surface'"
           >
@@ -207,8 +200,6 @@
               </template>
             </div>
           </div>
-
-          <!-- Faol vazifalar -->
           <div class="flex items-center gap-3 rounded-xl border border-pb-border bg-pb-surface px-3 py-3">
             <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-emerald-50 text-emerald-600">
               <i class="fa-solid fa-list-check text-sm"></i>
@@ -227,8 +218,6 @@
           </div>
         </div>
       </div>
-
-      <!-- Kategoriya bo'yicha bajarilgan -->
       <div class="border-b border-pb-border py-3">
         <p class="mb-2 text-[11px] font-semibold uppercase tracking-wide text-pb-muted">
           Kategoriya bo'yicha bajarilgan
@@ -260,26 +249,24 @@
             :key="`${group.categoryId}-${group.kind}`"
             class="min-w-[160px] rounded-xl border border-pb-border bg-pb-surface px-3 py-3 flex flex-col gap-3"
           >
-            <!-- Top: icon + name + kind -->
             <div class="flex items-start gap-2">
               <div class="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-500 mt-0.5">
                 <i class="fa-solid fa-tag text-xs"></i>
               </div>
-              <div class="min-w-0">
-                <span class="block truncate text-[11px] font-bold uppercase tracking-wide text-pb-text">
+              <div class="flex flex-col">
+                <span class="truncate text-[11px] font-bold uppercase tracking-wide text-pb-text">
                   {{ group.categoryName }}
                 </span>
-                <span class="text-[11px] text-pb-muted">
+                <span class="text-[11px] font-semibold text-pb-muted">
                   {{ group.kind === 'ALBUM' ? 'Albom' : group.kind === 'VIGNETTE' ? 'Vinetka' : 'Rasmli albom' }}
                 </span>
               </div>
             </div>
-            <!-- Bottom: order count left, page count right -->
             <div class="flex items-end justify-between gap-2">
               <div>
                 <p class="text-base font-bold tabular-nums text-pb-text leading-tight">
                   {{ group.totalOrderCount }}
-                  <span class="text-sm font-medium text-pb-muted">ta order</span>
+                  <span class="text-sm font-medium text-pb-muted">ta buyurtma</span>
                 </p>
                 <p class="text-[12px] font-semibold text-pb-accent">{{ group.totalProcessed }} dona</p>
               </div>
@@ -304,6 +291,7 @@
         />
         <AppInput
             v-model="formFilter"
+            type="search"
             label="Qidirish"
             placeholder="Qidirish ..."
         />
@@ -331,7 +319,7 @@
           <colgroup>
             <col style="width: 3%">
             <col style="width: 15%">
-            <col style="width: 13%">
+            <col style="width: 8%">
             <col style="width: 12%">
             <col style="width: 12%">
             <col style="width: 12%">

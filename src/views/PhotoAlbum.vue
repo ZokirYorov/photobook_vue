@@ -37,21 +37,21 @@
         <div class="grid grid-cols-3 divide-x divide-pb-border">
           <div class="flex flex-col gap-1 px-1.5 text-center sm:px-3">
             <span class="text-xs font-medium text-pb-muted sm:text-sm">Jami</span>
-            <div class="flex flex-wrap items-baseline justify-center gap-1">
+            <div class="flex flex-col items-center justify-center">
               <span class="text-md font-bold tabular-nums text-pb-accent sm:text-lg">{{ cat.total }}</span>
               <span class="text-xs text-pb-muted sm:text-sm">dona</span>
             </div>
           </div>
           <div class="flex flex-col gap-1 px-1.5 text-center sm:px-3">
             <span class="text-xs font-medium text-pb-muted sm:text-sm">Bajarilgan</span>
-            <div class="flex flex-wrap items-baseline justify-center gap-1">
+            <div class="flex flex-col items-center justify-center">
               <span class="text-md font-bold tabular-nums text-pb-accent sm:text-lg">{{ cat.processed }}</span>
               <span class="text-xs text-pb-muted sm:text-sm">dona</span>
             </div>
           </div>
           <div class="flex flex-col gap-1 px-1.5 text-center sm:px-3">
             <span class="text-xs font-medium text-pb-muted sm:text-sm">Qoldi</span>
-            <div class="flex flex-wrap items-baseline justify-center gap-1">
+            <div class="flex flex-col items-center justify-center">
               <span class="text-md font-bold tabular-nums text-pb-accent sm:text-lg">{{ cat.remaining }}</span>
               <span class="text-xs text-pb-muted sm:text-sm">dona</span>
             </div>
@@ -135,7 +135,7 @@
             <div class="flex flex-col w-full">
               <AppInput
                   type="text"
-                  placeholder="Nomini kiriting"
+                  placeholder="Masalan: Litsey"
                   label="Nomi"
                   class="w-full"
                   v-model="itemForm.orderName"
@@ -146,7 +146,7 @@
             <div class="flex flex-col w-full">
               <AppInput
                   type="text"
-                  placeholder="Turini kiriting"
+                  placeholder="Masalan: Qora koja"
                   label="Turi"
                   class="w-full"
                   v-model="itemForm.itemType"
@@ -350,10 +350,10 @@
           class="w-full rounded text-sm">
         <colgroup>
           <col style="width: 2%">
+          <col style="width: 15%">
+          <col style="width: 8%">
+          <col style="width: 12%">
           <col style="width: 13%">
-          <col style="width: 12%">
-          <col style="width: 12%">
-          <col style="width: 12%">
           <col style="width: 13%">
           <col style="width: 13%">
           <col style="width: 10%">
@@ -373,7 +373,7 @@
           <th class="p-2 px-3 text-start">Sana</th>
           <th class="p-2 text-start">Muddat</th>
           <th class="p-2 text-start">Holat</th>
-          <th class="p-2 text-end">Amallar</th>
+          <th class="p-2 text-start">Amallar</th>
         </tr>
         </thead>
         <tbody v-if="isLoading">
@@ -415,14 +415,22 @@
             <p class="text-sm font-semibold text-pb-muted">{{album.categoryName}}</p>
             <p class="text-sm font-semibold text-pb-accent">{{album.itemType}}</p>
           </td>
-          <td class="p-3 items-center justify-center flex">
-            <img
-                v-if="album.imageUrl"
+          <td class="p-2">
+            <div
                 @click="openPreview(album.imageUrl)"
-                class="w-14 h-10 sm:h-10 lg:h-12 cursor-pointer rounded-xl"
-                loading="lazy"
-                :src="getAvatarUrl(album.imageUrl)" alt=""
-            />
+                class="relative group cursor-pointer w-14 h-10 sm:h-10 lg:h-12">
+              <img
+                  v-if="album.imageUrl"
+                  class="w-full h-full rounded-xl"
+                  loading="lazy"
+                  :src="getAvatarUrl(album.imageUrl)"
+                  alt=""
+              />
+
+              <i v-if="album.imageUrl"
+                 class="fa-solid fa-eye absolute inset-4 flex opacity-0 group-hover:opacity-100 transition duration-300 text-white text-md bg-black/40 rounded-xl"
+              ></i>
+            </div>
           </td>
           <td class="p-2">{{ album.customerName }}</td>
           <td class="p-2">{{ album.receiverName }}</td>
@@ -430,7 +438,7 @@
             <div
                 v-for="emp in album.employees"
                 :key="emp.employeeId"
-                class="border-b border-pb-border py-1"
+                class="border-b border-pb-border"
             >
               <div class="flex text-sm gap-1 items-center justify-between">
                 <i

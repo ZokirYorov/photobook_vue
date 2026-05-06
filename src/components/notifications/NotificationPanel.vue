@@ -77,6 +77,7 @@
           </select>
         </div>
       </div>
+      <i @click="$emit('close')" class="fa-solid fa-close px-2 py-1.5 text-gray-600 bg-gray-200 cursor-pointer hover:bg-gray-100 rounded-full"></i>
     </div>
     <div
         v-if="notifications.length"
@@ -168,6 +169,7 @@ const emit = defineEmits<{
   "toggle-sound": [];
   "notification-click": [item: NotificationItemType];
   "load-more": [];
+  "close": []
 }>();
 
 const onSearchInput = (event: Event) => {
