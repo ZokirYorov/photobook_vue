@@ -338,6 +338,7 @@ export interface EmployeeMonthlyOrderSummary {
     itemType: string;
     status: OrderStatus | string;
     acceptedDate: string;
+    pageCount?: number;
     lastLoggedAt: string;
     totalDelta: number;
 }

@@ -33,6 +33,7 @@
             <th class="px-3 py-3 text-start">Buyurtma</th>
             <th class="px-3 py-3 text-center">Kategoriya</th>
             <th class="px-3 py-3 text-center">Sana</th>
+            <th class="px-3 py-3 text-center">Betlar</th>
             <th class="px-3 py-3 text-center">Miqdori</th>
             <th class="px-3 py-3 text-center">Holati</th>
           </tr>
@@ -59,6 +60,9 @@
             <td class="px-3 py-2.5 text-center text-pb-muted tabular-nums">
               {{ formatDate(order.lastLoggedAt) }}
             </td>
+            <td class="px-3 py-2.5 text-center tabular-nums text-pb-muted">
+              {{ order.pageCount ?? '—' }}
+            </td>
             <td class="px-3 py-2.5 text-center">
               <span class="font-bold tabular-nums text-pb-accent">{{ formatDelta(order.totalDelta) }}</span>
             </td>
@@ -74,7 +78,7 @@
           </tbody>
           <tfoot class="sticky bottom-0 border-t-2 border-pb-border bg-pb-elevated">
           <tr>
-            <td colspan="4" class="px-3 py-2.5 text-sm font-semibold text-pb-text">
+            <td colspan="5" class="px-3 py-2.5 text-sm font-semibold text-pb-text">
               Jami: <span class="text-gray-500">{{ orders.length }} ta buyurtma</span>
             </td>
             <td class="px-3 py-2.5 text-center font-bold text-pb-accent tabular-nums">
