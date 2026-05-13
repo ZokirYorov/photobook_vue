@@ -167,7 +167,7 @@
                v-model="itemForm.status"
                :options="itemStatus"
                disabledValue="Xolatni tanlang"
-               label="Status"
+               label="Holat"
                text-field="text"
                value-field="value"
            />
@@ -414,8 +414,8 @@
           <td class="p-2 ">{{ rowNumber(index) }}</td>
           <td class="py-1 px-2 break-all">
             <p class="font-semibold">{{ album.orderName }}</p>
-            <p class="text-sm font-semibold text-pb-muted">{{album.categoryName}}</p>
-            <p class="text-sm font-semibold text-pb-accent">{{album.itemType}}</p>
+            <p class="text-sm font-semibold text-pb-accent">{{album.categoryName}}</p>
+            <p class="text-sm font-semibold text-pb-muted">{{album.itemType}}</p>
           </td>
           <td class="p-2">
             <div
@@ -476,7 +476,7 @@
                   }"
                 ></span>
             </div>
-            <div class="mt-1 flex items-center justify-between px-1 text-sm text-pb-muted">
+            <div class="mt-1 flex items-center justify-between text-sm text-pb-muted">
               <span>{{ getProcessedCount(album) || 0 }} / {{ album.amount }}</span>
               <span>{{album.pageCount || 0}}-Bet</span>
             </div>

@@ -211,7 +211,7 @@
               v-model="itemForm.status"
               :options="itemStatus"
               disabledValue="Xolatni tanlang"
-              label="Status"
+              label="Holat"
               text-field="text"
               value-field="value"
           />
@@ -422,7 +422,7 @@
           <td class="p-1">{{ rowNumber(index) }}</td>
           <td class="p-2 break-all">
             <p class="break-all font-semibold">{{ order.orderName }}</p>
-            <p class="text-sm font-semibold text-pb-muted">{{order.categoryName}}</p>
+            <p class="text-sm font-semibold text-pb-accent">{{order.categoryName}}</p>
           </td>
           <td class="p-2">
             <div

@@ -381,8 +381,8 @@
             <td class="px-3 py-2">{{index + 1}}</td>
             <td class="p-2 break-all">
               <p class="font-semibold">{{ task.orderName }}</p>
-              <p class="text-sm font-semibold text-pb-muted">{{task.categoryName}}</p>
-              <p class="text-sm font-semibold text-pb-accent">{{task.itemType}}</p>
+              <p class="text-sm font-semibold text-pb-accent">{{task.categoryName}}</p>
+              <p class="text-sm font-semibold text-pb-muted">{{task.itemType}}</p>
             </td>
             <td class="p-2">
               <img

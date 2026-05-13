@@ -9,7 +9,7 @@
     <div class="flex items-center w-full gap-2 justify-around">
       <div
           v-if="imageSrc"
-          class="relative w-full overflow-hidden rounded-lg border border-pb-border bg-pb-app/40"
+          class="relative w-full min-h-10 overflow-hidden rounded-lg border border-pb-border bg-pb-app/40"
       >
         <div class="flex max-h-[112px] p-1.5 items-center justify-center">
           <img

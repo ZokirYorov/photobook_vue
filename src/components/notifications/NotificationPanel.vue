@@ -295,6 +295,7 @@ watch(
   min-height: 36px;
   border: 1px solid var(--color-pb-border);
   border-radius: 8px;
+  cursor: pointer;
   background: var(--color-pb-surface);
   color: var(--color-pb-header);
   font-size: 13px;

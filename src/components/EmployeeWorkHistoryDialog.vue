@@ -49,13 +49,13 @@
               <p class="font-medium text-pb-text leading-snug">{{ order.orderName }}</p>
               <span
                   v-if="order.category"
-                  class="rounded font-semibold uppercase tracking-wide"
+                  class="rounded font-semibold tracking-wide"
                   :class="order.category ? 'font-mono text-blue-600' : ''"
               >{{ order.category }}</span>
               <p v-if="order.itemType" class="text-xs text-pb-accent">{{ order.itemType }}</p>
             </td>
-            <td class="px-3 py-2.5 text-center text-blue-600">
-              {{order.kind}}
+            <td v-if="order.kind" class="px-3 py-2.5 text-center text-blue-600">
+              {{ statusOrder[order.kind] }}
             </td>
             <td class="px-3 py-2.5 text-center text-pb-muted tabular-nums">
               {{ formatDate(order.lastLoggedAt) }}
@@ -153,14 +153,11 @@ const resolveStatusLabel = (status: string): string => {
   }
 };
 
-const resolveCategoryBadge = (category: string): string => {
-  const key = category.toLowerCase();
-  if (key.includes("albom") || key.includes("album")) return "bg-violet-100 text-violet-700";
-  if (key.includes("vinetka")) return "bg-amber-100 text-amber-700";
-  if (key.includes("maktab")) return "bg-sky-100 text-sky-700";
-  if (key.includes("nikoh")) return "bg-pink-100 text-pink-700";
-  return "bg-pb-elevated text-pb-label";
-};
+const statusOrder: Record<string, string> = {
+  ALBUM: "ALBOM",
+  VIGNETTE: "VINETKA",
+  PICTURE: "RASMLI ALBOM",
+}
 
 const resolveStatusBadge = (status: string): string => {
   switch (status) {
