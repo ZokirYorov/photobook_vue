@@ -117,7 +117,7 @@ export const useStore = defineStore('item', () => {
         tasks: {
             content: [] as UserTask[],
             pageNumber: 0,
-            pageSize: 100,
+            pageSize: 10,
             totalElements: 0,
             totalPages: 0,
             last: true,
@@ -592,8 +592,13 @@ export const useStore = defineStore('item', () => {
 
     let lastTaskFilters: Partial<IPaging> = {};
 
-    const loadGetUserTasks = async (filters: Partial<IPaging> = {} ) => {
+    const loadGetUserTasks = async (filters: Partial<IPaging> = {}, append = false ) => {
+
         lastTaskFilters = filters;
+        const currentPage = append
+            ? state.value.tasks.pageNumber + 1
+            : (filters.page ?? 0)
+
         const res = await axiosInstance.post("/api/v1/user-tasks/me/paging",
             {
                 search: filters.search || '',
@@ -605,14 +610,20 @@ export const useStore = defineStore('item', () => {
             },
             {
                 params: {
-                    page: filters.page ?? 0,
-                    size: filters.size ?? 100,
+                    page: currentPage,
+                    size: filters.size ?? 10,
                     sort: filters.sort || [],
                 },
             }
             );
         state.value.tasks = {
-            content: res.data.content || [],
+            content: append
+            ? [
+                    ...state.value.tasks.content,
+                    ...(res.data.content || []),
+                ]
+            : (res.data.content || []),
+
             pageNumber: res.data.pageNumber,
             pageSize: res.data.pageSize,
             totalElements: res.data.totalElements,

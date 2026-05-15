@@ -243,7 +243,7 @@
         <div v-else-if="categoryGroups.length === 0" class="text-sm text-pb-muted">
           Bajarilgan vazifalar mavjud emas
         </div>
-        <div v-else class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-2">
+        <div v-else class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-2">
           <div
             v-for="group in categoryGroups"
             :key="`${group.categoryId}-${group.kind}`"
@@ -315,7 +315,9 @@
             faClass="fa-solid fa-filter-circle-xmark"
         />
       </div>
-      <div class="max-h-[min(70vh,calc(100dvh-17rem))] overflow-x-auto overflow-y-auto rounded-md border border-pb-border/60">
+      <div
+          ref="tableContainer"
+          class="max-h-[min(70vh,calc(100dvh-17rem))] overflow-x-auto overflow-y-auto rounded-md border border-pb-border/60">
         <table class="w-full table-auto text-sm">
           <colgroup>
             <col style="width: 3%">
@@ -458,7 +460,7 @@
 <script setup lang="ts">
 import { useStore } from "@/stores/store";
 import CButton from "@/components/CButton.vue";
-import {computed, nextTick, onMounted, ref, watch} from "vue";
+import {computed, nextTick, onMounted, ref, watch, onBeforeUnmount} from "vue";
 import {CategoryGroup, CategoryMonthlyStats, OrderStatus, UserTask, WorkStatus} from "@/typeModules/useModules";
 import axiosInstance from "@/axios";
 import CDialog from "@/components/CDialog.vue";
@@ -481,16 +483,15 @@ const formStatus = ref<OrderStatus | null>(null);
 const formData = ref<string | null | undefined>(null);
 const endData = ref<string | null | undefined>(null);
 const isLoading = ref(false);
-
 const myMonthlyStats = ref<number>(0);
 const myLastMonthlyStats = ref<number>(0);
 const statsLoading = ref(false);
-
 const prevMonthUnfinishedCount = ref<number>(0);
 const prevMonthUnfinishedLoading = ref(false);
-
 const categoryStats = ref<CategoryMonthlyStats[]>([]);
 const categoryStatsLoading = ref(false);
+const tableContainer = ref<HTMLElement | null>(null);
+const loadingMore = ref(false);
 
 const categoryGroups = computed<CategoryGroup[]>(() => {
   const map = new Map<string, CategoryGroup>();
@@ -619,8 +620,8 @@ const loadPrevMonthUnfinished = async () => {
 };
 
 const currentFilters = () => ({
-  search: formFilter.value || '',
-  statuses: formStatus.value ? [formStatus.value] : [],
+  search: formFilter.value.trim() || undefined,
+  statuses: formStatus.value ? [formStatus.value] : undefined,
   acceptedDateFrom: monthAcceptedDateFrom.value,
   acceptedDateTo: monthAcceptedDateTo.value,
   deadlineFrom: formData.value || undefined,
@@ -762,7 +763,6 @@ const form = ref({
   workStatus: "STARTED" as WorkStatus,
 });
 
-
 const filteredOrders = computed(() => {
 
   let data = [...(dataStore.state.tasks.content || [])]
@@ -850,6 +850,34 @@ const completedTask = async () => {
   }
 };
 
+const loadMoreTasks = async () => {
+  if (loadingMore.value) return;
+  if (dataStore.state.tasks.last) return;
+  loadingMore.value = true;
+
+  try {
+    await dataStore.loadGetUserTasks(
+        currentFilters(),
+        true
+    );
+  } finally {
+    loadingMore.value = false;
+  }
+};
+
+const handleScroll = async () => {
+  const el = tableContainer.value;
+
+  if (!el) return;
+
+  const bottom =
+      el.scrollTop + el.clientHeight >= el.scrollHeight - 100;
+
+  if (bottom) {
+    await loadMoreTasks();
+  }
+};
+
 watch(
     [formStatus, formFilter, formData, endData],
     (_newVal, _oldVal, onCleanup) => {
@@ -864,7 +892,7 @@ watch(
             deadlineFrom: formData.value || undefined,
             deadlineTo: endData.value || undefined,
             page: 0,
-            size: 100
+            size: 10
           })
         }
         catch (error) {
@@ -909,11 +937,23 @@ onMounted(async () => {
       loadCategoryStats(),
       loadPrevMonthUnfinished(),
     ]);
+
+    if (tableContainer.value) {
+      tableContainer.value.addEventListener("scroll", handleScroll);
+    }
+
   } catch {
   } finally {
     isLoading.value = false;
   }
 });
+
+onBeforeUnmount(() => {
+  if (tableContainer.value) {
+    tableContainer.value.removeEventListener("scroll", handleScroll);
+  }
+});
+
 </script>
 
 <style scoped>
@@ -922,7 +962,6 @@ onMounted(async () => {
       linear-gradient(180deg, rgb(248 250 252 / 0.9) 0%, var(--color-pb-app) 36%, var(--color-pb-app) 100%),
       radial-gradient(ellipse 65% 40% at 50% -8%, rgb(37 99 235 / 0.07), transparent 52%);
 }
-
 .animate-fade-in {
   animation: fadeIn 0.4s ease-in-out;
 }
